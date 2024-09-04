@@ -1,7 +1,6 @@
 #ifndef ENGINE_SOURCES_TYPE_INFO_FILE_TYPE_INDEX_H
 #define ENGINE_SOURCES_TYPE_INFO_FILE_TYPE_INDEX_H
 
-
 namespace egg::TypeInfo
 {
     template <typename SizeType, typename = void>
