@@ -1,11 +1,11 @@
 #include "ECS/Containers/SparseSet/SparseSet.h"
 
 #include "Single.h"
+#include "Hash/HashString.h"
+#include "TypeInfo/TypeID.h"
 
 #include <gtest/gtest.h>
 
-#include "Hash/HashString.h"
-#include "TypeInfo/TypeHash.h"
 
 class SparseSetTest : public testing::Test
 {
@@ -322,21 +322,13 @@ TEST_F(SparseSetTest, Sort)
         }
     }
 
-    std::cout << '"' << egg::TypeInfo::GetTypeName<SparseSetType>() << '"' << '\n';
-    std::cout << egg::TypeInfo::TypeHash<>::Get<SparseSetType>() << '\t';
-    std::cout << std::hash<std::string_view> {}(egg::TypeInfo::GetTypeName<SparseSetType>()) << '\n';
+    union h
+    {
+    };
 
-    std::cout << '"' << egg::TypeInfo::GetTypeName<EntityType>() << '"' << '\n';
-    std::cout << egg::TypeInfo::TypeHash<>::Get<EntityType>() << '\t';
-    std::cout << std::hash<std::string_view> {}(egg::TypeInfo::GetTypeName<EntityType>()) << '\n';
-
-    std::cout << '"' << egg::TypeInfo::GetTypeName<int>() << '"' << '\n';
-    std::cout << egg::TypeInfo::TypeHash<>::Get<int>() << '\t';
-    std::cout << std::hash<std::string_view> {}(egg::TypeInfo::GetTypeName<int>()) << '\n';
-
-    std::cout << '"' << egg::TypeInfo::GetTypeName<double>() << '"' << '\n';
-    std::cout << egg::TypeInfo::TypeHash<>::Get<double>() << '\t';
-    std::cout << std::hash<std::string_view> {}(egg::TypeInfo::GetTypeName<double>()) << '\n';
+    enum hh
+    {
+    };
 }
 
 TEST_F(SparseSetTest, Subscript)

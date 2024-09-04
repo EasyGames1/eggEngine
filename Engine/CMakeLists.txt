@@ -46,12 +46,14 @@ add_library(VulkanEngine_lib
         Sources/Containers/IterableAdaptor.h
         Sources/Containers/PointerImitator.h
         Sources/Containers/Sorting.h
-        Sources/TypeInfo/TypeHash.h
         Sources/TypeInfo/TypeID.h
         Sources/TypeInfo/TypeIndex.h
-        Sources/TypeInfo/TypeInfo.h
         Sources/Hash/HashString.h
         Sources/Hash/Hash.h
+        Sources/TypeInfo/TypeName.h
+        Sources/TypeInfo/TypeID.h
+        Sources/TypeInfo/IDType.h
+        Sources/TypeInfo/FunctionName.h
 )
 
 find_package(Vulkan REQUIRED)

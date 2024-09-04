@@ -1,7 +1,7 @@
 #ifndef ENGINE_SOURCES_TYPE_INFO_FILE_TYPE_INDEX_H
 #define ENGINE_SOURCES_TYPE_INFO_FILE_TYPE_INDEX_H
 
-#include "TypeID.h"
+#include "IDType.h"
 
 namespace egg::TypeInfo
 {
@@ -10,14 +10,14 @@ namespace egg::TypeInfo
     {
     public:
         template <typename>
-        [[nodiscard]] static TypeID Get() noexcept
+        [[nodiscard]] constexpr static IDType Get() noexcept
         {
-            static const TypeID Index { Next() };
+            static const IDType Index { Next() };
             return Index;
         }
 
     private:
-        [[nodiscard]] static TypeID Next() noexcept
+        [[nodiscard]] constexpr static IDType Next() noexcept
         {
             static std::size_t Counter {};
             return Counter++;
