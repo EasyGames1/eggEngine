@@ -1,4 +1,4 @@
-#include "Single.h"
+#include "./Single.h"
 
 std::size_t Random::Get(const std::size_t Min, const std::size_t Max)
 {

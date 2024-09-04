@@ -1,8 +1,8 @@
 #ifndef ENGINE_SOURCES_ECS_TRAITS_FILE_ENTITY_TRAITS_H
 #define ENGINE_SOURCES_ECS_TRAITS_FILE_ENTITY_TRAITS_H
 
-#include "BasicEntityTraits.h"
-#include "PageSizeTraits.h"
+#include "./BasicEntityTraits.h"
+#include "./PageSizeTraits.h"
 
 #include <bit>
 

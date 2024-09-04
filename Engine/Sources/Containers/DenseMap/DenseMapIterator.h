@@ -1,7 +1,7 @@
 #ifndef ENGINE_SOURCES_CONTAINERS_DENSE_MAP_FILE_DENSE_MAP_ITERATOR_H
 #define ENGINE_SOURCES_CONTAINERS_DENSE_MAP_FILE_DENSE_MAP_ITERATOR_H
 
-#include "Containers/PointerImitator.h"
+#include "../PointerImitator.h"
 
 #include <iterator>
 #include <utility>

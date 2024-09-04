@@ -1,7 +1,7 @@
 #ifndef ENGINE_SOURCES_TYPE_INFO_FILE_TYPE_NAME_H
 #define ENGINE_SOURCES_TYPE_INFO_FILE_TYPE_NAME_H
 
-#include "FunctionName.h"
+#include "./Internal/FunctionName.h"
 
 #include <source_location>
 #include <string_view>

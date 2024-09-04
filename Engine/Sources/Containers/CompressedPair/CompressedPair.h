@@ -1,7 +1,7 @@
 #ifndef ENGINE_SOURCES_CONTAINERS_COMPRESSED_PAIR_FILE_COMPRESSED_PAIR_H
 #define ENGINE_SOURCES_CONTAINERS_COMPRESSED_PAIR_FILE_COMPRESSED_PAIR_H
 
-#include "CompressedPairElement.h"
+#include "./CompressedPairElement.h"
 
 namespace egg::Containers
 {

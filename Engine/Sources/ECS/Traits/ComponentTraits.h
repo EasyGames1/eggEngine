@@ -1,7 +1,7 @@
 #ifndef ENGINE_SOURCES_ECS_TRAITS_FILE_COMPONENT_TRAITS_H
 #define ENGINE_SOURCES_ECS_TRAITS_FILE_COMPONENT_TRAITS_H
 
-#include "PageSizeTraits.h"
+#include "./PageSizeTraits.h"
 
 #include <type_traits>
 

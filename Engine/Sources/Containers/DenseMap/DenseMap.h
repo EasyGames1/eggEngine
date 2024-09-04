@@ -1,8 +1,8 @@
 #ifndef ENGINE_SOURCES_CONTAINERS_DENSE_MAP_FILE_DENSE_MAP_H
 #define ENGINE_SOURCES_CONTAINERS_DENSE_MAP_FILE_DENSE_MAP_H
 
-#include "DenseMapIterator.h"
-#include "DenseMapLocalIterator.h"
+#include "./DenseMapIterator.h"
+#include "./DenseMapLocalIterator.h"
 #include "../../Containers/Container.h"
 #include "../../Containers/DenseMap/DenseMapNode.h"
 #include "../CompressedPair/CompressedPair.h"

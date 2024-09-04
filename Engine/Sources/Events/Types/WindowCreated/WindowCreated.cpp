@@ -1,4 +1,4 @@
-#include "WindowCreated.h"
+#include "./WindowCreated.h"
 
 namespace egg::Events
 {
