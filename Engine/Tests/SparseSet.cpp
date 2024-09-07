@@ -330,29 +330,29 @@ TEST_F(SparseSetTest, Sort)
     {
     };
 
-    std::cout << '"' << egg::TypeInfo::TypeInfo<std::uint64_t>::GetName<h>() << '"' << '\n';
-    std::cout << egg::TypeInfo::TypeInfo<std::uint64_t>::GetID<h>() << '\t';
-    std::cout << std::hash<std::string_view> {}(egg::TypeInfo::TypeInfo<std::uint64_t>::GetName<h>()) << '\n';
+    std::cout << '"' << egg::Types::TypeInfo<std::uint64_t>::GetName<h>() << '"' << '\n';
+    std::cout << egg::Types::TypeInfo<std::uint64_t>::GetID<h>() << '\t';
+    std::cout << std::hash<std::string_view> {}(egg::Types::TypeInfo<std::uint64_t>::GetName<h>()) << '\n';
 
-    std::cout << '"' << egg::TypeInfo::TypeInfo<std::uint64_t>::GetName<hh>() << '"' << '\n';
-    std::cout << egg::TypeInfo::TypeInfo<std::uint64_t>::GetID<hh>() << '\t';
-    std::cout << std::hash<std::string_view> {}(egg::TypeInfo::TypeInfo<std::uint64_t>::GetName<hh>()) << '\n';
+    std::cout << '"' << egg::Types::TypeInfo<std::uint64_t>::GetName<hh>() << '"' << '\n';
+    std::cout << egg::Types::TypeInfo<std::uint64_t>::GetID<hh>() << '\t';
+    std::cout << std::hash<std::string_view> {}(egg::Types::TypeInfo<std::uint64_t>::GetName<hh>()) << '\n';
 
-    std::cout << '"' << egg::TypeInfo::TypeInfo<std::uint64_t>::GetName<SparseSetType>() << '"' << '\n';
-    std::cout << egg::TypeInfo::TypeInfo<std::uint64_t>::GetID<SparseSetType>() << '\t';
-    std::cout << std::hash<std::string_view> {}(egg::TypeInfo::TypeInfo<std::uint64_t>::GetName<SparseSetType>()) << '\n';
+    std::cout << '"' << egg::Types::TypeInfo<std::uint64_t>::GetName<SparseSetType>() << '"' << '\n';
+    std::cout << egg::Types::TypeInfo<std::uint64_t>::GetID<SparseSetType>() << '\t';
+    std::cout << std::hash<std::string_view> {}(egg::Types::TypeInfo<std::uint64_t>::GetName<SparseSetType>()) << '\n';
 
-    std::cout << '"' << egg::TypeInfo::TypeInfo<std::uint64_t>::GetName<EntityType>() << '"' << '\n';
-    std::cout << egg::TypeInfo::TypeInfo<std::uint64_t>::GetID<EntityType>() << '\t';
-    std::cout << std::hash<std::string_view> {}(egg::TypeInfo::TypeInfo<std::uint64_t>::GetName<EntityType>()) << '\n';
+    std::cout << '"' << egg::Types::TypeInfo<std::uint64_t>::GetName<EntityType>() << '"' << '\n';
+    std::cout << egg::Types::TypeInfo<std::uint64_t>::GetID<EntityType>() << '\t';
+    std::cout << std::hash<std::string_view> {}(egg::Types::TypeInfo<std::uint64_t>::GetName<EntityType>()) << '\n';
 
-    std::cout << '"' << egg::TypeInfo::TypeInfo<std::uint64_t>::GetName<int>() << '"' << '\n';
-    std::cout << egg::TypeInfo::TypeInfo<std::uint64_t>::GetID<int>() << '\t';
-    std::cout << std::hash<std::string_view> {}(egg::TypeInfo::TypeInfo<std::uint64_t>::GetName<int>()) << '\n';
+    std::cout << '"' << egg::Types::TypeInfo<std::uint64_t>::GetName<int>() << '"' << '\n';
+    std::cout << egg::Types::TypeInfo<std::uint64_t>::GetID<int>() << '\t';
+    std::cout << std::hash<std::string_view> {}(egg::Types::TypeInfo<std::uint64_t>::GetName<int>()) << '\n';
 
-    std::cout << '"' << egg::TypeInfo::TypeInfo<std::uint64_t>::GetName<double>() << '"' << '\n';
-    std::cout << egg::TypeInfo::TypeInfo<std::uint64_t>::GetID<double>() << '\t';
-    std::cout << std::hash<std::string_view> {}(egg::TypeInfo::TypeInfo<std::uint64_t>::GetName<double>()) << '\n';
+    std::cout << '"' << egg::Types::TypeInfo<std::uint64_t>::GetName<double>() << '"' << '\n';
+    std::cout << egg::Types::TypeInfo<std::uint64_t>::GetID<double>() << '\t';
+    std::cout << std::hash<std::string_view> {}(egg::Types::TypeInfo<std::uint64_t>::GetName<double>()) << '\n';
 }
 
 TEST_F(SparseSetTest, Subscript)

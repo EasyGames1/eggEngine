@@ -20,7 +20,7 @@ namespace egg::Hash
         {
         }
 
-        [[nodiscard]] constexpr std::uint32_t Murmur2() noexcept requires std::is_same_v<SizeType, std::uint32_t>
+        [[nodiscard]] constexpr std::uint32_t Murmur2() const noexcept requires std::is_same_v<SizeType, std::uint32_t>
         {
             using TraitsType = Traits::Murmur2Traits<SizeType>;
 
@@ -50,7 +50,7 @@ namespace egg::Hash
             return Hash ^ Hash >> 15u;
         }
 
-        [[nodiscard]] constexpr SizeType Murmur2() noexcept requires std::is_same_v<SizeType, std::uint64_t>
+        [[nodiscard]] constexpr SizeType Murmur2() const noexcept requires std::is_same_v<SizeType, std::uint64_t>
         {
             using TraitsType = Traits::Murmur2Traits<SizeType>;
 
@@ -73,9 +73,9 @@ namespace egg::Hash
             return TraitsType::ShiftMix(TraitsType::ShiftMix(Hash) * TraitsType::Multiplier);
         }
 
-        [[nodiscard]] constexpr SizeType FNV1a() noexcept
+        [[nodiscard]] constexpr SizeType FNV1a() const noexcept
         {
-            using TraitsType = TypeInfo::Traits::FNV1aTraits<SizeType>;
+            using TraitsType = Types::Traits::FNV1aTraits<SizeType>;
 
             SizeType Hash { TraitsType::Offset };
 

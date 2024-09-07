@@ -4,7 +4,7 @@
 #include <source_location>
 #include <string_view>
 
-namespace egg::TypeInfo::Internal
+namespace egg::Types::Internal
 {
     template <typename>
     [[nodiscard]] consteval std::string_view GetFunctionName() noexcept

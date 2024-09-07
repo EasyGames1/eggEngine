@@ -8,7 +8,7 @@
 #include <span>
 #include <string_view>
 
-namespace egg::TypeInfo
+namespace egg::Types
 {
     template <typename SizeType, typename Group = void>
     struct TypeInfo
@@ -33,7 +33,7 @@ namespace egg::TypeInfo
         {
             if constexpr (constexpr std::string_view Name { GetName<Type>() }; Name.empty())
             {
-                return TypeIndex<SizeType, Group>::template Get<Type>();
+                return Internal::TypeIndex<SizeType, Group>::template Get<Type>();
             }
             else
             {

@@ -3,9 +3,9 @@
 
 #include <cstdint>
 
-namespace egg::TypeInfo
+namespace egg::Types
 {
-    using IDType = std::uint64_t;
+    using TypeID = std::uint64_t;
 }
 
 #endif // ENGINE_SOURCES_TYPE_INFO_FILE_ID_TYPE_H
