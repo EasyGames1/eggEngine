@@ -14,11 +14,10 @@
 
 namespace egg::ECS::Containers
 {
-    template <typename Type, typename AllocatorParameter = std::allocator<Type>>
+    template <ValidEntity Type, ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
     class SparseSet
     {
         using AllocatorTraits = Traits::Allocator<AllocatorParameter>;
-        static_assert(ValidAllocator<Type, AllocatorParameter>, "Invalid allocator");
 
         using SparseContainer = PagedVector<Type, AllocatorParameter>;
         using PackedContainer = std::vector<Type, AllocatorParameter>;

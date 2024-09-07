@@ -19,8 +19,8 @@ namespace egg::ECS::Containers
 
     namespace Traits = egg::Containers::Traits;
 
-    template <typename Type, typename AllocatorType>
-    concept ValidAllocator = egg::Containers::ValidAllocator<Type, AllocatorType>;
+    template <typename AllocatorType, typename Type>
+    concept ValidAllocator = egg::Containers::ValidAllocator<AllocatorType, Type>;
 
     template <typename Type>
     concept EBCOEligible = egg::Containers::EBCOEligible<Type>;

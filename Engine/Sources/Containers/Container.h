@@ -98,7 +98,7 @@ namespace egg::Containers
         using Iterator = std::iterator_traits<Type>;
     }
 
-    template <typename Type, typename AllocatorType>
+    template <typename AllocatorType, typename Type>
     concept ValidAllocator = std::is_same_v<Type, typename Traits::Allocator<AllocatorType>::value_type>;
 
     template <typename Type>

@@ -14,12 +14,11 @@
 
 namespace egg::ECS::Containers
 {
-    template <typename Type, typename EntityTypeParameter, typename AllocatorParameter = std::allocator<Type>>
+    template <typename Type, ValidEntity EntityTypeParameter, ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
     class Storage final : public SparseSet<EntityTypeParameter,
                                            typename Traits::Allocator<AllocatorParameter>::template rebind_alloc<Entity>>
     {
         using AllocatorTraits = Traits::Allocator<AllocatorParameter>;
-        static_assert(ValidAllocator<Type, AllocatorParameter>, "Invalid allocator");
 
         using TraitsType = ComponentTraits<Type>;
         using EntityTraitsType = EntityTraits<EntityTypeParameter>;
@@ -316,14 +315,12 @@ namespace egg::ECS::Containers
         ContainerType Payload;
     };
 
-    template <typename EntityType, typename Alloc>
-    class Storage<EntityType, EntityType, Alloc> : public SparseSet<EntityType, Alloc>
+    template <ValidEntity EntityType, ValidAllocator<EntityType> AllocatorParameter>
+    class Storage<EntityType, EntityType, AllocatorParameter> : public SparseSet<EntityType, AllocatorParameter>
     {
-        static_assert(ValidAllocator<EntityType, Alloc>, "Invalid allocator");
-        using BaseType = SparseSet<EntityType, Alloc>;
-
     public:
-        using AllocatorType = Alloc;
+        using BaseType = SparseSet<EntityType, AllocatorParameter>;
+        using AllocatorType = AllocatorParameter;
 
         Storage() : Storage { AllocatorType {} }
         {
@@ -350,8 +347,8 @@ namespace egg::ECS::Containers
         }
     };
 
-    template <ZeroSizedComponent Type, typename EntityType, typename Alloc>
-    class Storage<Type, EntityType, Alloc> final : public Storage<EntityType, Alloc>
+    template <ZeroSizedComponent Type, ValidEntity EntityType, ValidAllocator<Type> AllocatorParameter>
+    class Storage<Type, EntityType, AllocatorParameter> final : public Storage<EntityType, AllocatorParameter>
     {
     public:
         using ElementType = Type;

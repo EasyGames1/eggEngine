@@ -18,14 +18,13 @@ namespace egg::Containers
 {
     template <typename KeyParameter, typename ValueParameter,
               typename HashParameter, typename KeyEqualParameter,
-              typename AllocatorParameter>
+              ValidAllocator<std::pair<const KeyParameter, ValueParameter>> AllocatorParameter>
     class DenseMap
     {
         static constexpr float DefaultThreshold { 0.875f };
         static constexpr std::size_t MinimumCapacity { 8u };
 
         using AllocatorTraits = Traits::Allocator<AllocatorParameter>;
-        static_assert(ValidAllocator<std::pair<const KeyParameter, ValueParameter>, AllocatorParameter>, "Invalid allocator");
 
         using NodeType = DenseMapNode<KeyParameter, ValueParameter>;
         using SparseContainer = std::vector<std::size_t, typename AllocatorTraits::template rebind_alloc<std::size_t>>;
