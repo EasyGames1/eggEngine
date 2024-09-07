@@ -48,8 +48,7 @@ add_library(VulkanEngine_lib
         Sources/Containers/Sorting.h
         Sources/TypeInfo/TypeIndex.h
         Sources/TypeInfo/TypeInfo.h
-        Sources/TypeInfo/IDType.h
-        Sources/TypeInfo/Internal/FunctionName.h
+        Sources/TypeInfo/TypeID.h
         Sources/Hash/Traits/Murmur2Traits.h
         Sources/Hash/Traits/Fnv1aTraits.h
 )

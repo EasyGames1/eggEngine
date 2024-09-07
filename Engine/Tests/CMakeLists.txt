@@ -5,11 +5,11 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(VulkanEngine_test WindowCreating.cpp
-        SparseSet.cpp
-        Storage.cpp
-        Single.cpp
-        DenseMap.cpp
-        Single.h
+        ECS/Containers/SparseSet.cpp
+        ECS/Containers/Storage.cpp
+        Include/Single/Single.cpp
+        Containers/DenseMap.cpp
+        Include/Single/Single.h
 )
 
 find_package(GTest REQUIRED)

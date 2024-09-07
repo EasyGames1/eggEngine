@@ -23,20 +23,18 @@ namespace egg::Types::Internal
         return { BeginTypeName, PrettyFunction.size() - EndTypeName };
     }
 
-    [[nodiscard]] consteval std::string_view RemovePrefixes(std::string_view TypeName) noexcept
+    [[nodiscard]] consteval std::string_view RemovePrefixes(std::string_view TypeName)
     {
+        for (constexpr std::string_view Prefixes[] { "enum ", "union ", "struct ", "class " };
+             const auto Prefix : Prefixes)
         {
-            for (constexpr std::string_view Prefixes[] { "struct ", "class ", "enum ", "union " };
-                 const auto Prefix : Prefixes)
+            if (TypeName.substr(0u, Prefix.size()) == Prefix)
             {
-                for (std::size_t Position = TypeName.find(Prefix); Position != std::string_view::npos; Position = TypeName.find(Prefix))
-                {
-                    TypeName.remove_prefix(Position + Prefix.size());
-                }
+                TypeName.remove_prefix(Prefix.size());
             }
-
-            return { TypeName.data(), TypeName.size() };
         }
+
+        return { TypeName.data(), TypeName.size() };
     }
 }
 
