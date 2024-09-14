@@ -5,7 +5,7 @@
 #include <cstring>
 #include <ranges>
 
-namespace egg::Hash::Traits
+namespace egg::Hash
 {
     template <typename>
     struct BasicMurmur2Traits;

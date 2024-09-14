@@ -16,9 +16,6 @@ namespace egg::ECS
 
         static constexpr std::size_t PageSize { PageSizeTraits<ComponentType>::value };
     };
-
-    template <typename Type>
-    concept ZeroSizedComponent = !sizeof(Type);
 }
 
 #endif // ENGINE_SOURCES_ECS_TRAITS_FILE_COMPONENT_TRAITS_H

@@ -51,6 +51,9 @@ add_library(VulkanEngine_lib
         Sources/TypeInfo/TypeID.h
         Sources/Hash/Traits/Murmur2Traits.h
         Sources/Hash/Traits/Fnv1aTraits.h
+        Sources/ECS/Containers/Registry/Registry.h
+        Sources/Events/Delegate.h
+        Sources/Events/Traits/FunctionPointerTraits.h
 )
 
 find_package(Vulkan REQUIRED)

@@ -1,17 +1,13 @@
 #ifndef ENGINE_SOURCES_ECS_TRAITS_FILE_BASIC_ENTITY_TRAITS_H
 #define ENGINE_SOURCES_ECS_TRAITS_FILE_BASIC_ENTITY_TRAITS_H
 
+#include "../Entity.h"
+
 #include <cstdint>
 #include <type_traits>
 
 namespace egg::ECS
 {
-    template <typename Type>
-    concept ValidEntity = std::is_enum_v<Type> || std::is_unsigned_v<Type> || (std::is_class_v<Type> && requires
-    {
-        typename Type::EntityType;
-    });
-
     template <ValidEntity>
     struct BasicEntityTraits;
 

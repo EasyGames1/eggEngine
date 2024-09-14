@@ -7,9 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_executable(VulkanEngine_test WindowCreating.cpp
         ECS/Containers/SparseSet.cpp
         ECS/Containers/Storage.cpp
-        Include/Single/Single.cpp
         Containers/DenseMap.cpp
-        Include/Single/Single.h
+        Single.h
 )
 
 find_package(GTest REQUIRED)

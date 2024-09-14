@@ -14,8 +14,8 @@ namespace egg::ECS::Containers
     class PagedVectorIterator final
     {
         using ContainerType = std::remove_const_t<Container>;
-        using AllocatorTraits = Traits::Allocator<typename ContainerType::allocator_type>;
-        using IteratorTraits = Traits::Iterator<std::conditional_t<
+        using AllocatorTraits = AllocatorTraits<typename ContainerType::allocator_type>;
+        using IteratorTraits = IteratorTraits<std::conditional_t<
             std::is_const_v<Container>,
             typename AllocatorTraits::template rebind_traits<typename std::pointer_traits<typename
                 ContainerType::value_type>::element_type>::const_pointer,

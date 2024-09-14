@@ -22,7 +22,7 @@ namespace egg::Hash
 
         [[nodiscard]] constexpr std::uint32_t Murmur2() const noexcept requires std::is_same_v<SizeType, std::uint32_t>
         {
-            using TraitsType = Traits::Murmur2Traits<SizeType>;
+            using TraitsType = Murmur2Traits<SizeType>;
 
             constexpr SizeType BlockSize { TraitsType::BlockSize };
 
@@ -52,7 +52,7 @@ namespace egg::Hash
 
         [[nodiscard]] constexpr SizeType Murmur2() const noexcept requires std::is_same_v<SizeType, std::uint64_t>
         {
-            using TraitsType = Traits::Murmur2Traits<SizeType>;
+            using TraitsType = Murmur2Traits<SizeType>;
 
             constexpr SizeType AlignMask { 0x7ull };
 
@@ -75,7 +75,7 @@ namespace egg::Hash
 
         [[nodiscard]] constexpr SizeType FNV1a() const noexcept
         {
-            using TraitsType = Types::Traits::FNV1aTraits<SizeType>;
+            using TraitsType = Types::FNV1aTraits<SizeType>;
 
             SizeType Hash { TraitsType::Offset };
 

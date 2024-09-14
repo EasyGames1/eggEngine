@@ -1,5 +1,5 @@
 #include "Containers/DenseMap/DenseMap.h"
-#include "../Include/Single/Single.h"
+#include "../Single.h"
 
 #include <gtest/gtest.h>
 

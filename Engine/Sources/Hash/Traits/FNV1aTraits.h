@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-namespace egg::Types::Traits
+namespace egg::Types
 {
     template <typename>
     struct BasicFNV1aTraits;

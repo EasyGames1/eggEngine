@@ -89,17 +89,14 @@ namespace egg::Containers
     //If the new container doesn't use anything declared in Container.h as stubs,
     //then you should extract anything like Traits, concept etc. into Container.h to prevent #include unused warnings
 
-    namespace Traits
-    {
-        template <typename Type>
-        using Allocator = std::allocator_traits<Type>;
+    template <typename Type>
+    using AllocatorTraits = std::allocator_traits<Type>;
 
-        template <typename Type>
-        using Iterator = std::iterator_traits<Type>;
-    }
+    template <typename Type>
+    using IteratorTraits = std::iterator_traits<Type>;
 
     template <typename AllocatorType, typename Type>
-    concept ValidAllocator = std::is_same_v<Type, typename Traits::Allocator<AllocatorType>::value_type>;
+    concept ValidAllocator = std::is_same_v<Type, typename AllocatorTraits<AllocatorType>::value_type>;
 
     template <typename Type>
     concept EBCOEligible = std::is_empty_v<Type> && !std::is_final_v<Type>;

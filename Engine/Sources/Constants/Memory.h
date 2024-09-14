@@ -2,7 +2,6 @@
 #define ENGINE_SOURCES_CONSTANTS_FILE_MEMORY_H
 
 #include <cstddef>
-#include <type_traits>
 
 namespace egg::Constants
 {
