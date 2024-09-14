@@ -14,23 +14,23 @@
 
 namespace egg::ECS::Containers
 {
-    template <typename Type, ValidEntity EntityTypeParameter, ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
-    class Storage final : public SparseSet<EntityTypeParameter,
-                                           typename Traits::Allocator<AllocatorParameter>::template rebind_alloc<Entity>>
+    template <typename Type, ValidEntity EntityParameter, ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
+    class Storage final : public SparseSet<EntityParameter,
+                                           typename AllocatorTraits<AllocatorParameter>::template rebind_alloc<Entity>>
     {
-        using AllocatorTraits = Traits::Allocator<AllocatorParameter>;
+        using AllocatorTraits = AllocatorTraits<AllocatorParameter>;
 
         using TraitsType = ComponentTraits<Type>;
-        using EntityTraitsType = EntityTraits<EntityTypeParameter>;
+        using EntityTraitsType = EntityTraits<EntityParameter>;
 
         using ContainerType = PagedVector<Type, AllocatorParameter>;
 
     public:
-        using BaseType = SparseSet<EntityTypeParameter, typename AllocatorTraits::template rebind_alloc<Entity>>;
+        using BaseType = SparseSet<EntityParameter, typename AllocatorTraits::template rebind_alloc<Entity>>;
         using AllocatorType = AllocatorParameter;
 
         using ElementType = Type;
-        using EntityType = EntityTypeParameter;
+        using EntityType = EntityParameter;
 
         using Pointer = typename ContainerType::Pointer;
         using ConstPointer = typename ContainerType::ConstPointer;
@@ -116,7 +116,7 @@ namespace egg::ECS::Containers
         }
 
         template <typename EntityIteratorType, typename ContainerIteratorType>
-            requires (std::is_same_v<typename Traits::Iterator<ContainerIteratorType>::value_type, ElementType>)
+            requires (std::is_same_v<typename IteratorTraits<ContainerIteratorType>::value_type, ElementType>)
         Iterator Insert(EntityIteratorType First, EntityIteratorType Last, ContainerIteratorType From)
         {
             for (; First != Last; ++First, ++From)
@@ -347,7 +347,7 @@ namespace egg::ECS::Containers
         }
     };
 
-    template <ZeroSizedComponent Type, ValidEntity EntityType, ValidAllocator<Type> AllocatorParameter>
+    template <typename Type, ValidEntity EntityType, ValidAllocator<Type> AllocatorParameter> requires(!PageSizeTraits<Type>::value)
     class Storage<Type, EntityType, AllocatorParameter> final : public Storage<EntityType, AllocatorParameter>
     {
     public:

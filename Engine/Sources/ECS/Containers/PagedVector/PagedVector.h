@@ -15,7 +15,7 @@ namespace egg::ECS::Containers
     template <typename Type, ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
     class PagedVector final
     {
-        using AllocatorTraits = Traits::Allocator<AllocatorParameter>;
+        using AllocatorTraits = AllocatorTraits<AllocatorParameter>;
 
         using ContainerType = std::vector<typename AllocatorTraits::pointer,
                                           typename AllocatorTraits::template rebind_alloc<typename AllocatorTraits::pointer>>;

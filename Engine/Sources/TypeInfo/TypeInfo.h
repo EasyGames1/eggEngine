@@ -2,8 +2,8 @@
 #define ENGINE_SOURCES_TYPE_INFO_FILE_TYPEID_H
 
 #include "./TypeIndex.h"
-#include "../Hash/DataHash.h"
 #include "Internal.h"
+#include "../Hash/DataHash.h"
 
 #include <span>
 #include <string_view>

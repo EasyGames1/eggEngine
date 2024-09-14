@@ -17,7 +17,11 @@ namespace egg::ECS::Containers
     using egg::Containers::rend;
     using egg::Containers::crend;
 
-    namespace Traits = egg::Containers::Traits;
+    template <typename Type>
+    using AllocatorTraits = egg::Containers::AllocatorTraits<Type>;
+
+    template <typename Type>
+    using IteratorTraits = egg::Containers::IteratorTraits<Type>;
 
     template <typename AllocatorType, typename Type>
     concept ValidAllocator = egg::Containers::ValidAllocator<AllocatorType, Type>;

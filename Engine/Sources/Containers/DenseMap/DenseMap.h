@@ -24,7 +24,7 @@ namespace egg::Containers
         static constexpr float DefaultThreshold { 0.875f };
         static constexpr std::size_t MinimumCapacity { 8u };
 
-        using AllocatorTraits = Traits::Allocator<AllocatorParameter>;
+        using AllocatorTraits = AllocatorTraits<AllocatorParameter>;
 
         using NodeType = DenseMapNode<KeyParameter, ValueParameter>;
         using SparseContainer = std::vector<std::size_t, typename AllocatorTraits::template rebind_alloc<std::size_t>>;

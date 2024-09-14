@@ -9,7 +9,7 @@ namespace egg::Containers
     class IterableAdaptor
     {
     public:
-        using ValueType = typename Traits::Iterator<IteratorType>::value_type;
+        using ValueType = typename IteratorTraits<IteratorType>::value_type;
 
         using Iterator = IteratorType;
         using ReverseIterator = std::reverse_iterator<Iterator>;

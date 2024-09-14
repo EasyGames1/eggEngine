@@ -1,6 +1,7 @@
 #include "ECS/Containers/SparseSet/SparseSet.h"
 
-#include "../../Include/Single/Single.h"
+#include "../../Single.h"
+#include "Events/Delegate.h"
 
 #include "TypeInfo/TypeInfo.h"
 

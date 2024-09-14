@@ -4,20 +4,20 @@
 #include "SparseSetIterator.h"
 #include "../Container.h"
 #include "../../Traits/EntityTraits.h"
+#include "Containers/Sorting.h"
 #include "ECS/Containers/PagedVector/PagedVector.h"
 #include "Math/Math.h"
 
 #include <memory>
 #include <vector>
 
-#include "Containers/Sorting.h"
 
 namespace egg::ECS::Containers
 {
     template <ValidEntity Type, ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
     class SparseSet
     {
-        using AllocatorTraits = Traits::Allocator<AllocatorParameter>;
+        using AllocatorTraits = AllocatorTraits<AllocatorParameter>;
 
         using SparseContainer = PagedVector<Type, AllocatorParameter>;
         using PackedContainer = std::vector<Type, AllocatorParameter>;
