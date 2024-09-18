@@ -102,7 +102,7 @@ namespace egg::Containers
     concept EBCOEligible = std::is_empty_v<Type> && !std::is_final_v<Type>;
 
     template <typename Type>
-    concept IsTransparent = requires
+    concept Transparent = requires
     {
         typename Type::is_transparent;
     };

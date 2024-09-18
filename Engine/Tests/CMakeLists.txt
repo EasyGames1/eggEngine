@@ -9,6 +9,7 @@ add_executable(VulkanEngine_test WindowCreating.cpp
         ECS/Containers/Storage.cpp
         Containers/DenseMap.cpp
         Single.h
+        Events/Delegate.cpp
 )
 
 find_package(GTest REQUIRED)

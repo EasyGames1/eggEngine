@@ -30,7 +30,7 @@ namespace egg::ECS::Containers
     concept EBCOEligible = egg::Containers::EBCOEligible<Type>;
 
     template <typename Type>
-    concept IsTransparent = egg::Containers::IsTransparent<Type>;
+    concept Transparent = egg::Containers::Transparent<Type>;
 }
 
 

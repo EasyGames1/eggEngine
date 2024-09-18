@@ -7,7 +7,6 @@
 
 #include <gtest/gtest.h>
 
-
 class SparseSetTest : public testing::Test
 {
 protected:

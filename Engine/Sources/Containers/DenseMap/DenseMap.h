@@ -293,13 +293,13 @@ namespace egg::Containers
             return FindInBucket(Key, GetBucketIndex(Key));
         }
 
-        template <typename Other> requires (IsTransparent<HashType> && IsTransparent<KeyEqualType>)
+        template <typename Other> requires (Transparent<HashType> && Transparent<KeyEqualType>)
         [[nodiscard]] Iterator Find(const Other& Key)
         {
             return FindInBucket(Key, GetBucketIndex(Key));
         }
 
-        template <typename Other> requires (IsTransparent<HashType> && IsTransparent<KeyEqualType>)
+        template <typename Other> requires (Transparent<HashType> && Transparent<KeyEqualType>)
         [[nodiscard]] ConstIterator Find(const Other& Key) const
         {
             return FindInBucket(Key, GetBucketIndex(Key));
@@ -334,7 +334,7 @@ namespace egg::Containers
             return Find(Key) != End();
         }
 
-        template <typename Other> requires (IsTransparent<HashType> && IsTransparent<KeyEqualType>)
+        template <typename Other> requires (Transparent<HashType> && Transparent<KeyEqualType>)
         [[nodiscard]] bool IsContains(const Other& Key) const
         {
             return Find(Key) != End();
