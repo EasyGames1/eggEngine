@@ -3,8 +3,6 @@
 
 #include <gtest/gtest.h>
 
-#include <array>
-
 namespace Functors
 {
     template <bool IsNoExcept>
@@ -101,6 +99,41 @@ namespace FreeFunctions
     }
 }
 
+namespace Lambdas
+{
+    template <bool IsNoExcept>
+    [[nodiscard]] consteval static auto VoidNoArgs() noexcept(IsNoExcept)
+    {
+        return []() -> void
+        {
+        };
+    }
+
+    template <bool IsNoExcept>
+    [[nodiscard]] consteval static auto VoidInt() noexcept(IsNoExcept)
+    {
+        return [](int) -> void
+        {
+        };
+    }
+
+    template <bool IsNoExcept>
+    [[nodiscard]] consteval static auto VoidObject() noexcept(IsNoExcept)
+    {
+        return [](Helper&) -> void
+        {
+        };
+    }
+
+    template <bool IsNoExcept>
+    [[nodiscard]] consteval static auto VoidObjectInt() noexcept(IsNoExcept)
+    {
+        return [](Helper&, int) -> void
+        {
+        };
+    }
+}
+
 enum class FunctionKind
 {
     Free,
@@ -167,37 +200,26 @@ struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::Member> :
 };
 
 template <bool IsNoExcept>
-struct PointerTraits<void(), IsNoExcept, FunctionKind::Lambda> :
-    Traits<+[]()-> void
-        {
-        }
-    >
+struct PointerTraits<void(), IsNoExcept, FunctionKind::Lambda>
+    : Traits<+Lambdas::VoidNoArgs<IsNoExcept>()>
 {
 };
 
 template <bool IsNoExcept>
 struct PointerTraits<void(int), IsNoExcept, FunctionKind::Lambda> :
-    Traits<+[](const int) -> void
-        {
-        }
-    >
+    Traits<+Lambdas::VoidInt<IsNoExcept>()>
 {
 };
 
 template <bool IsNoExcept>
 struct PointerTraits<void(Helper&), IsNoExcept, FunctionKind::Lambda> :
-    Traits<+[](const Helper&) -> void
-    {
-    }>
+    Traits<+Lambdas::VoidObject<IsNoExcept>()>
 {
 };
 
 template <bool IsNoExcept>
 struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::Lambda> :
-    Traits<+[](Helper&, const int)-> void
-        {
-        }
-    >
+    Traits<+Lambdas::VoidObjectInt<IsNoExcept>()>
 {
 };
 
@@ -261,7 +283,6 @@ using FunctionTypes = testing::Types<
     std::pair<void(*)(int, int), void(*)(int)>,
     std::pair<void(*)(Helper&, int), void(*)()>,
     std::pair<void(*)(Helper&, int), void(*)(int)>
-
 >;
 TYPED_TEST_SUITE(DelegateTest, FunctionTypes);
 

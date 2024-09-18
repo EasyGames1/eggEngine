@@ -25,12 +25,12 @@ namespace egg::GUI
         glfwSetWindowSizeLimits(Data, MinWidth, MinHeight, MaxWidth, MaxHeight);
     }
 
-    void Window::SetSizeMin(const DimensionsType Width, const DimensionsType Height) const
+    void Window::SetSizeMinimum(const DimensionsType Width, const DimensionsType Height) const
     {
         glfwSetWindowSizeLimits(Data, Width, Height, GLFW_DONT_CARE, GLFW_DONT_CARE);
     }
 
-    void Window::SetSizeMax(const DimensionsType Width, const DimensionsType Height) const
+    void Window::SetSizeMaximum(const DimensionsType Width, const DimensionsType Height) const
     {
         glfwSetWindowSizeLimits(Data, GLFW_DONT_CARE, GLFW_DONT_CARE, Width, Height);
     }
@@ -325,7 +325,7 @@ namespace egg::GUI
         return glfwGetWindowMonitor(Data);
     }
 
-    bool Window::GetAttribute(const Attribute Value) const
+    bool Window::GetAttributeValue(const Attribute Value) const
     {
         return glfwGetWindowAttrib(Data, std::to_underlying(Value));
     }

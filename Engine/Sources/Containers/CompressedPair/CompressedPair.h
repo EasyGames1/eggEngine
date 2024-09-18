@@ -74,13 +74,6 @@ namespace egg::Containers
             return static_cast<const SecondBase&>(*this).Get();
         }
 
-        constexpr void Swap(CompressedPair& Other)
-            noexcept (std::is_nothrow_swappable_v<FirstType> && std::is_nothrow_swappable_v<SecondType>)
-        {
-            std::swap(GetFirst(), Other.GetFirst());
-            std::swap(GetSecond(), Other.GetSecond());
-        }
-
         template <std::size_t Index>
         constexpr decltype(auto) Get() noexcept
         {

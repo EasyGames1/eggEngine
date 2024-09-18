@@ -19,7 +19,7 @@ namespace egg::GUI
             OpenGLES = GLFW_OPENGL_ES_API
         };
 
-        enum class Attribute
+        enum class Attribute //TODO check all class and rewrite things
         {
             Decorated = GLFW_DECORATED,
             Resizable = GLFW_RESIZABLE,
@@ -208,9 +208,9 @@ namespace egg::GUI
 
         void SetSizeLimits(DimensionsType MinWidth, DimensionsType MinHeight, DimensionsType MaxWidth, DimensionsType MaxHeight) const;
 
-        void SetSizeMin(DimensionsType Width, DimensionsType Height) const;
+        void SetSizeMinimum(DimensionsType Width, DimensionsType Height) const;
 
-        void SetSizeMax(DimensionsType Width, DimensionsType Height) const;
+        void SetSizeMaximum(DimensionsType Width, DimensionsType Height) const;
 
         void SetTitle(std::string_view Title) const;
 
@@ -309,7 +309,7 @@ namespace egg::GUI
 
         [[nodiscard]] GLFWmonitor* GetMonitor() const;
 
-        [[nodiscard]] bool GetAttribute(Attribute Value) const;
+        [[nodiscard]] bool GetAttributeValue(Attribute Value) const;
 
         [[nodiscard]] bool IsShouldClose() const;
 

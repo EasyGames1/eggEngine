@@ -4,6 +4,7 @@
 #include "./PagedVectorIterator.h"
 #include "../Container.h"
 #include "../../Traits/BasicEntityTraits.h"
+#include "Containers/CompressedPair/CompressedPair.h"
 #include "ECS/Traits/PageSizeTraits.h"
 #include "Math/Math.h"
 
@@ -24,11 +25,11 @@ namespace egg::ECS::Containers
 
         void ReleasePages()
         {
-            for (auto&& Page : Payload)
+            for (auto&& Page : Payload.GetFirst())
             {
                 if (!Page) continue;
                 std::destroy(Page, Page + PageSize::value);
-                AllocatorTraits::deallocate(Allocator, Page, PageSize::value);
+                AllocatorTraits::deallocate(Payload.GetSecond(), Page, PageSize::value);
                 Page = nullptr;
             }
         }
@@ -46,7 +47,7 @@ namespace egg::ECS::Containers
         using ConstReverseIterator = std::reverse_iterator<ConstIterator>;
 
 
-        explicit PagedVector(const AllocatorType& Allocator = {}) : Allocator { Allocator }
+        explicit PagedVector(const AllocatorType& Allocator = {}) : Payload { Allocator, Allocator }
         {
         }
 
@@ -54,7 +55,8 @@ namespace egg::ECS::Containers
         {
         }
 
-        PagedVector(PagedVector&& Other, const AllocatorType& Allocator) : Payload { std::move(Other.Payload) }, Allocator { Allocator }
+        PagedVector(PagedVector&& Other, const AllocatorType& Allocator)
+            : Payload { ContainerType { std::move(Other.Payload.GetFirst()), Allocator }, Allocator }
         {
             EGG_ASSERT(AllocatorTraits::is_always_equal::value || GetAllocator() == Other.GetAllocator(),
                        "Cannot copy paged vector because it has a incompatible allocator");
@@ -73,42 +75,41 @@ namespace egg::ECS::Containers
                        "Cannot copy paged vector because it has a incompatible allocator");
             ReleasePages();
             Payload = std::move(Other.Payload);
-            Allocator = std::move(Other.Allocator);
             return *this;
         }
 
         [[nodiscard]] std::size_t GetExtent() const noexcept
         {
-            return Payload.size() * PageSize::value;
+            return Payload.GetFirst().size() * PageSize::value;
         }
 
         [[nodiscard]] constexpr AllocatorType GetAllocator() const noexcept
         {
-            return Allocator;
+            return Payload.GetSecond();
         }
 
         [[nodiscard]] Pointer GetPointer(const std::size_t Position) const
         {
             const auto Page { Position / PageSize::value };
-            return Page < Payload.size() && Payload[Page]
-                       ? Payload[Page] + Math::FastModulo(Position, PageSize::value)
+            return Page < Payload.GetFirst().size() && Payload.GetFirst()[Page]
+                       ? Payload.GetFirst()[Page] + Math::FastModulo(Position, PageSize::value)
                        : nullptr;
         }
 
         [[nodiscard]] Reference GetReference(const std::size_t Position) const
         {
             EGG_ASSERT(GetPointer(Position), "Payload not contain position");
-            return Payload[Position / PageSize::value][Math::FastModulo(Position, PageSize::value)];
+            return Payload.GetFirst()[Position / PageSize::value][Math::FastModulo(Position, PageSize::value)];
         }
 
         [[nodiscard]] Iterator Begin(const std::size_t AvailableElements) noexcept
         {
-            return { &Payload, AvailableElements };
+            return { &Payload.GetFirst(), AvailableElements };
         }
 
         [[nodiscard]] ConstIterator Begin(const std::size_t AvailableElements) const noexcept
         {
-            return { &Payload, AvailableElements };
+            return { &Payload.GetFirst(), AvailableElements };
         }
 
         [[nodiscard]] ConstIterator ConstBegin(const std::size_t AvailableElements) const noexcept
@@ -118,12 +119,12 @@ namespace egg::ECS::Containers
 
         [[nodiscard]] Iterator End() noexcept
         {
-            return { &Payload, {} };
+            return { &Payload.GetFirst(), {} };
         }
 
         [[nodiscard]] ConstIterator End() const noexcept
         {
-            return { &Payload, {} };
+            return { &Payload.GetFirst(), {} };
         }
 
         [[nodiscard]] ConstIterator ConstEnd() const noexcept
@@ -165,40 +166,43 @@ namespace egg::ECS::Containers
         {
             const auto Page { Position / PageSize::value };
 
-            if (Page >= Payload.size()) Payload.resize(Page + 1u, nullptr);
+            if (Page >= Payload.GetFirst().size()) Payload.GetFirst().resize(Page + 1u, nullptr);
 
-            if (!Payload[Page])
+            if (!Payload.GetFirst()[Page])
             {
-                Payload[Page] = AllocatorTraits::allocate(Allocator, PageSize::value);
+                Payload.GetFirst()[Page] = AllocatorTraits::allocate(Payload.GetSecond(), PageSize::value);
                 if constexpr (ValidEntity<Type>)
                 {
-                    std::uninitialized_fill(Payload[Page], Payload[Page] + PageSize::value, EntityTraits<Type>::Tombstone);
+                    std::uninitialized_fill(
+                        Payload.GetFirst()[Page],
+                        Payload.GetFirst()[Page] + PageSize::value,
+                        EntityTraits<Type>::Tombstone
+                    );
                 }
             }
 
-            return Payload[Page][Math::FastModulo(Position, PageSize::value)];
+            return Payload.GetFirst()[Page][Math::FastModulo(Position, PageSize::value)];
         }
 
         void Shrink(const std::size_t Size, const std::size_t AvailableElements)
         {
             for (auto Position = Size; Position < AvailableElements; ++Position)
             {
-                AllocatorTraits::destroy(Allocator, std::addressof(GetReference(Position)));
+                AllocatorTraits::destroy(Payload.GetSecond(), std::addressof(GetReference(Position)));
             }
 
             const auto From { (Size + PageSize::value - 1u) / PageSize::value };
 
-            for (auto Position = From; Position < Payload.size(); ++Position)
+            for (auto Position = From; Position < Payload.GetFirst().size(); ++Position)
             {
-                AllocatorTraits::deallocate(Allocator, Payload[Position], PageSize::value);
+                AllocatorTraits::deallocate(Payload.GetSecond(), Payload.GetFirst()[Position], PageSize::value);
             }
 
-            Payload.resize(From);
+            Payload.GetFirst().resize(From);
         }
 
     private:
-        ContainerType Payload;
-        [[no_unique_address]] AllocatorType Allocator;
+        egg::Containers::CompressedPair<ContainerType, AllocatorType> Payload;
     };
 }
 
