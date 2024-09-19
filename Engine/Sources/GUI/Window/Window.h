@@ -311,7 +311,7 @@ namespace egg::GUI
 
         [[nodiscard]] bool GetAttributeValue(Attribute Value) const;
 
-        [[nodiscard]] bool IsShouldClose() const;
+        [[nodiscard]] bool GetShouldClose() const;
 
         [[nodiscard]] void* GetUserPointer() const;
 

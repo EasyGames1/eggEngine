@@ -64,7 +64,7 @@ TEST_F(DenseMapTest, InsertIterators)
 
     for (auto [Key, Value] : Vector)
     {
-        EXPECT_TRUE(DenseMap.IsContains(Key));
+        EXPECT_TRUE(DenseMap.Contains(Key));
         EXPECT_EQ(DenseMap.At(Key), Value);
     }
 
@@ -184,10 +184,10 @@ TEST_F(DenseMapTest, Erase)
     for (std::size_t i = 0; i < IterationsCount; ++i)
     {
         EXPECT_TRUE(DenseMap.Erase(i));
-        EXPECT_FALSE(DenseMap.IsContains(i));
+        EXPECT_FALSE(DenseMap.Contains(i));
     }
 
-    EXPECT_TRUE(DenseMap.IsEmpty());
+    EXPECT_TRUE(DenseMap.Empty());
 }
 
 TEST_F(DenseMapTest, EraseIterator)
@@ -196,14 +196,14 @@ TEST_F(DenseMapTest, EraseIterator)
     {
         const auto KeyToErase { It->first };
         It = DenseMap.Erase(DenseMapType::ConstIterator { It });
-        EXPECT_FALSE(DenseMap.IsContains(KeyToErase));
+        EXPECT_FALSE(DenseMap.Contains(KeyToErase));
     }
 }
 
 TEST_F(DenseMapTest, Clear)
 {
     DenseMap.Clear();
-    EXPECT_TRUE(DenseMap.IsEmpty());
+    EXPECT_TRUE(DenseMap.Empty());
 }
 
 TEST_F(DenseMapTest, Rehash)
@@ -239,23 +239,23 @@ TEST_F(DenseMapTest, Subscript)
         EXPECT_EQ(DenseMap[Key], Value);
     }
 
-    EXPECT_FALSE(DenseMap.IsContains(IterationsCount));
+    EXPECT_FALSE(DenseMap.Contains(IterationsCount));
 
     DenseMap[IterationsCount] = GetEntityAt(IterationsCount);
 
-    EXPECT_TRUE(DenseMap.IsContains(IterationsCount));
+    EXPECT_TRUE(DenseMap.Contains(IterationsCount));
 }
 
 TEST_F(DenseMapTest, IsContains)
 {
     for (const auto Key : DenseMap | std::views::keys)
     {
-        EXPECT_TRUE(DenseMap.IsContains(Key));
+        EXPECT_TRUE(DenseMap.Contains(Key));
     }
 
     for (const auto Key : DenseMap | std::views::keys)
     {
-        EXPECT_TRUE(DenseMap.IsContains(static_cast<ConvertableToKey>(Key)));
+        EXPECT_TRUE(DenseMap.Contains(static_cast<ConvertableToKey>(Key)));
     }
 }
 
@@ -266,11 +266,11 @@ TEST_F(DenseMapTest, GetSize)
 
 TEST_F(DenseMapTest, IsEmpty)
 {
-    EXPECT_FALSE(DenseMap.IsEmpty());
+    EXPECT_FALSE(DenseMap.Empty());
 
     DenseMap.Clear();
 
-    EXPECT_TRUE(DenseMap.IsEmpty());
+    EXPECT_TRUE(DenseMap.Empty());
 }
 
 TEST_F(DenseMapTest, Iterables)

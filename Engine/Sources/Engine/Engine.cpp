@@ -42,7 +42,7 @@ namespace egg
 
     void Engine::MainLoop()
     {
-        while (!Window->IsShouldClose())
+        while (!Window->GetShouldClose())
         {
             glfwPollEvents();
 

@@ -50,7 +50,7 @@ TEST_F(SparseSetTest, PushIterators)
 
     for (std::size_t i = IterationsCount; i < IterationsCount * 2u; ++i)
     {
-        EXPECT_TRUE(Sparse.IsContains(GetEntityAt(i)));
+        EXPECT_TRUE(Sparse.Contains(GetEntityAt(i)));
         EXPECT_EQ(Vector[i - IterationsCount], Sparse[i]);
     }
 }
@@ -72,9 +72,9 @@ TEST_F(SparseSetTest, Erase)
     for (std::size_t i = 0; i < IterationsCount; ++i)
     {
         const EntityType ToErase { GetEntityAt(i) };
-        EXPECT_TRUE(Sparse.IsContains(ToErase));
+        EXPECT_TRUE(Sparse.Contains(ToErase));
         Sparse.Erase(ToErase);
-        EXPECT_FALSE(Sparse.IsContains(ToErase));
+        EXPECT_FALSE(Sparse.Contains(ToErase));
     }
 }
 
@@ -92,16 +92,16 @@ TEST_F(SparseSetTest, EraseIterators)
 
     for (const auto Current : Vector)
     {
-        EXPECT_FALSE(Sparse.IsContains(Current));
+        EXPECT_FALSE(Sparse.Contains(Current));
     }
 
-    EXPECT_TRUE(Sparse.IsEmpty());
+    EXPECT_TRUE(Sparse.Empty());
 }
 
 TEST_F(SparseSetTest, Clear)
 {
     Sparse.Clear();
-    EXPECT_TRUE(Sparse.IsEmpty());
+    EXPECT_TRUE(Sparse.Empty());
 }
 
 TEST_F(SparseSetTest, Remove)
@@ -112,7 +112,7 @@ TEST_F(SparseSetTest, Remove)
         EXPECT_TRUE(Sparse.Remove(EntityToRemove));
     }
 
-    EXPECT_TRUE(Sparse.IsEmpty());
+    EXPECT_TRUE(Sparse.Empty());
 }
 
 TEST_F(SparseSetTest, RemoveIterators)
@@ -129,10 +129,10 @@ TEST_F(SparseSetTest, RemoveIterators)
 
     for (const auto Current : Vector)
     {
-        EXPECT_FALSE(Sparse.IsContains(Current));
+        EXPECT_FALSE(Sparse.Contains(Current));
     }
 
-    EXPECT_TRUE(Sparse.IsEmpty());
+    EXPECT_TRUE(Sparse.Empty());
 }
 
 TEST_F(SparseSetTest, SwapElements)
@@ -190,7 +190,7 @@ TEST_F(SparseSetTest, IsContains)
 {
     for (std::size_t i = 0; i < IterationsCount; ++i)
     {
-        EXPECT_TRUE(Sparse.IsContains(GetEntityAt(i)));
+        EXPECT_TRUE(Sparse.Contains(GetEntityAt(i)));
     }
 }
 

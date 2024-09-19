@@ -329,13 +329,13 @@ namespace egg::Containers
             return InsertOrDoNothing(std::move(Key)).first->second;
         }
 
-        [[nodiscard]] bool IsContains(const KeyType& Key) const
+        [[nodiscard]] bool Contains(const KeyType& Key) const
         {
             return Find(Key) != End();
         }
 
         template <typename Other> requires (Transparent<HashType> && Transparent<KeyEqualType>)
-        [[nodiscard]] bool IsContains(const Other& Key) const
+        [[nodiscard]] bool Contains(const Other& Key) const
         {
             return Find(Key) != End();
         }
@@ -350,7 +350,7 @@ namespace egg::Containers
             return Packed.GetFirst().max_size();
         }
 
-        [[nodiscard]] bool IsEmpty() const noexcept
+        [[nodiscard]] bool Empty() const noexcept
         {
             return Packed.GetFirst().empty();
         }

@@ -330,7 +330,7 @@ namespace egg::GUI
         return glfwGetWindowAttrib(Data, std::to_underlying(Value));
     }
 
-    bool Window::IsShouldClose() const
+    bool Window::GetShouldClose() const
     {
         return glfwWindowShouldClose(Data);
     }

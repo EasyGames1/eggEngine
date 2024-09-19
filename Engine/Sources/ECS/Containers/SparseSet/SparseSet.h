@@ -133,9 +133,9 @@ namespace egg::ECS::Containers
 
         bool Remove(const EntityType Entity)
         {
-            const bool Contains { IsContains(Entity) };
-            if (Contains) Erase(Entity);
-            return Contains;
+            const bool Exists { Contains(Entity) };
+            if (Exists) Erase(Entity);
+            return Exists;
         }
 
         template <typename It>
@@ -147,9 +147,9 @@ namespace egg::ECS::Containers
             {
                 while (First != Last)
                 {
-                    while (First != Last && !IsContains(*First)) ++First;
+                    while (First != Last && !Contains(*First)) ++First;
                     const auto IteratorToErase { First };
-                    while (First != Last && IsContains(*First)) ++First;
+                    while (First != Last && Contains(*First)) ++First;
 
                     Count += std::distance(IteratorToErase, First);
                     Erase(IteratorToErase, First);
@@ -181,7 +181,7 @@ namespace egg::ECS::Containers
             Packed.shrink_to_fit();
         }
 
-        [[nodiscard]] bool IsContains(const EntityType Entity) const noexcept
+        [[nodiscard]] bool Contains(const EntityType Entity) const noexcept
         {
             const auto* Element { GetPointer(Entity) };
             return Element && (TraitsType::ToVersionPart(Entity) ^ TraitsType::ToIntegral(*Element)) < TraitsType::EntityMask;
@@ -189,7 +189,7 @@ namespace egg::ECS::Containers
 
         [[nodiscard]] std::size_t GetIndex(const EntityType Entity) const noexcept
         {
-            EGG_ASSERT(IsContains(Entity), "Set does not contain entity");
+            EGG_ASSERT(Contains(Entity), "Set does not contain entity");
             return TraitsType::ToEntity(GetReference(Entity));
         }
 
@@ -201,12 +201,12 @@ namespace egg::ECS::Containers
 
         [[nodiscard]] ConstIterator Find(const EntityType Entity) const noexcept
         {
-            return IsContains(Entity) ? ToIterator(Entity) : End();
+            return Contains(Entity) ? ToIterator(Entity) : End();
         }
 
         [[nodiscard]] Iterator Find(const EntityType Entity) noexcept
         {
-            return IsContains(Entity) ? ToIterator(Entity) : End();
+            return Contains(Entity) ? ToIterator(Entity) : End();
         }
 
         template <typename CompareType, typename SortType = egg::Containers::StandardSort, typename... Args>
@@ -245,7 +245,7 @@ namespace egg::ECS::Containers
                  It != CurrentLast && First != Last;
                  ++First)
             {
-                if (const auto Other { *First }; IsContains(Other))
+                if (const auto Other { *First }; Contains(Other))
                 {
                     if (const auto Current { *It }; Current != Other)
                     {
@@ -264,7 +264,7 @@ namespace egg::ECS::Containers
             return Packed.size();
         }
 
-        [[nodiscard]] bool IsEmpty() const noexcept
+        [[nodiscard]] bool Empty() const noexcept
         {
             return Packed.empty();
         }
@@ -372,7 +372,7 @@ namespace egg::ECS::Containers
 
         void Erase(Iterator It)
         {
-            EGG_ASSERT(IsContains(*It), "Sparse does not contain entity to remove");
+            EGG_ASSERT(Contains(*It), "Sparse does not contain entity to remove");
             auto& Index { GetReference(*It) };
             const auto EntityIndex { TraitsType::ToEntity(Index) };
 

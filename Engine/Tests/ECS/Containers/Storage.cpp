@@ -251,7 +251,7 @@ TEST_F(StorageTest, Sort)
 TEST_F(StorageTest, Clear)
 {
     Storage.Clear();
-    EXPECT_TRUE(Storage.IsEmpty());
+    EXPECT_TRUE(Storage.Empty());
 }
 
 TEST_F(StorageTest, Data)
