@@ -3,7 +3,6 @@
 
 #include <gtest/gtest.h>
 
-#include <iterator>
 #include <ranges>
 
 class DenseMapTest : public testing::Test

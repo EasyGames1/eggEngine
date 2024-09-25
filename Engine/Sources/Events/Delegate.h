@@ -143,7 +143,7 @@ namespace egg::Events
 
                 [[maybe_unused]] const std::tuple Tuple { std::forward_as_tuple(std::forward<Args>(Arguments)...) };
 
-                if constexpr (std::is_member_object_pointer_v<decltype(Candidate)>)
+                if constexpr (MemberFunctorPointer<decltype(Candidate)>)
                 {
                     return InvokeMemberFunctor<Candidate, Indices + Offset...>(std::move(Tuple));
                 }
@@ -169,7 +169,7 @@ namespace egg::Events
 
                 [[maybe_unused]] const std::tuple Tuple { std::forward_as_tuple(std::forward<Args>(Arguments)...) };
 
-                if constexpr (std::is_member_object_pointer_v<decltype(Candidate)>)
+                if constexpr (MemberFunctorPointer<decltype(Candidate)>)
                 {
                     return std::invoke_r<ResultType>(
                         std::invoke(

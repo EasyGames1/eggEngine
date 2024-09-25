@@ -137,9 +137,10 @@ namespace Lambdas
 enum class FunctionKind
 {
     Free,
-    Member,
+    MemberFunction,
+    MemberValue,
+    MemberFunctor,
     Lambda,
-    Functor
 };
 
 template <auto Candidate>
@@ -176,26 +177,74 @@ struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::Free> :
 };
 
 template <bool IsNoExcept>
-struct PointerTraits<void(), IsNoExcept, FunctionKind::Member> :
+struct PointerTraits<void(), IsNoExcept, FunctionKind::MemberFunction> :
     Traits<&Helper::VoidNoArgs<IsNoExcept>>
 {
 };
 
 template <bool IsNoExcept>
-struct PointerTraits<void(int), IsNoExcept, FunctionKind::Member> :
+struct PointerTraits<void(int), IsNoExcept, FunctionKind::MemberFunction> :
     Traits<&Helper::VoidInt<IsNoExcept>>
 {
 };
 
 template <bool IsNoExcept>
-struct PointerTraits<void(Helper&), IsNoExcept, FunctionKind::Member> :
+struct PointerTraits<void(Helper&), IsNoExcept, FunctionKind::MemberFunction> :
     Traits<&Helper::VoidObject<IsNoExcept>>
 {
 };
 
 template <bool IsNoExcept>
-struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::Member> :
+struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::MemberFunction> :
     Traits<&Helper::VoidObjectInt<IsNoExcept>>
+{
+};
+
+template <bool IsNoExcept>
+struct PointerTraits<void(), IsNoExcept, FunctionKind::MemberValue> :
+    Traits<&Helper::Value>
+{
+};
+
+template <bool IsNoExcept>
+struct PointerTraits<void(int), IsNoExcept, FunctionKind::MemberValue> :
+    Traits<&Helper::Value>
+{
+};
+
+template <bool IsNoExcept>
+struct PointerTraits<void(Helper&), IsNoExcept, FunctionKind::MemberValue> :
+    Traits<&Helper::Value>
+{
+};
+
+template <bool IsNoExcept>
+struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::MemberValue> :
+    Traits<&Helper::Value>
+{
+};
+
+template <bool IsNoExcept>
+struct PointerTraits<void(), IsNoExcept, FunctionKind::MemberFunctor> :
+    Traits<&FunctorsHelper<IsNoExcept>::FunctorVoidNoArgs>
+{
+};
+
+template <bool IsNoExcept>
+struct PointerTraits<void(int), IsNoExcept, FunctionKind::MemberFunctor> :
+    Traits<&FunctorsHelper<IsNoExcept>::FunctorVoidInt>
+{
+};
+
+template <bool IsNoExcept>
+struct PointerTraits<void(Helper&), IsNoExcept, FunctionKind::MemberFunctor> :
+    Traits<&FunctorsHelper<IsNoExcept>::FunctorVoidObject>
+{
+};
+
+template <bool IsNoExcept>
+struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::MemberFunctor> :
+    Traits<&FunctorsHelper<IsNoExcept>::FunctorVoidObjectInt>
 {
 };
 
@@ -223,30 +272,6 @@ struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::Lambda> :
 {
 };
 
-template <bool IsNoExcept>
-struct PointerTraits<void(), IsNoExcept, FunctionKind::Functor> :
-    Traits<&FunctorsHelper<IsNoExcept>::FunctorVoidNoArgs>
-{
-};
-
-template <bool IsNoExcept>
-struct PointerTraits<void(int), IsNoExcept, FunctionKind::Functor> :
-    Traits<&FunctorsHelper<IsNoExcept>::FunctorVoidInt>
-{
-};
-
-template <bool IsNoExcept>
-struct PointerTraits<void(Helper&), IsNoExcept, FunctionKind::Functor> :
-    Traits<&FunctorsHelper<IsNoExcept>::FunctorVoidObject>
-{
-};
-
-template <bool IsNoExcept>
-struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::Functor> :
-    Traits<&FunctorsHelper<IsNoExcept>::FunctorVoidObjectInt>
-{
-};
-
 template <typename FunctionType>
 class DelegateTest : public DelegateTest<std::pair<FunctionType, FunctionType>>
 {
@@ -261,17 +286,19 @@ protected:
 
     egg::Events::Delegate<DelegateType> Delegate;
 
-    static constexpr auto FreePointer { PointerTraits<FunctionType, false, FunctionKind::Free>::Pointer };
-    static constexpr auto FreePointerNoExcept { PointerTraits<FunctionType, true, FunctionKind::Free>::Pointer };
+    static constexpr auto Free { PointerTraits<FunctionType, false, FunctionKind::Free>::Pointer };
+    static constexpr auto FreeNoExcept { PointerTraits<FunctionType, true, FunctionKind::Free>::Pointer };
 
-    static constexpr auto MemberPointer { PointerTraits<FunctionType, false, FunctionKind::Member>::Pointer };
-    static constexpr auto MemberPointerNoExcept { PointerTraits<FunctionType, true, FunctionKind::Member>::Pointer };
+    static constexpr auto MemberFunction { PointerTraits<FunctionType, false, FunctionKind::MemberFunction>::Pointer };
+    static constexpr auto MemberFunctionNoExcept { PointerTraits<FunctionType, true, FunctionKind::MemberFunction>::Pointer };
+
+    static constexpr auto MemberValue { PointerTraits<FunctionType, false, FunctionKind::MemberValue>::Pointer };
+
+    static constexpr auto MemberFunctor { PointerTraits<FunctionType, false, FunctionKind::MemberFunctor>::Pointer };
+    static constexpr auto MemberFunctorNoExcept { PointerTraits<FunctionType, true, FunctionKind::MemberFunctor>::Pointer };
 
     static constexpr auto Lambda { PointerTraits<FunctionType, false, FunctionKind::Lambda>::Pointer };
     static constexpr auto LambdaNoExcept { PointerTraits<FunctionType, true, FunctionKind::Lambda>::Pointer };
-
-    static constexpr auto FunctorPointer { PointerTraits<FunctionType, false, FunctionKind::Functor>::Pointer };
-    static constexpr auto FunctorPointerNoExcept { PointerTraits<FunctionType, true, FunctionKind::Functor>::Pointer };
 };
 
 using FunctionTypes = testing::Types<
@@ -289,34 +316,68 @@ TYPED_TEST_SUITE(DelegateTest, FunctionTypes);
 TYPED_TEST(DelegateTest, Connect)
 {
     EXPECT_FALSE(this->Delegate);
-    this->Delegate.template Connect<this->FreePointer>();
+    this->Delegate.template Connect<this->Free>();
     EXPECT_TRUE(this->Delegate);
     this->Delegate.Reset();
 
     EXPECT_FALSE(this->Delegate);
-    this->Delegate.template Connect<this->FreePointerNoExcept>();
+    this->Delegate.template Connect<this->FreeNoExcept>();
     EXPECT_TRUE(this->Delegate);
     this->Delegate.Reset();
 
 
     Helper HelperObject;
     EXPECT_FALSE(this->Delegate);
-    this->Delegate.template Connect<this->MemberPointer>(HelperObject);
+    this->Delegate.template Connect<this->MemberFunction>(HelperObject);
     EXPECT_TRUE(this->Delegate);
     this->Delegate.Reset();
 
     EXPECT_FALSE(this->Delegate);
-    this->Delegate.template Connect<this->MemberPointer>(&HelperObject);
+    this->Delegate.template Connect<this->MemberFunction>(&HelperObject);
     EXPECT_TRUE(this->Delegate);
     this->Delegate.Reset();
 
     EXPECT_FALSE(this->Delegate);
-    this->Delegate.template Connect<this->MemberPointerNoExcept>(HelperObject);
+    this->Delegate.template Connect<this->MemberFunctionNoExcept>(HelperObject);
     EXPECT_TRUE(this->Delegate);
     this->Delegate.Reset();
 
     EXPECT_FALSE(this->Delegate);
-    this->Delegate.template Connect<this->MemberPointerNoExcept>(&HelperObject);
+    this->Delegate.template Connect<this->MemberFunctionNoExcept>(&HelperObject);
+    EXPECT_TRUE(this->Delegate);
+    this->Delegate.Reset();
+
+
+    EXPECT_FALSE(this->Delegate);
+    this->Delegate.template Connect<this->MemberValue>(HelperObject);
+    EXPECT_TRUE(this->Delegate);
+    this->Delegate.Reset();
+
+    EXPECT_FALSE(this->Delegate);
+    this->Delegate.template Connect<this->MemberValue>(&HelperObject);
+    EXPECT_TRUE(this->Delegate);
+    this->Delegate.Reset();
+
+
+    FunctorsHelper<false> FunctorHelperObject;
+    EXPECT_FALSE(this->Delegate);
+    this->Delegate.template Connect<this->MemberFunctor>(FunctorHelperObject);
+    EXPECT_TRUE(this->Delegate);
+    this->Delegate.Reset();
+
+    EXPECT_FALSE(this->Delegate);
+    this->Delegate.template Connect<this->MemberFunctor>(&FunctorHelperObject);
+    EXPECT_TRUE(this->Delegate);
+    this->Delegate.Reset();
+
+    FunctorsHelper<true> FunctorHelperNoExceptObject;
+    EXPECT_FALSE(this->Delegate);
+    this->Delegate.template Connect<this->MemberFunctorNoExcept>(FunctorHelperNoExceptObject);
+    EXPECT_TRUE(this->Delegate);
+    this->Delegate.Reset();
+
+    EXPECT_FALSE(this->Delegate);
+    this->Delegate.template Connect<this->MemberFunctorNoExcept>(&FunctorHelperNoExceptObject);
     EXPECT_TRUE(this->Delegate);
     this->Delegate.Reset();
 
@@ -330,58 +391,69 @@ TYPED_TEST(DelegateTest, Connect)
     this->Delegate.template Connect<this->LambdaNoExcept>();
     EXPECT_TRUE(this->Delegate);
     this->Delegate.Reset();
-
-
-    FunctorsHelper<false> FunctorHelperObject;
-    EXPECT_FALSE(this->Delegate);
-    this->Delegate.template Connect<this->FunctorPointer>(FunctorHelperObject);
-    EXPECT_TRUE(this->Delegate);
-    this->Delegate.Reset();
-
-    EXPECT_FALSE(this->Delegate);
-    this->Delegate.template Connect<this->FunctorPointer>(&FunctorHelperObject);
-    EXPECT_TRUE(this->Delegate);
-    this->Delegate.Reset();
-
-    FunctorsHelper<true> FunctorHelperNoExceptObject;
-    EXPECT_FALSE(this->Delegate);
-    this->Delegate.template Connect<this->FunctorPointerNoExcept>(FunctorHelperNoExceptObject);
-    EXPECT_TRUE(this->Delegate);
-    this->Delegate.Reset();
-
-    EXPECT_FALSE(this->Delegate);
-    this->Delegate.template Connect<this->FunctorPointerNoExcept>(&FunctorHelperNoExceptObject);
-    EXPECT_TRUE(this->Delegate);
-    this->Delegate.Reset();
 }
 
 TYPED_TEST(DelegateTest, Constructors)
 {
-    egg::Events::Delegate DelegateFreePointer { egg::Events::ConnectionArgument<this->FreePointer> {} };
-    EXPECT_TRUE(DelegateFreePointer);
+    egg::Events::Delegate DelegateFree { egg::Events::ConnectionArgument<this->Free> {} };
+    EXPECT_TRUE(DelegateFree);
 
-    egg::Events::Delegate DelegateFreePointerNoExcept { egg::Events::ConnectionArgument<this->FreePointerNoExcept> {} };
-    EXPECT_TRUE(DelegateFreePointerNoExcept);
+    egg::Events::Delegate DelegateFreeNoExcept { egg::Events::ConnectionArgument<this->FreeNoExcept> {} };
+    EXPECT_TRUE(DelegateFreeNoExcept);
 
 
     Helper HelperObject;
-    egg::Events::Delegate DelegateMemberPointer { egg::Events::ConnectionArgument<this->MemberPointer> {}, HelperObject };
-    EXPECT_TRUE(DelegateMemberPointer);
+    egg::Events::Delegate DelegateMemberFunction { egg::Events::ConnectionArgument<this->MemberFunction> {}, HelperObject };
+    EXPECT_TRUE(DelegateMemberFunction);
 
-    egg::Events::Delegate DelegateMemberPointerWithPointer {
-        egg::Events::ConnectionArgument<this->MemberPointer> {}, &HelperObject
+    egg::Events::Delegate DelegateMemberFunctionWithPointer {
+        egg::Events::ConnectionArgument<this->MemberFunction> {}, &HelperObject
     };
-    EXPECT_TRUE(DelegateMemberPointerWithPointer);
+    EXPECT_TRUE(DelegateMemberFunctionWithPointer);
 
-    egg::Events::Delegate DelegateMemberPointerNoExcept {
-        egg::Events::ConnectionArgument<this->MemberPointerNoExcept> {}, HelperObject
+    egg::Events::Delegate DelegateMemberFunctionNoExcept {
+        egg::Events::ConnectionArgument<this->MemberFunctionNoExcept> {}, HelperObject
     };
-    EXPECT_TRUE(DelegateMemberPointerNoExcept);
+    EXPECT_TRUE(DelegateMemberFunctionNoExcept);
 
-    egg::Events::Delegate DelegateMemberPointerNoExceptWithPointer {
-        egg::Events::ConnectionArgument<this->MemberPointerNoExcept> {}, &HelperObject
+    egg::Events::Delegate DelegateMemberFunctionNoExceptWithPointer {
+        egg::Events::ConnectionArgument<this->MemberFunctionNoExcept> {}, &HelperObject
     };
-    EXPECT_TRUE(DelegateMemberPointerNoExceptWithPointer);
+    EXPECT_TRUE(DelegateMemberFunctionNoExceptWithPointer);
+
+
+    egg::Events::Delegate DelegateMemberValue {
+        egg::Events::ConnectionArgument<this->MemberValue> {}, HelperObject
+    };
+    EXPECT_TRUE(DelegateMemberValue);
+
+    egg::Events::Delegate DelegateMemberValueWithPointer {
+        egg::Events::ConnectionArgument<this->MemberValue> {}, &HelperObject
+    };
+    EXPECT_TRUE(DelegateMemberValueWithPointer);
+
+
+    FunctorsHelper<false> FunctorHelperObject;
+    egg::Events::Delegate DelegateMemberFunctor {
+        egg::Events::ConnectionArgument<this->MemberFunctor> {}, FunctorHelperObject
+    };
+    EXPECT_TRUE(DelegateMemberFunctor);
+
+    egg::Events::Delegate DelegateMemberFunctorWithPointer {
+        egg::Events::ConnectionArgument<this->MemberFunctor> {}, &FunctorHelperObject
+    };
+    EXPECT_TRUE(DelegateMemberFunctorWithPointer);
+
+    FunctorsHelper<true> FunctorHelperNoExceptObject;
+    egg::Events::Delegate DelegateMemberFunctorNoExcept {
+        egg::Events::ConnectionArgument<this->MemberFunctorNoExcept> {}, FunctorHelperNoExceptObject
+    };
+    EXPECT_TRUE(DelegateMemberFunctorNoExcept);
+
+    egg::Events::Delegate DelegateMemberFunctorNoExceptWithPointer {
+        egg::Events::ConnectionArgument<this->MemberFunctorNoExcept> {}, &FunctorHelperNoExceptObject
+    };
+    EXPECT_TRUE(DelegateMemberFunctorNoExceptWithPointer);
 
 
     egg::Events::Delegate DelegateLambda { egg::Events::ConnectionArgument<this->Lambda> {} };
@@ -389,51 +461,47 @@ TYPED_TEST(DelegateTest, Constructors)
 
     egg::Events::Delegate DelegateLambdaNoExcept { egg::Events::ConnectionArgument<this->LambdaNoExcept> {} };
     EXPECT_TRUE(DelegateLambdaNoExcept);
-
-
-    FunctorsHelper<false> FunctorHelperObject;
-    egg::Events::Delegate DelegateFunctorPointer {
-        egg::Events::ConnectionArgument<this->FunctorPointer> {}, FunctorHelperObject
-    };
-    EXPECT_TRUE(DelegateFunctorPointer);
-
-    egg::Events::Delegate DelegateFunctorPointerWithPointer {
-        egg::Events::ConnectionArgument<this->FunctorPointer> {}, &FunctorHelperObject
-    };
-    EXPECT_TRUE(DelegateFunctorPointerWithPointer);
-
-    FunctorsHelper<true> FunctorHelperNoExceptObject;
-    egg::Events::Delegate DelegateFunctorPointerNoExcept {
-        egg::Events::ConnectionArgument<this->FunctorPointerNoExcept> {}, FunctorHelperNoExceptObject
-    };
-    EXPECT_TRUE(DelegateFunctorPointerNoExcept);
-
-    egg::Events::Delegate DelegateFunctorPointerNoExceptWithPointer {
-        egg::Events::ConnectionArgument<this->FunctorPointerNoExcept> {}, &FunctorHelperNoExceptObject
-    };
-    EXPECT_TRUE(DelegateFunctorPointerNoExceptWithPointer);
 }
 
 TYPED_TEST(DelegateTest, Reset)
 {
-    this->Delegate.template Connect<this->FreePointer>();
+    this->Delegate.template Connect<this->Free>();
     EXPECT_TRUE(this->Delegate);
     this->Delegate.Reset();
     EXPECT_FALSE(this->Delegate);
 
-    this->Delegate.template Connect<this->FreePointerNoExcept>();
+    this->Delegate.template Connect<this->FreeNoExcept>();
     EXPECT_TRUE(this->Delegate);
     this->Delegate.Reset();
     EXPECT_FALSE(this->Delegate);
 
 
     Helper HelperObject;
-    this->Delegate.template Connect<this->MemberPointer>(HelperObject);
+    this->Delegate.template Connect<this->MemberFunction>(HelperObject);
     EXPECT_TRUE(this->Delegate);
     this->Delegate.Reset();
     EXPECT_FALSE(this->Delegate);
 
-    this->Delegate.template Connect<this->MemberPointerNoExcept>(HelperObject);
+    this->Delegate.template Connect<this->MemberFunctionNoExcept>(HelperObject);
+    EXPECT_TRUE(this->Delegate);
+    this->Delegate.Reset();
+    EXPECT_FALSE(this->Delegate);
+
+
+    this->Delegate.template Connect<this->MemberValue>(HelperObject);
+    EXPECT_TRUE(this->Delegate);
+    this->Delegate.Reset();
+    EXPECT_FALSE(this->Delegate);
+
+
+    FunctorsHelper<false> FunctorHelperObject;
+    this->Delegate.template Connect<this->MemberFunctor>(FunctorHelperObject);
+    EXPECT_TRUE(this->Delegate);
+    this->Delegate.Reset();
+    EXPECT_FALSE(this->Delegate);
+
+    FunctorsHelper<true> FunctorHelperNoExceptObject;
+    this->Delegate.template Connect<this->MemberFunctorNoExcept>(FunctorHelperNoExceptObject);
     EXPECT_TRUE(this->Delegate);
     this->Delegate.Reset();
     EXPECT_FALSE(this->Delegate);
@@ -445,19 +513,6 @@ TYPED_TEST(DelegateTest, Reset)
     EXPECT_FALSE(this->Delegate);
 
     this->Delegate.template Connect<this->LambdaNoExcept>();
-    EXPECT_TRUE(this->Delegate);
-    this->Delegate.Reset();
-    EXPECT_FALSE(this->Delegate);
-
-
-    FunctorsHelper<false> FunctorHelperObject;
-    this->Delegate.template Connect<this->FunctorPointer>(FunctorHelperObject);
-    EXPECT_TRUE(this->Delegate);
-    this->Delegate.Reset();
-    EXPECT_FALSE(this->Delegate);
-
-    FunctorsHelper<true> FunctorHelperNoExceptObject;
-    this->Delegate.template Connect<this->FunctorPointerNoExcept>(FunctorHelperNoExceptObject);
     EXPECT_TRUE(this->Delegate);
     this->Delegate.Reset();
     EXPECT_FALSE(this->Delegate);
