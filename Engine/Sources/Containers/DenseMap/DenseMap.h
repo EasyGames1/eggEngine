@@ -4,8 +4,8 @@
 #include "./DenseMapIterator.h"
 #include "./DenseMapLocalIterator.h"
 #include "../../Containers/Container.h"
-#include "../../Containers/DenseMap/DenseMapNode.h"
 #include "../CompressedPair/CompressedPair.h"
+#include "./Internal/DenseMapNode.h"
 #include "Math/Math.h"
 
 #include <algorithm>
@@ -26,7 +26,7 @@ namespace egg::Containers
 
         using AllocatorTraits = AllocatorTraits<AllocatorParameter>;
 
-        using NodeType = DenseMapNode<KeyParameter, ValueParameter>;
+        using NodeType = Internal::DenseMapNode<KeyParameter, ValueParameter>;
         using SparseContainer = std::vector<std::size_t, typename AllocatorTraits::template rebind_alloc<std::size_t>>;
         using PackedContainer = std::vector<NodeType, typename AllocatorTraits::template rebind_alloc<NodeType>>;
 

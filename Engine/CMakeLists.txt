@@ -34,9 +34,9 @@ add_library(VulkanEngine_lib
         Sources/Scene/Scene.h
         Sources/Constants/Memory.h
         Sources/Containers/DenseMap/DenseMap.h
-        Sources/Containers/DenseMap/DenseMapNode.h
+        Sources/Containers/DenseMap/Internal/DenseMapNode.h
         Sources/Containers/CompressedPair/CompressedPair.h
-        Sources/Containers/CompressedPair/CompressedPairElement.h
+        Sources/Containers/CompressedPair/Internal/CompressedPairElement.h
         Sources/Containers/DenseMap/DenseMapLocalIterator.h
         Sources/ECS/Entity.h
         Sources/Events/Types/WindowEvent/WindowEvent.h
@@ -49,11 +49,13 @@ add_library(VulkanEngine_lib
         Sources/TypeInfo/TypeIndex.h
         Sources/TypeInfo/TypeInfo.h
         Sources/TypeInfo/TypeID.h
-        Sources/Hash/Traits/Murmur2Traits.h
-        Sources/Hash/Traits/Fnv1aTraits.h
+        Sources/Hash/Internal/Traits/Murmur2Traits.h
+        Sources/Hash/Internal/Traits/Fnv1aTraits.h
         Sources/ECS/Containers/Registry/Registry.h
         Sources/Events/Delegate.h
         Sources/Events/Traits/FunctionPointerTraits.h
+        Sources/TypeInfo/Internal/FunctionNameUtils.h
+        Sources/TypeInfo/Internal/TypeNameUtils.h
 )
 
 find_package(Vulkan REQUIRED)

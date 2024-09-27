@@ -5,7 +5,7 @@
 #include <cstring>
 #include <ranges>
 
-namespace egg::Hash
+namespace egg::Hash::Internal
 {
     template <typename>
     struct BasicMurmur2Traits;
@@ -35,27 +35,29 @@ namespace egg::Hash
 
         static constexpr Type Multiplier { BaseType::Multiplier };
 
-        [[nodiscard]] static constexpr Type UnalignedLoad(const std::byte* Pointer)
+        [[nodiscard]] static constexpr Type UnalignedLoad(const std::byte* Pointer) noexcept
         {
-            Type Result;
-            std::memcpy(&Result, Pointer, sizeof(Result));
+            Type Result {};
+            for (std::size_t i = 0; i < sizeof(Result); ++i)
+            {
+                Result |= std::to_integer<Type>(Pointer[i]) << (i << 3u);
+            }
             return Result;
         }
 
-        [[nodiscard]] static constexpr Type ShiftMix(const Type Value)
+        [[nodiscard]] static constexpr Type ShiftMix(const Type Value) noexcept
         {
-            return Value ^ Value >> 47;
+            return Value ^ Value >> 47u;
         }
 
         [[nodiscard]] static constexpr Type LoadBytes(const std::span<const std::byte> Bytes)
         {
             Type Result {};
-
-            for (const auto Byte : std::ranges::reverse_view { Bytes })
+            for (const std::byte Byte : std::ranges::reverse_view { Bytes })
             {
-                Result = (Result << 8) + static_cast<unsigned char>(Byte);
+                Result <<= 8u;
+                Result += std::to_integer<Type>(Byte);
             }
-
             return Result;
         }
     };

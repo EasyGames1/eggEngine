@@ -7,20 +7,21 @@ namespace egg::Types::Internal
     class TypeIndex final
     {
     public:
+        using IndexType = SizeType;
+
         template <typename>
-        [[nodiscard]] constexpr static SizeType Get() noexcept
+        [[nodiscard]] static IndexType Get() noexcept
         {
-            static const SizeType Index { Next() };
+            static const IndexType Index { Counter++ };
             return Index;
         }
 
     private:
-        [[nodiscard]] constexpr static SizeType Next() noexcept
-        {
-            static SizeType Counter {};
-            return Counter++;
-        }
+        static IndexType Counter;
     };
+
+    template <typename SizeType, typename Group>
+    typename TypeIndex<SizeType, Group>::IndexType TypeIndex<SizeType, Group>::Counter {};
 }
 
 #endif // ENGINE_SOURCES_TYPE_INFO_FILE_TYPE_INDEX_H

@@ -2,8 +2,9 @@
 #define ENGINE_SOURCES_TYPE_INFO_FILE_TYPEID_H
 
 #include "./TypeIndex.h"
-#include "Internal.h"
 #include "../Hash/DataHash.h"
+#include "./Internal/FunctionNameUtils.h"
+#include "./Internal/TypeNameUtils.h"
 
 #include <span>
 #include <string_view>
@@ -16,16 +17,19 @@ namespace egg::Types
         template <typename Type>
         [[nodiscard]] static consteval std::string_view GetName() noexcept
         {
-            const auto [Begin, Rest] { Internal::GetFunctionBounds() };
+            constexpr Internal::FunctionBounds Bounds { Internal::GetFunctionBounds() };
 
-            if (Begin == std::string_view::npos)
+            if (Bounds.BeginTypeName == std::string_view::npos)
             {
                 return std::string_view {};
             }
 
             constexpr std::string_view PrettyFunction { Internal::GetFunctionName<Type>() };
 
-            return Internal::RemovePrefixes(PrettyFunction.substr(Begin, PrettyFunction.size() - Rest - Begin));
+            return Internal::RemovePrefixes(PrettyFunction.substr(
+                Bounds.BeginTypeName,
+                PrettyFunction.size() - Bounds.RestAfterTypeName - Bounds.BeginTypeName
+            ));
         }
 
         template <typename Type>

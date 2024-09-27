@@ -1,17 +1,17 @@
 #ifndef ENGINE_SOURCES_CONTAINERS_COMPRESSED_PAIR_FILE_COMPRESSED_PAIR_H
 #define ENGINE_SOURCES_CONTAINERS_COMPRESSED_PAIR_FILE_COMPRESSED_PAIR_H
 
-#include "./CompressedPairElement.h"
+#include "./Internal/CompressedPairElement.h"
 
 namespace egg::Containers
 {
     template <typename First, typename Second>
     class CompressedPair final
-        : CompressedPairElement<First, 0u>,
-          CompressedPairElement<Second, 1u>
+        : Internal::CompressedPairElement<First, 0u>,
+          Internal::CompressedPairElement<Second, 1u>
     {
-        using FirstBase = CompressedPairElement<First, 0u>;
-        using SecondBase = CompressedPairElement<Second, 1u>;
+        using FirstBase = Internal::CompressedPairElement<First, 0u>;
+        using SecondBase = Internal::CompressedPairElement<Second, 1u>;
 
     public:
         using FirstType = First;
@@ -38,13 +38,13 @@ namespace egg::Containers
         {
         }
 
-        template <typename... Args, typename... OtherTypes>
+        template <typename... Args, typename... OtherArgs>
         constexpr CompressedPair(std::piecewise_construct_t,
                                  std::tuple<Args...> Arguments,
-                                 std::tuple<OtherTypes...> Other)
-            noexcept (std::is_nothrow_constructible_v<FirstBase, Args...> && std::is_nothrow_constructible_v<SecondBase, OtherTypes...>)
+                                 std::tuple<OtherArgs...> OtherArguments)
+            noexcept (std::is_nothrow_constructible_v<FirstBase, Args...> && std::is_nothrow_constructible_v<SecondBase, OtherArgs...>)
             : FirstBase { std::move(Arguments), std::index_sequence_for<Args...> {} },
-              SecondBase { std::move(Other), std::index_sequence_for<OtherTypes...> {} }
+              SecondBase { std::move(OtherArguments), std::index_sequence_for<OtherArgs...> {} }
         {
         }
 
