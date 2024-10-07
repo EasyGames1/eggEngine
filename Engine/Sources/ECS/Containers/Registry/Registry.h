@@ -5,7 +5,7 @@
 #include "../../Entity.h"
 #include "Containers/DenseMap/DenseMap.h"
 #include "ECS/Containers/SparseSet/SparseSet.h"
-#include "TypeInfo/TypeID.h"
+#include "Type/TypeID.h"
 
 #include <functional>
 

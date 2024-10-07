@@ -3,7 +3,7 @@
 #include "../../Single.h"
 #include "Events/Delegate.h"
 
-#include "TypeInfo/TypeInfo.h"
+#include "Type/TypeInfo.h"
 
 #include <gtest/gtest.h>
 
@@ -179,7 +179,7 @@ TEST_F(SparseSetTest, GetExtent)
 
 TEST_F(SparseSetTest, GetData)
 {
-    auto* First { Sparse.GetData() };
+    auto* First { Sparse.GetEntityData() };
     for (std::size_t i = 0; i < IterationsCount; ++i, ++First)
     {
         EXPECT_EQ(*First, GetEntityAt(i));

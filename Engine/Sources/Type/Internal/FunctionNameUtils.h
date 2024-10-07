@@ -13,7 +13,7 @@ namespace egg::Types::Internal
         return std::source_location::current().function_name();
     }
 
-    struct FunctionBounds
+    struct FunctionBounds final
     {
         constexpr FunctionBounds(const std::size_t BeginTypeName, const std::size_t RestAfterTypeName)
             : BeginTypeName { BeginTypeName },

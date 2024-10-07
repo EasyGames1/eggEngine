@@ -45,17 +45,21 @@ add_library(VulkanEngine_lib
         Sources/Containers/Container.h
         Sources/Containers/IterableAdaptor.h
         Sources/Containers/PointerImitator.h
-        Sources/Containers/Sorting.h
-        Sources/TypeInfo/TypeIndex.h
-        Sources/TypeInfo/TypeInfo.h
-        Sources/TypeInfo/TypeID.h
+        Sources/Type/TypeInfo.h
+        Sources/Type/TypeID.h
         Sources/Hash/Internal/Traits/Murmur2Traits.h
         Sources/Hash/Internal/Traits/Fnv1aTraits.h
         Sources/ECS/Containers/Registry/Registry.h
         Sources/Events/Delegate.h
         Sources/Events/Traits/FunctionPointerTraits.h
-        Sources/TypeInfo/Internal/FunctionNameUtils.h
-        Sources/TypeInfo/Internal/TypeNameUtils.h
+        Sources/Type/Internal/FunctionNameUtils.h
+        Sources/Type/Internal/TypeNameUtils.h
+        Sources/Type/Internal/TypeIndex.h
+        Sources/Type/Traits/Constness.h
+        Sources/Algorithms/Sorting/StandardSorting.h
+        Sources/Type/Traits/Deduction.h
+        Sources/Events/Traits/FunctorOverloadTraits.h
+        Sources/Events/Traits/Internal/FunctorOverloadTraits.h
 )
 
 find_package(Vulkan REQUIRED)

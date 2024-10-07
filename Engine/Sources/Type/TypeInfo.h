@@ -1,9 +1,9 @@
 #ifndef ENGINE_SOURCES_TYPE_INFO_FILE_TYPEID_H
 #define ENGINE_SOURCES_TYPE_INFO_FILE_TYPEID_H
 
-#include "./TypeIndex.h"
 #include "../Hash/DataHash.h"
 #include "./Internal/FunctionNameUtils.h"
+#include "./Internal/TypeIndex.h"
 #include "./Internal/TypeNameUtils.h"
 
 #include <span>
@@ -12,7 +12,7 @@
 namespace egg::Types
 {
     template <typename SizeType, typename Group = void>
-    struct TypeInfo
+    struct TypeInfo final
     {
         template <typename Type>
         [[nodiscard]] static consteval std::string_view GetName() noexcept

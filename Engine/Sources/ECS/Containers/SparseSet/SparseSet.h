@@ -4,7 +4,7 @@
 #include "SparseSetIterator.h"
 #include "../Container.h"
 #include "../../Traits/EntityTraits.h"
-#include "Containers/Sorting.h"
+#include "Algorithms/Sorting/StandardSorting.h"
 #include "ECS/Containers/PagedVector/PagedVector.h"
 #include "Math/Math.h"
 
@@ -24,10 +24,11 @@ namespace egg::ECS::Containers
 
         using TraitsType = EntityTraits<Type>;
 
+        using Reference = typename PackedContainer::reference;
+
     public:
         using AllocatorType = AllocatorParameter;
         using Pointer = typename PackedContainer::const_pointer;
-        using Reference = typename PackedContainer::reference;
 
         using EntityType = typename TraitsType::ValueType;
         using VersionType = typename TraitsType::VersionType;
@@ -38,13 +39,13 @@ namespace egg::ECS::Containers
         using ConstReverseIterator = std::reverse_iterator<ConstIterator>;
 
 
-        explicit SparseSet(const AllocatorType& Allocator = {}) : Sparse { Allocator }, Packed { Allocator }
+        explicit SparseSet(const AllocatorType& Allocator = {})
+            noexcept(std::is_nothrow_constructible_v<SparseContainer, const AllocatorType&>)
+            : Sparse { Allocator }, Packed { Allocator }
         {
         }
 
-        SparseSet(SparseSet&& Other) noexcept : Sparse { std::move(Other.Sparse) }, Packed { std::move(Other.Packed) }
-        {
-        }
+        SparseSet(SparseSet&& Other) noexcept(std::is_nothrow_move_constructible_v<SparseContainer>) = default;
 
         SparseSet(SparseSet&& Other, const AllocatorType& Allocator) : Sparse { std::move(Other.Sparse), Allocator },
                                                                        Packed { std::move(Other.Packed), Allocator }
@@ -57,7 +58,7 @@ namespace egg::ECS::Containers
 
         SparseSet& operator=(const SparseSet&) = delete;
 
-        SparseSet& operator=(SparseSet&& Other) noexcept
+        SparseSet& operator=(SparseSet&& Other) noexcept(std::is_nothrow_move_assignable_v<SparseContainer>)
         {
             EGG_ASSERT(AllocatorTraits::is_always_equal::value || Packed.get_allocator() == Other.Packed.get_allocator(),
                        "Cannot copy sparse set because it has a incompatible allocator");
@@ -66,7 +67,7 @@ namespace egg::ECS::Containers
             return *this;
         }
 
-        Iterator Push(const EntityType Entity)
+        virtual Iterator Push(const EntityType Entity)
         {
             EGG_ASSERT(Entity != TraitsType::Tombstone, "The entity cannot be a tombstone");
             auto& Element { Assure(Entity) };
@@ -209,13 +210,13 @@ namespace egg::ECS::Containers
             return Contains(Entity) ? ToIterator(Entity) : End();
         }
 
-        template <typename CompareType, typename SortType = egg::Containers::StandardSort, typename... Args>
+        template <typename CompareType, typename SortType = Algorithms::Sorting::StandardSorting, typename... Args>
         void Sort(CompareType Compare, SortType Sort = SortType {}, Args&&... Arguments)
         {
             SortCount(GetSize(), std::move(Compare), std::move(Sort), std::forward<Args>(Arguments)...);
         }
 
-        template <typename CompareType, typename SortType = egg::Containers::StandardSort, typename... Args>
+        template <typename CompareType, typename SortType = Algorithms::Sorting::StandardSorting, typename... Args>
         void SortCount(const std::size_t Count, CompareType Compare, SortType Sort = SortType {}, Args&&... Arguments)
         {
             EGG_ASSERT(Count <= GetSize(), "Count of elements to sort exceeds the number of elements");
@@ -274,7 +275,7 @@ namespace egg::ECS::Containers
             return Sparse.GetExtent();
         }
 
-        [[nodiscard]] Pointer GetData() const noexcept
+        [[nodiscard]] Pointer GetEntityData() const noexcept
         {
             return Packed.data();
         }

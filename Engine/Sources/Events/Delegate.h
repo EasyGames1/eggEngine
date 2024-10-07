@@ -3,6 +3,8 @@
 
 #include "Config/Config.h"
 #include "Traits/FunctionPointerTraits.h"
+#include "Traits/FunctorOverloadTraits.h"
+#include "Type/Traits/Constness.h"
 
 #include <functional>
 #include <tuple>
@@ -120,7 +122,7 @@ namespace egg::Events
 
     private:
         template <auto Candidate, std::size_t InstanceIndex, std::size_t... Indices>
-        [[nodiscard]] static constexpr ResultType InvokeMemberFunctor(std::tuple<Args...>&& Tuple)
+        [[nodiscard]] static constexpr ResultType InvokeMemberFunctor(auto&& Tuple)
         {
             return std::invoke_r<ResultType>(
                 std::invoke(
@@ -143,7 +145,7 @@ namespace egg::Events
 
                 [[maybe_unused]] const std::tuple Tuple { std::forward_as_tuple(std::forward<Args>(Arguments)...) };
 
-                if constexpr (MemberFunctorPointer<decltype(Candidate)>)
+                if constexpr (ValidMemberFunctorOverload<decltype(Candidate), ResultType, Args...>)
                 {
                     return InvokeMemberFunctor<Candidate, Indices + Offset...>(std::move(Tuple));
                 }
@@ -169,17 +171,15 @@ namespace egg::Events
 
                 [[maybe_unused]] const std::tuple Tuple { std::forward_as_tuple(std::forward<Args>(Arguments)...) };
 
-                if constexpr (MemberFunctorPointer<decltype(Candidate)>)
+                using PayloadConstness = Types::PointeeConstnessAsOther<Type, void>;
+
+                if constexpr (ValidMemberFunctorOverload<decltype(Candidate), ReturnType, Type, Args...>)
                 {
                     return std::invoke_r<ResultType>(
                         std::invoke(
                             Candidate,
                             *static_cast<std::conditional_t<std::is_pointer_v<Type>, Type, std::add_pointer_t<Type>>>(
-                                const_cast<std::add_pointer_t<std::conditional_t<
-                                        std::is_const_v<std::conditional_t<std::is_pointer_v<Type>, std::remove_pointer_t<Type>, Type>>,
-                                        std::add_const_t<void>,
-                                        void>
-                                >>(Payload)
+                                const_cast<PayloadConstness>(Payload)
                             )
                         ),
                         std::forward<std::tuple_element_t<Indices + Offset, std::tuple<Args...>>>(std::get<Indices + Offset>(Tuple))...
@@ -189,13 +189,7 @@ namespace egg::Events
                 {
                     return std::invoke_r<ResultType>(
                         Candidate,
-                        static_cast<Type>(
-                            const_cast<std::add_pointer_t<std::conditional_t<
-                                    std::is_const_v<std::remove_pointer_t<Type>>,
-                                    std::add_const_t<void>,
-                                    void>
-                            >>(Payload)
-                        ),
+                        static_cast<Type>(const_cast<PayloadConstness>(Payload)),
                         std::forward<std::tuple_element_t<Indices + Offset, std::tuple<Args...>>>(std::get<Indices + Offset>(Tuple))...
                     );
                 }
@@ -203,10 +197,7 @@ namespace egg::Events
                 {
                     return std::invoke_r<ResultType>(
                         Candidate,
-                        *static_cast<std::add_pointer_t<Type>>(
-                            const_cast<std::add_pointer_t<std::conditional_t<std::is_const_v<Type>, std::add_const_t<void>, void>>>(
-                                Payload)
-                        ),
+                        *static_cast<std::add_pointer_t<Type>>(const_cast<PayloadConstness>(Payload)),
                         std::forward<std::tuple_element_t<Indices + Offset, std::tuple<Args...>>>(std::get<Indices + Offset>(Tuple))...
                     );
                 }
@@ -216,7 +207,9 @@ namespace egg::Events
         template <auto Candidate>
         [[nodiscard]] static constexpr auto GetWrapped() noexcept
         {
-            if constexpr (std::is_invocable_r_v<ResultType, decltype(Candidate), Args...>)
+            if constexpr (
+                constexpr bool MemberFunctor { ValidMemberFunctorOverload<decltype(Candidate), ResultType, Args...> };
+                std::is_invocable_r_v<ResultType, decltype(Candidate), Args...> && !MemberFunctor)
             {
                 return [](const void*, Args... Arguments) -> ResultType
                 {
@@ -234,9 +227,20 @@ namespace egg::Events
                     "A member pointer provided without an object argument to a delegate whose first argument type differs from the object argument type"
                 );
 
-                return Wrap<Candidate>(
-                    typename FunctionPointerTraits<decltype(Candidate)>::template IndexSequenceFor<InstanceType> {}
-                );
+                if constexpr (MemberFunctor)
+                {
+                    return Wrap<Candidate>(
+                        typename FunctionPointerTraits<
+                            MemberFunctorOverload<decltype(Candidate), ReturnType, Args...>
+                        >::template IndexSequenceFor<InstanceType> {}
+                    );
+                }
+                else
+                {
+                    return Wrap<Candidate>(
+                        typename FunctionPointerTraits<decltype(Candidate)>::template IndexSequenceFor<InstanceType> {}
+                    );
+                }
             }
             else
             {
@@ -249,7 +253,15 @@ namespace egg::Events
         template <auto Candidate, ValidValueOrInstance<decltype(Candidate)> Type>
         [[nodiscard]] static constexpr auto GetWrapped() noexcept
         {
-            if constexpr (std::is_invocable_r_v<ResultType, decltype(Candidate), Type, Args...>)
+            if constexpr (ValidMemberFunctorOverload<decltype(Candidate), ResultType, Type, Args...>)
+            {
+                return Wrap<Candidate, Type>(
+                    typename FunctionPointerTraits<
+                        MemberFunctorOverload<decltype(Candidate), ResultType, Type, Args...>
+                    >::template IndexSequenceFor<> {}
+                );
+            }
+            else if constexpr (std::is_invocable_r_v<ResultType, decltype(Candidate), Type, Args...>)
             {
                 return Wrap<Candidate, Type>(std::index_sequence_for<Args...> {});
             }
@@ -258,7 +270,7 @@ namespace egg::Events
                 return Wrap<Candidate, Type>(
                     typename FunctionPointerTraits<
                         decltype(Candidate),
-                        std::conditional_t<std::is_pointer_v<Type>, std::remove_pointer_t<Type>, std::remove_reference_t<Type>>
+                        std::remove_cvref_t<std::remove_pointer_t<Type>>
                     >::template IndexSequenceFor<> {}
                 );
             }

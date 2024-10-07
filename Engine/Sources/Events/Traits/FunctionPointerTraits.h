@@ -5,9 +5,6 @@
 
 namespace egg::Events
 {
-    template <typename Type>
-    concept ValidFunctor = requires { Type::operator(); };
-
     template <typename ReturnType, typename... Args>
     struct FunctionTraits
     {
@@ -75,13 +72,6 @@ namespace egg::Events
         using InstanceType = Class;
     };
 
-    template <typename Class, ValidFunctor Type, typename... Other>
-    struct FunctionPointerTraits<Type Class::*, Other...> : FunctionPointerTraits<decltype(&Type::operator()), Other...>
-    {
-        using InstanceType = Class;
-        using FunctorType = Type;
-    };
-
     template <typename Type>
     concept FreeFunctionPointer = !requires { typename FunctionPointerTraits<Type>::InstanceType; };
 
@@ -91,9 +81,6 @@ namespace egg::Events
 
     template <typename Type, typename FunctionPointerType>
     concept ValidValueOrInstance = FreeFunctionPointer<FunctionPointerType> || ValidInstance<Type, FunctionPointerType>;
-
-    template <typename Type>
-    concept MemberFunctorPointer = requires { typename FunctionPointerTraits<Type>::FunctorType; };
 }
 
 #endif // ENGINE_SOURCES_EVENTS_TRAITS_FILE_FUNCTION_POINTER_TRAITS_H

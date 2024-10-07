@@ -14,32 +14,26 @@
 namespace egg::ECS::Containers
 {
     template <typename Type, ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
-    class PagedVector final
+    class PagedVector
     {
         using AllocatorTraits = AllocatorTraits<AllocatorParameter>;
 
         using ContainerType = std::vector<typename AllocatorTraits::pointer,
                                           typename AllocatorTraits::template rebind_alloc<typename AllocatorTraits::pointer>>;
+        using PayloadType = egg::Containers::CompressedPair<ContainerType, AllocatorParameter>;
 
         using PageSize = PageSizeTraits<Type>;
 
-        void ReleasePages()
-        {
-            for (auto&& Page : Payload.GetFirst())
-            {
-                if (!Page) continue;
-                std::destroy(Page, Page + PageSize::value);
-                AllocatorTraits::deallocate(Payload.GetSecond(), Page, PageSize::value);
-                Page = nullptr;
-            }
-        }
-
     public:
         using AllocatorType = AllocatorParameter;
+
         using ValueType = typename AllocatorTraits::value_type;
-        using Pointer = typename AllocatorTraits::const_pointer;
+
+        using Pointer = typename AllocatorTraits::pointer;
         using ConstPointer = typename AllocatorTraits::const_pointer;
+
         using Reference = ValueType&;
+        using ConstReference = const ValueType&;
 
         using Iterator = PagedVectorIterator<ContainerType>;
         using ConstIterator = PagedVectorIterator<const ContainerType>;
@@ -47,16 +41,20 @@ namespace egg::ECS::Containers
         using ConstReverseIterator = std::reverse_iterator<ConstIterator>;
 
 
-        explicit PagedVector(const AllocatorType& Allocator = {}) : Payload { Allocator, Allocator }
+        explicit PagedVector(const AllocatorType& Allocator = {})
+            noexcept(std::is_nothrow_constructible_v<PayloadType, const AllocatorType&, const AllocatorType&>)
+            : Payload { Allocator, Allocator }
         {
         }
 
-        PagedVector(PagedVector&& Other) noexcept : Payload { std::move(Other.Payload) }
-        {
-        }
+        PagedVector(PagedVector&& Other) noexcept(std::is_nothrow_move_constructible_v<PayloadType>) = default;
 
         PagedVector(PagedVector&& Other, const AllocatorType& Allocator)
-            : Payload { ContainerType { std::move(Other.Payload.GetFirst()), Allocator }, Allocator }
+            : Payload {
+                std::piecewise_construct,
+                std::forward_as_tuple(std::move(Other.Payload.GetFirst()), Allocator),
+                std::forward_as_tuple(Allocator)
+            }
         {
             EGG_ASSERT(AllocatorTraits::is_always_equal::value || GetAllocator() == Other.GetAllocator(),
                        "Cannot copy paged vector because it has a incompatible allocator");
@@ -69,7 +67,7 @@ namespace egg::ECS::Containers
 
         PagedVector& operator=(const PagedVector&) = delete;
 
-        PagedVector& operator=(PagedVector&& Other) noexcept
+        PagedVector& operator=(PagedVector&& Other) noexcept(std::is_nothrow_move_assignable_v<PayloadType>)
         {
             EGG_ASSERT(AllocatorTraits::is_always_equal::value || GetAllocator() == Other.GetAllocator(),
                        "Cannot copy paged vector because it has a incompatible allocator");
@@ -202,7 +200,18 @@ namespace egg::ECS::Containers
         }
 
     private:
-        egg::Containers::CompressedPair<ContainerType, AllocatorType> Payload;
+        void ReleasePages()
+        {
+            for (auto&& Page : Payload.GetFirst())
+            {
+                if (!Page) continue;
+                std::destroy(Page, Page + PageSize::value);
+                AllocatorTraits::deallocate(Payload.GetSecond(), Page, PageSize::value);
+                Page = nullptr;
+            }
+        }
+
+        PayloadType Payload;
     };
 }
 

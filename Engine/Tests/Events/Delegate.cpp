@@ -18,6 +18,12 @@ namespace Functors
     {
         void operator()(const int) noexcept(IsNoExcept)
         {
+            std::cout << "WoW!\n";
+        }
+
+        void operator()(const std::string_view) noexcept(IsNoExcept)
+        {
+            std::cout << "Double!\n";
         }
     };
 
@@ -315,6 +321,11 @@ TYPED_TEST_SUITE(DelegateTest, FunctionTypes);
 
 TYPED_TEST(DelegateTest, Connect)
 {
+    FunctorsHelper<true> h;
+    egg::Events::Delegate<void(/*FunctorsHelper<true>&*/int)> Del;
+    Del.Connect<&FunctorsHelper<true>::FunctorVoidInt>(h);
+    Del(100);
+
     EXPECT_FALSE(this->Delegate);
     this->Delegate.template Connect<this->Free>();
     EXPECT_TRUE(this->Delegate);

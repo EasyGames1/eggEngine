@@ -6,7 +6,7 @@
 namespace egg::Containers
 {
     template <typename IteratorType, typename SentinelType = IteratorType>
-    class IterableAdaptor
+    class IterableAdaptor final
     {
     public:
         using ValueType = typename IteratorTraits<IteratorType>::value_type;

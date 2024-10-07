@@ -256,7 +256,7 @@ TEST_F(StorageTest, Clear)
 
 TEST_F(StorageTest, Data)
 {
-    for (std::size_t i = 0; const auto& Current : Storage.Data())
+    for (std::size_t i = 0; const auto& Current : Storage.Element())
     {
         EXPECT_EQ(Current, GetComponentAtReversed(i));
         ++i;
