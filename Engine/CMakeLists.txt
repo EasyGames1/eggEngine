@@ -14,12 +14,9 @@ add_library(VulkanEngine_lib
         Sources/GUI/Window/Window.cpp
         Sources/Math/Math.cpp
         Sources/Config/Config.h
-        Sources/ECS/Containers/PagedVector/PagedVectorIterator.h
         Sources/ECS/Containers/PagedVector/PagedVector.h
         Sources/ECS/Containers/SparseSet/SparseSet.h
-        Sources/ECS/Containers/SparseSet/SparseSetIterator.h
         Sources/ECS/Containers/Storage/Storage.h
-        Sources/ECS/Containers/Storage/StorageIterator.h
         Sources/ECS/Systems/Renderer/Renderer.h
         Sources/ECS/Systems/System.h
         Sources/ECS/Traits/BasicEntityTraits.h
@@ -37,11 +34,9 @@ add_library(VulkanEngine_lib
         Sources/Containers/DenseMap/Internal/DenseMapNode.h
         Sources/Containers/CompressedPair/CompressedPair.h
         Sources/Containers/CompressedPair/Internal/CompressedPairElement.h
-        Sources/Containers/DenseMap/DenseMapLocalIterator.h
         Sources/ECS/Entity.h
         Sources/Events/Types/WindowEvent/WindowEvent.h
         Sources/ECS/Containers/Container.h
-        Sources/Containers/DenseMap/DenseMapIterator.h
         Sources/Containers/Container.h
         Sources/Containers/IterableAdaptor.h
         Sources/Containers/PointerImitator.h
@@ -60,6 +55,11 @@ add_library(VulkanEngine_lib
         Sources/Type/Traits/Deduction.h
         Sources/Events/Traits/FunctorOverloadTraits.h
         Sources/Events/Traits/Internal/FunctorOverloadTraits.h
+        Sources/Containers/DenseMap/Internal/DenseMapIterator.h
+        Sources/Containers/DenseMap/Internal/DenseMapLocalIterator.h
+        Sources/ECS/Containers/SparseSet/Internal/SparseSetIterator.h
+        Sources/ECS/Containers/Storage/Internal/StorageIterator.h
+        Sources/ECS/Containers/PagedVector/Internal/PagedVectorIterator.h
 )
 
 find_package(Vulkan REQUIRED)

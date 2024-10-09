@@ -1,10 +1,10 @@
 #ifndef ENGINE_SOURCES_CONTAINERS_DENSE_MAP_FILE_DENSE_MAP_H
 #define ENGINE_SOURCES_CONTAINERS_DENSE_MAP_FILE_DENSE_MAP_H
 
-#include "./DenseMapIterator.h"
-#include "./DenseMapLocalIterator.h"
 #include "../../Containers/Container.h"
 #include "../CompressedPair/CompressedPair.h"
+#include "./Internal/DenseMapIterator.h"
+#include "./Internal/DenseMapLocalIterator.h"
 #include "./Internal/DenseMapNode.h"
 #include "Math/Math.h"
 
@@ -39,13 +39,13 @@ namespace egg::Containers
         using HashType = HashParameter;
         using KeyEqualType = KeyEqualParameter;
 
-        using Iterator = DenseMapIterator<typename PackedContainer::iterator>;
-        using ConstIterator = DenseMapIterator<typename PackedContainer::const_iterator>;
-        using ReverseIterator = DenseMapIterator<typename PackedContainer::reverse_iterator>;
-        using ConstReverseIterator = DenseMapIterator<typename PackedContainer::const_reverse_iterator>;
+        using Iterator = Internal::DenseMapIterator<typename PackedContainer::iterator>;
+        using ConstIterator = Internal::DenseMapIterator<typename PackedContainer::const_iterator>;
+        using ReverseIterator = Internal::DenseMapIterator<typename PackedContainer::reverse_iterator>;
+        using ConstReverseIterator = Internal::DenseMapIterator<typename PackedContainer::const_reverse_iterator>;
 
-        using LocalIterator = DenseMapLocalIterator<typename PackedContainer::iterator>;
-        using ConstLocalIterator = DenseMapLocalIterator<typename PackedContainer::const_iterator>;
+        using LocalIterator = Internal::DenseMapLocalIterator<typename PackedContainer::iterator>;
+        using ConstLocalIterator = Internal::DenseMapLocalIterator<typename PackedContainer::const_iterator>;
 
         DenseMap() : DenseMap { MinimumCapacity }
         {

@@ -1,11 +1,11 @@
 #ifndef ENGINE_SOURCES_ECS_CONTAINERS_PAGED_VECTOR_FILE_PAGED_VECTOR_H
 #define ENGINE_SOURCES_ECS_CONTAINERS_PAGED_VECTOR_FILE_PAGED_VECTOR_H
 
-#include "./PagedVectorIterator.h"
 #include "../Container.h"
 #include "../../Traits/BasicEntityTraits.h"
 #include "Containers/CompressedPair/CompressedPair.h"
 #include "ECS/Traits/PageSizeTraits.h"
+#include "./Internal/PagedVectorIterator.h"
 #include "Math/Math.h"
 
 #include <memory>
@@ -35,8 +35,8 @@ namespace egg::ECS::Containers
         using Reference = ValueType&;
         using ConstReference = const ValueType&;
 
-        using Iterator = PagedVectorIterator<ContainerType>;
-        using ConstIterator = PagedVectorIterator<const ContainerType>;
+        using Iterator = Internal::PagedVectorIterator<ContainerType>;
+        using ConstIterator = Internal::PagedVectorIterator<const ContainerType>;
         using ReverseIterator = std::reverse_iterator<Iterator>;
         using ConstReverseIterator = std::reverse_iterator<ConstIterator>;
 

@@ -1,11 +1,11 @@
 #ifndef ENGINE_SOURCES_ECS_CONTAINERS_STORAGE_FILE_STORAGE_H
 #define ENGINE_SOURCES_ECS_CONTAINERS_STORAGE_FILE_STORAGE_H
 
-#include "StorageIterator.h"
 #include "../Container.h"
 #include "../../../Containers/IterableAdaptor.h"
 #include "../../Traits/ComponentTraits.h"
 #include "../SparseSet/SparseSet.h"
+#include "./Internal/StorageIterator.h"
 #include "ECS/Entity.h"
 
 #include <stdexcept>
@@ -43,16 +43,20 @@ namespace egg::ECS::Containers
         using ReverseIterator = typename ContainerType::ReverseIterator;
         using ConstReverseIterator = typename ContainerType::ConstReverseIterator;
 
+        using EachIterator = Internal::StorageIterator<typename BaseType::Iterator, Iterator>;
+        using ConstEachIterator = Internal::StorageIterator<typename BaseType::ConstIterator, ConstIterator>;
+        using ReverseEachIterator = Internal::StorageIterator<typename BaseType::ReverseIterator, ReverseIterator>;
+        using ConstReverseEachIterator = Internal::StorageIterator<typename BaseType::ConstReverseIterator, ConstReverseIterator>;
+
         using ElementIterable = egg::Containers::IterableAdaptor<Iterator>;
         using ConstElementIterable = egg::Containers::IterableAdaptor<ConstIterator>;
         using ReverseElementIterable = egg::Containers::IterableAdaptor<ReverseIterator>;
         using ConstReverseElementIterable = egg::Containers::IterableAdaptor<ConstReverseIterator>;
 
-        using EachIterable = egg::Containers::IterableAdaptor<StorageIterator<typename BaseType::Iterator, Iterator>>;
-        using ConstEachIterable = egg::Containers::IterableAdaptor<StorageIterator<typename BaseType::ConstIterator, ConstIterator>>;
-        using ReverseEachIterable = egg::Containers::IterableAdaptor<StorageIterator<typename BaseType::ReverseIterator, ReverseIterator>>;
-        using ConstReverseEachIterable = egg::Containers::IterableAdaptor<
-            StorageIterator<typename BaseType::ConstReverseIterator, ConstReverseIterator>>;
+        using EachIterable = egg::Containers::IterableAdaptor<EachIterator>;
+        using ConstEachIterable = egg::Containers::IterableAdaptor<ConstEachIterator>;
+        using ReverseEachIterable = egg::Containers::IterableAdaptor<ReverseEachIterator>;
+        using ConstReverseEachIterable = egg::Containers::IterableAdaptor<ConstReverseEachIterator>;
 
 
         Storage() : Storage { AllocatorType {} }
@@ -207,16 +211,16 @@ namespace egg::ECS::Containers
         [[nodiscard]] EachIterable Each() noexcept
         {
             return {
-                StorageIterator { BaseType::Begin(), Payload.Begin(BaseType::GetSize()) },
-                StorageIterator { BaseType::End(), Payload.End() }
+                EachIterator { BaseType::Begin(), Payload.Begin(BaseType::GetSize()) },
+                EachIterator { BaseType::End(), Payload.End() }
             };
         }
 
         [[nodiscard]] ConstEachIterable Each() const noexcept
         {
             return {
-                StorageIterator { BaseType::Begin(), Payload.Begin(BaseType::GetSize()) },
-                StorageIterator { BaseType::End(), Payload.End() }
+                ConstEachIterator { BaseType::Begin(), Payload.Begin(BaseType::GetSize()) },
+                ConstEachIterator { BaseType::End(), Payload.End() }
             };
         }
 
@@ -228,16 +232,16 @@ namespace egg::ECS::Containers
         [[nodiscard]] ReverseEachIterable ReverseEach() noexcept
         {
             return {
-                StorageIterator { BaseType::ReverseBegin(), Payload.ReverseBegin() },
-                StorageIterator { BaseType::ReverseEnd(), Payload.ReverseEnd(BaseType::GetSize()) }
+                ReverseEachIterator { BaseType::ReverseBegin(), Payload.ReverseBegin() },
+                ReverseEachIterator { BaseType::ReverseEnd(), Payload.ReverseEnd(BaseType::GetSize()) }
             };
         }
 
         [[nodiscard]] ConstReverseEachIterable ReverseEach() const noexcept
         {
             return {
-                StorageIterator { BaseType::ReverseBegin(), Payload.ReverseBegin() },
-                StorageIterator { BaseType::ReverseEnd(), Payload.ReverseEnd(BaseType::GetSize()) }
+                ConstReverseEachIterator { BaseType::ReverseBegin(), Payload.ReverseBegin() },
+                ConstReverseEachIterator { BaseType::ReverseEnd(), Payload.ReverseEnd(BaseType::GetSize()) }
             };
         }
 

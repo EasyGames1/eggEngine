@@ -1,16 +1,14 @@
 #ifndef ENGINE_SOURCES_ECS_CONTAINERS_SPARSE_SET_FILE_SPARSE_SET_H
 #define ENGINE_SOURCES_ECS_CONTAINERS_SPARSE_SET_FILE_SPARSE_SET_H
 
-#include "SparseSetIterator.h"
 #include "../Container.h"
 #include "../../Traits/EntityTraits.h"
 #include "Algorithms/Sorting/StandardSorting.h"
 #include "ECS/Containers/PagedVector/PagedVector.h"
-#include "Math/Math.h"
+#include "./Internal/SparseSetIterator.h"
 
 #include <memory>
 #include <vector>
-
 
 namespace egg::ECS::Containers
 {
@@ -33,8 +31,8 @@ namespace egg::ECS::Containers
         using EntityType = typename TraitsType::ValueType;
         using VersionType = typename TraitsType::VersionType;
 
-        using Iterator = SparseSetIterator<PackedContainer>;
-        using ConstIterator = SparseSetIterator<const PackedContainer>;
+        using Iterator = Internal::SparseSetIterator<PackedContainer>;
+        using ConstIterator = Internal::SparseSetIterator<const PackedContainer>;
         using ReverseIterator = std::reverse_iterator<Iterator>;
         using ConstReverseIterator = std::reverse_iterator<ConstIterator>;
 
