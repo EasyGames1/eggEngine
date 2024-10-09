@@ -8,4 +8,6 @@
 
 #endif
 
+#define EGG_EVENTS_RESOLVE_MEMBER_FUNCTORS true
+
 #endif // ENGINE_SOURCES_CONFIG_CONFIG_H

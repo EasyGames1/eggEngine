@@ -12,7 +12,8 @@ namespace egg::Events
     using FunctorOverload = typename Internal::FunctorOverloadTraits<Functor, Return, Args...>::Type;
 
     template <typename MemberFunctor, typename Return, typename... Args>
-    concept ValidMemberFunctorOverload = requires { typename Internal::MemberFunctorOverloadTraits<MemberFunctor, Return, Args...>; };
+    concept ValidMemberFunctorOverload =
+        EGG_EVENTS_RESOLVE_MEMBER_FUNCTORS && requires { typename Internal::MemberFunctorOverloadTraits<MemberFunctor, Return, Args...>; };
 
     template <typename MemberFunctor, typename Return, typename... Args> requires ValidMemberFunctorOverload<MemberFunctor, Return, Args...>
     using MemberFunctorOverload = typename Internal::MemberFunctorOverloadTraits<MemberFunctor, Return, Args...>::Type;
