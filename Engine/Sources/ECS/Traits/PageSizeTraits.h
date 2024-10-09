@@ -8,25 +8,23 @@
 
 namespace egg::ECS
 {
-    template <typename Type, typename = void>
+    template <typename Type>
     struct PageSizeTraits : std::integral_constant<std::size_t, !std::is_empty_v<Type> * Constants::PageSize<Type>>
     {
     };
 
-    template <>
-    struct PageSizeTraits<void> : std::integral_constant<std::size_t, 0u>
+    template <typename Type> requires std::is_void_v<Type>
+    struct PageSizeTraits<Type> : std::integral_constant<std::size_t, 0u>
     {
     };
 
-    template <typename Type>
-    struct PageSizeTraits<Type, std::void_t<decltype(Type::PageSize)>>
-        : std::integral_constant<std::size_t, Constants::PageSize<typename Type::PageSize>>
+    template <typename Type> requires requires { Type::PageSize; } && std::is_integral_v<decltype(Type::PageSize)>
+    struct PageSizeTraits<Type> : std::integral_constant<std::size_t, Constants::PageSize<typename Type::PageSize>>
     {
     };
 
     template <ValidEntity Type>
-    struct PageSizeTraits<Type> :
-        std::integral_constant<typename BasicEntityTraits<Type>::EntityType, Constants::PageSize<Type>>
+    struct PageSizeTraits<Type> : std::integral_constant<typename BasicEntityTraits<Type>::EntityType, Constants::PageSize<Type>>
     {
     };
 }

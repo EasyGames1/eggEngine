@@ -26,7 +26,7 @@ namespace egg::ECS::Containers
 
     public:
         using AllocatorType = AllocatorParameter;
-        using Pointer = typename PackedContainer::const_pointer;
+        using ConstPointer = typename PackedContainer::const_pointer;
 
         using EntityType = typename TraitsType::ValueType;
         using VersionType = typename TraitsType::VersionType;
@@ -273,7 +273,7 @@ namespace egg::ECS::Containers
             return Sparse.GetExtent();
         }
 
-        [[nodiscard]] Pointer GetEntityData() const noexcept
+        [[nodiscard]] ConstPointer GetEntityData() const noexcept
         {
             return Packed.data();
         }
@@ -394,7 +394,7 @@ namespace egg::ECS::Containers
         }
 
     private:
-        [[nodiscard]] Pointer GetPointer(const EntityType Entity) const
+        [[nodiscard]] ConstPointer GetPointer(const EntityType Entity) const
         {
             return Sparse.GetPointer(TraitsType::ToEntity(Entity));
         }

@@ -1,5 +1,6 @@
 #include "ECS/Containers/Storage/Storage.h"
 #include "../../Single.h"
+#include "ECS/Traits/ComponentTraits.h"
 
 #include <gtest/gtest.h>
 

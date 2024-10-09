@@ -3,7 +3,6 @@
 
 #include "../Container.h"
 #include "../../../Containers/IterableAdaptor.h"
-#include "../../Traits/ComponentTraits.h"
 #include "../SparseSet/SparseSet.h"
 #include "./Internal/StorageIterator.h"
 #include "ECS/Entity.h"
@@ -16,27 +15,23 @@ namespace egg::ECS::Containers
 {
     template <typename Type, ValidEntity EntityParameter, ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
     class Storage : public SparseSet<EntityParameter,
-                                     typename AllocatorTraits<AllocatorParameter>::template rebind_alloc<Entity>>
+                                     typename AllocatorTraits<AllocatorParameter>::template rebind_alloc<EntityParameter>>
     {
-        using AllocatorTraits = AllocatorTraits<AllocatorParameter>;
-
-        using TraitsType = ComponentTraits<Type>;
-        using EntityTraitsType = EntityTraits<EntityParameter>;
-
+        using StorageAllocatorTraits = AllocatorTraits<AllocatorParameter>;
         using ContainerType = PagedVector<Type, AllocatorParameter>;
 
     public:
-        using BaseType = SparseSet<EntityParameter, typename AllocatorTraits::template rebind_alloc<Entity>>;
+        using BaseType = SparseSet<EntityParameter, typename StorageAllocatorTraits::template rebind_alloc<EntityParameter>>;
         using AllocatorType = AllocatorParameter;
 
         using ElementType = Type;
         using EntityType = EntityParameter;
 
-        using Pointer = typename ContainerType::Pointer;
+        using Pointer = typename ContainerType::ConstPointer;
         using ConstPointer = typename ContainerType::ConstPointer;
 
         using Reference = typename ContainerType::Reference;
-        using ConstReference = const typename ContainerType::ConstReference;
+        using ConstReference = typename ContainerType::ConstReference;
 
         using Iterator = typename ContainerType::Iterator;
         using ConstIterator = typename ContainerType::ConstIterator;
@@ -71,12 +66,13 @@ namespace egg::ECS::Containers
         {
         }
 
-        Storage(Storage&& Other) noexcept(std::is_nothrow_move_constructible_v<ContainerType>) = default;
+        Storage(Storage&& Other)
+            noexcept(std::is_nothrow_move_constructible_v<BaseType> && std::is_nothrow_move_constructible_v<ContainerType>) = default;
 
         Storage(Storage&& Other, const AllocatorType& Allocator) : BaseType { std::move(Other), Allocator },
                                                                    Payload { std::move(Other.Payload), Allocator }
         {
-            EGG_ASSERT(AllocatorTraits::is_always_equal::value || Payload.GetAllocator() == Other.Payload.GetAllocator(),
+            EGG_ASSERT(StorageAllocatorTraits::is_always_equal::value || Payload.GetAllocator() == Other.Payload.GetAllocator(),
                        "Cannot copy storage because it has a incompatible allocator");
         }
 
@@ -85,9 +81,12 @@ namespace egg::ECS::Containers
             ShrinkToSize(0u);
         }
 
-        Storage& operator=(Storage&& Other) noexcept(std::is_nothrow_move_assignable_v<ContainerType>)
+        Storage& operator=(const Storage&) = delete;
+
+        Storage& operator=(Storage&& Other)
+            noexcept(std::is_nothrow_move_assignable_v<BaseType> && std::is_nothrow_move_assignable_v<ContainerType>)
         {
-            EGG_ASSERT(AllocatorTraits::is_always_equal::value || Payload.GetAllocator() == Other.Payload.GetAllocator(),
+            EGG_ASSERT(StorageAllocatorTraits::is_always_equal::value || Payload.GetAllocator() == Other.Payload.GetAllocator(),
                        "Cannot copy storage because it has a incompatible allocator");
             ShrinkToSize(0u);
             BaseType::operator=(std::move(Other));
@@ -153,7 +152,6 @@ namespace egg::ECS::Containers
             return Element;
         }
 
-
         void Clear() override
         {
             AllocatorType Allocator { Payload.GetAllocator() };
@@ -161,7 +159,7 @@ namespace egg::ECS::Containers
             for (auto First = BaseType::Begin(), Last = BaseType::End(); First != Last; ++First)
             {
                 BaseType::Erase(First);
-                AllocatorTraits::destroy(Allocator, std::addressof(Payload.GetReference(First.GetIndex())));
+                StorageAllocatorTraits::destroy(Allocator, std::addressof(Payload.GetReference(First.GetIndex())));
             }
         }
 
@@ -320,7 +318,7 @@ namespace egg::ECS::Containers
                 auto& Element { Payload.GetReference(BaseType::GetIndex(*First)) };
                 auto& Other { Payload.GetReference(BaseType::GetSize() - 1u) };
                 Element = std::move(Other);
-                AllocatorTraits::destroy(Allocator, std::addressof(Other));
+                StorageAllocatorTraits::destroy(Allocator, std::addressof(Other));
                 BaseType::Erase(First);
             }
         }
@@ -333,44 +331,47 @@ namespace egg::ECS::Containers
         ContainerType Payload;
     };
 
-    template <ValidEntity EntityType, ValidAllocator<EntityType> AllocatorParameter>
-    class Storage<EntityType, EntityType, AllocatorParameter> : public SparseSet<EntityType, AllocatorParameter>
-        //TODO: Review specializations
+    template <typename Type, ValidEntity EntityParameter, ValidAllocator<Type> AllocatorParameter>
+        requires std::is_same_v<Type, EntityParameter> || (!PageSizeTraits<Type>::value)
+    class Storage<Type, EntityParameter, AllocatorParameter>
+        : public SparseSet<EntityParameter, typename AllocatorTraits<AllocatorParameter>::template rebind_alloc<EntityParameter>>
     {
+        using ContainerType = PagedVector<Type, AllocatorParameter>;
+
     public:
-        using BaseType = SparseSet<EntityType, AllocatorParameter>;
+        using BaseType = SparseSet<EntityParameter, typename AllocatorTraits<AllocatorParameter>::template rebind_alloc<EntityParameter>>;
         using AllocatorType = AllocatorParameter;
+
+        using ElementType = Type;
+        using EntityType = EntityParameter;
+
+        using Pointer = typename ContainerType::Pointer;
+        using ConstPointer = typename ContainerType::ConstPointer;
+
+        using Reference = typename ContainerType::Reference;
+        using ConstReference = typename ContainerType::ConstReference;
+
 
         Storage() : Storage { AllocatorType {} }
         {
         }
 
-        explicit Storage(const AllocatorType& Allocator) : BaseType { Allocator }
+        explicit Storage(const AllocatorType& Allocator) noexcept(std::is_nothrow_constructible_v<BaseType, const AllocatorType&>)
+            : BaseType { Allocator }
         {
         }
 
-        Storage(Storage&& Other) noexcept : BaseType { std::move(Other) }
-        {
-        }
+        Storage(Storage&& Other) noexcept(std::is_nothrow_move_constructible_v<BaseType>) = default;
 
-        Storage(Storage&& Other, const AllocatorType& Allocator) noexcept : BaseType { std::move(Other), Allocator }
+        Storage(Storage&& Other, const AllocatorType& Allocator) : BaseType { std::move(Other), Allocator }
         {
         }
 
         ~Storage() noexcept override = default;
 
-        Storage& operator=(Storage&& Other) noexcept
-        {
-            BaseType::operator=(std::move(Other));
-            return *this;
-        }
-    };
+        Storage& operator=(const Storage&) = delete;
 
-    template <typename Type, ValidEntity EntityType, ValidAllocator<Type> AllocatorParameter> requires(!PageSizeTraits<Type>::value)
-    class Storage<Type, EntityType, AllocatorParameter> : public Storage<EntityType, AllocatorParameter>
-    {
-    public:
-        using ElementType = Type;
+        Storage& operator=(Storage&& Other) noexcept(std::is_nothrow_move_assignable_v<BaseType>) = default;
     };
 }
 
