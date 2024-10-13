@@ -54,6 +54,14 @@ namespace egg::Containers
         constexpr CompressedPair& operator=(CompressedPair&& Other)
             noexcept (std::is_nothrow_move_assignable_v<FirstBase> && std::is_nothrow_move_assignable_v<SecondBase>) = default;
 
+        constexpr friend void swap(CompressedPair& Left, CompressedPair& Right)
+            noexcept(std::is_nothrow_swappable_v<FirstType> && std::is_nothrow_swappable_v<SecondType>)
+        {
+            using std::swap;
+            swap(Left.GetFirst(), Right.GetFirst());
+            swap(Left.GetSecond(), Right.GetSecond());
+        }
+
         [[nodiscard]] constexpr FirstType& GetFirst() noexcept
         {
             return static_cast<FirstBase&>(*this).Get();

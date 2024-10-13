@@ -65,6 +65,14 @@ namespace egg::ECS::Containers
             return *this;
         }
 
+        friend void swap(SparseSet& Left, SparseSet& Right)
+            noexcept(std::is_nothrow_swappable_v<SparseContainer> && std::is_nothrow_swappable_v<PackedContainer>)
+        {
+            using std::swap;
+            swap(Left.Sparse, Right.Sparse);
+            swap(Left.Packed, Right.Packed);
+        }
+
         virtual Iterator Push(const EntityType Entity)
         {
             EGG_ASSERT(Entity != TraitsType::Tombstone, "The entity cannot be a tombstone");
@@ -390,7 +398,8 @@ namespace egg::ECS::Containers
             GetReference(From) = TraitsType::Combine(static_cast<typename TraitsType::EntityType>(Right), TraitsType::ToIntegral(From));
             GetReference(To) = TraitsType::Combine(static_cast<typename TraitsType::EntityType>(Left), TraitsType::ToIntegral(To));
 
-            std::swap(Packed[Left], Packed[Right]);
+            using std::swap;
+            swap(Packed[Left], Packed[Right]);
         }
 
     private:

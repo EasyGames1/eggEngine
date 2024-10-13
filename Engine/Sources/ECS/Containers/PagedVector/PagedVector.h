@@ -76,6 +76,12 @@ namespace egg::ECS::Containers
             return *this;
         }
 
+        friend void swap(PagedVector& Left, PagedVector& Right) noexcept(std::is_nothrow_swappable_v<PayloadType>)
+        {
+            using std::swap;
+            swap(Left.Payload, Right.Payload);
+        }
+
         [[nodiscard]] std::size_t GetExtent() const noexcept
         {
             return Payload.GetFirst().size() * PageSize::value;

@@ -25,12 +25,6 @@ namespace egg::ECS::Containers
 
     template <typename AllocatorType, typename Type>
     concept ValidAllocator = egg::Containers::ValidAllocator<AllocatorType, Type>;
-
-    template <typename Type>
-    concept EBCOEligible = egg::Containers::EBCOEligible<Type>;
-
-    template <typename Type>
-    concept Transparent = egg::Containers::Transparent<Type>;
 }
 
 

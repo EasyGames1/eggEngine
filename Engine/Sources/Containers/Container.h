@@ -97,15 +97,6 @@ namespace egg::Containers
 
     template <typename AllocatorType, typename Type>
     concept ValidAllocator = std::is_same_v<Type, typename AllocatorTraits<AllocatorType>::value_type>;
-
-    template <typename Type>
-    concept EBCOEligible = std::is_empty_v<Type> && !std::is_final_v<Type>;
-
-    template <typename Type>
-    concept Transparent = requires
-    {
-        typename Type::is_transparent;
-    };
 }
 
 #endif // ENGINE_SOURCES_CONTAINERS_FILE_CONTAINER_H

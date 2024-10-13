@@ -94,6 +94,14 @@ namespace egg::ECS::Containers
             return *this;
         }
 
+        friend void swap(Storage& Left, Storage& Right)
+            noexcept(std::is_nothrow_swappable_v<BaseType> && std::is_nothrow_swappable_v<ContainerType>)
+        {
+            using std::swap;
+            swap(static_cast<BaseType&>(Left), static_cast<BaseType&>(Right));
+            swap(Left.Payload, Right.Payload);
+        }
+
         template <typename... Args>
         Reference Emplace(const EntityType Entity, Args&&... Arguments)
         {
@@ -308,7 +316,8 @@ namespace egg::ECS::Containers
         void SwapPayloadAt(const std::size_t Left, const std::size_t Right)
         {
             static_assert(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>, "Non-movable type");
-            std::swap(Payload.GetReference(Left), Payload.GetReference(Right));
+            using std::swap;
+            swap(Payload.GetReference(Left), Payload.GetReference(Right));
         }
 
         void Pop(typename BaseType::Iterator First, typename BaseType::Iterator Last) override

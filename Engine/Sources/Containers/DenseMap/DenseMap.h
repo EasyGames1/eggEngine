@@ -27,8 +27,12 @@ namespace egg::Containers
         using AllocatorTraits = AllocatorTraits<AllocatorParameter>;
 
         using NodeType = Internal::DenseMapNode<KeyParameter, ValueParameter>;
+
         using SparseContainer = std::vector<std::size_t, typename AllocatorTraits::template rebind_alloc<std::size_t>>;
         using PackedContainer = std::vector<NodeType, typename AllocatorTraits::template rebind_alloc<NodeType>>;
+
+        using SparsePair = CompressedPair<SparseContainer, HashParameter>;
+        using PackedPair = CompressedPair<PackedContainer, KeyEqualParameter>;
 
     public:
         using AllocatorType = AllocatorParameter;
@@ -102,9 +106,8 @@ namespace egg::Containers
         {
         }
 
-        DenseMap(DenseMap&&) noexcept (
-            std::is_nothrow_move_constructible_v<CompressedPair<SparseContainer, HashType>> &&
-            std::is_nothrow_move_constructible_v<CompressedPair<PackedContainer, KeyEqualType>>) = default;
+        DenseMap(DenseMap&&) noexcept (std::is_nothrow_move_constructible_v<SparsePair> && std::is_nothrow_move_constructible_v<PackedPair>)
+        = default;
 
         DenseMap(DenseMap&& Other, const AllocatorType& Allocator)
             : Sparse {
@@ -125,9 +128,17 @@ namespace egg::Containers
 
         DenseMap& operator=(const DenseMap&) = default;
 
-        DenseMap& operator=(DenseMap&&) noexcept (
-            std::is_nothrow_move_assignable_v<CompressedPair<SparseContainer, HashType>> &&
-            std::is_nothrow_move_assignable_v<CompressedPair<PackedContainer, KeyEqualType>>) = default;
+        DenseMap& operator=(DenseMap&&)
+            noexcept (std::is_nothrow_move_assignable_v<SparsePair> && std::is_nothrow_move_assignable_v<PackedPair>) = default;
+
+        friend void swap(DenseMap& Left, DenseMap& Right)
+            noexcept(std::is_nothrow_swappable_v<SparsePair> && std::is_nothrow_swappable_v<PackedPair>)
+        {
+            using std::swap;
+            swap(Left.Sparse, Right.Sparse);
+            swap(Left.Packed, Right.Packed);
+            swap(Left.Threshold, Right.Threshold);
+        }
 
         std::pair<Iterator, bool> Insert(const ValueType& Value)
         {
@@ -293,13 +304,13 @@ namespace egg::Containers
             return FindInBucket(Key, GetBucketIndex(Key));
         }
 
-        template <typename Other> requires (Transparent<HashType> && Transparent<KeyEqualType>)
+        template <typename Other> requires (Types::Transparent<HashType> && Types::Transparent<KeyEqualType>)
         [[nodiscard]] Iterator Find(const Other& Key)
         {
             return FindInBucket(Key, GetBucketIndex(Key));
         }
 
-        template <typename Other> requires (Transparent<HashType> && Transparent<KeyEqualType>)
+        template <typename Other> requires (Types::Transparent<HashType> && Types::Transparent<KeyEqualType>)
         [[nodiscard]] ConstIterator Find(const Other& Key) const
         {
             return FindInBucket(Key, GetBucketIndex(Key));
@@ -334,7 +345,7 @@ namespace egg::Containers
             return Find(Key) != End();
         }
 
-        template <typename Other> requires (Transparent<HashType> && Transparent<KeyEqualType>)
+        template <typename Other> requires (Types::Transparent<HashType> && Types::Transparent<KeyEqualType>)
         [[nodiscard]] bool Contains(const Other& Key) const
         {
             return Find(Key) != End();
@@ -587,8 +598,8 @@ namespace egg::Containers
             }
         }
 
-        CompressedPair<SparseContainer, HashType> Sparse;
-        CompressedPair<PackedContainer, KeyEqualType> Packed;
+        SparsePair Sparse;
+        PackedPair Packed;
         float Threshold;
     };
 }

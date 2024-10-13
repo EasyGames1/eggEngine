@@ -1,7 +1,7 @@
 #ifndef ENGINE_SOURCES_CONTAINERS_COMPRESSED_PAIR_FILE_COMPRESSED_PAIR_ELEMENT_H
 #define ENGINE_SOURCES_CONTAINERS_COMPRESSED_PAIR_FILE_COMPRESSED_PAIR_ELEMENT_H
 
-#include "../../Container.h"
+#include "Type/Traits/Capabilities.h"
 
 #include <cstddef>
 #include <tuple>
@@ -51,7 +51,7 @@ namespace egg::Containers::Internal
         Type Value;
     };
 
-    template <EBCOEligible Type, std::size_t Position>
+    template <Types::EBCOEligible Type, std::size_t Position>
     class CompressedPairElement<Type, Position> : public Type
     {
         using BaseType = Type;
