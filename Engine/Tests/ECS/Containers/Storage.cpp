@@ -61,7 +61,7 @@ struct Velocity
 
     Velocity operator/(const float Value) const
     {
-        return *this * (1 / Value);
+        return *this * (1.f / Value);
     }
 
     bool operator<(const Velocity& Other) const
@@ -107,7 +107,7 @@ protected:
 
     StorageTest()
     {
-        for (std::size_t i = 0; i < IterationsCount; ++i)
+        for (std::size_t i = 0u; i < IterationsCount; ++i)
         {
             Storage.Emplace(GetEntityAt(i), GetComponentAt(i));
         }
@@ -215,15 +215,15 @@ TEST_F(StorageTest, Sort)
 
     for (std::size_t i = IterationsCount - 1u; i; --i)
     {
-        EXPECT_TRUE(Compare(Storage[i], Storage[i - 1]));
+        EXPECT_TRUE(Compare(Storage[i], Storage[i - 1u]));
     }
 
     Storage.Clear();
 
-    for (std::size_t i = 0, Value = 1; i < IterationsCount; ++i)
+    for (std::size_t i = 0u, Value = 1u; i < IterationsCount; ++i)
     {
         Storage.Emplace(GetEntityAt(Value), GetComponentAt(Value));
-        if (i % 2) --Value;
+        if (i % 2u) --Value;
         else Value += 4u;
     }
 
@@ -231,12 +231,12 @@ TEST_F(StorageTest, Sort)
 
     for (std::size_t i = IterationsCount - 1u; i; --i)
     {
-        EXPECT_TRUE(Compare(Storage[i], Storage[i - 1]));
+        EXPECT_TRUE(Compare(Storage[i], Storage[i - 1u]));
     }
 
     Storage.Clear();
 
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         Storage.Emplace(GetEntityAt(i), GetComponentAt(i));
     }
@@ -245,7 +245,7 @@ TEST_F(StorageTest, Sort)
 
     for (std::size_t i = IterationsCount - 1u; i; --i)
     {
-        EXPECT_TRUE(Compare(Storage[i], Storage[i - 1]));
+        EXPECT_TRUE(Compare(Storage[i], Storage[i - 1u]));
     }
 }
 
@@ -257,7 +257,7 @@ TEST_F(StorageTest, Clear)
 
 TEST_F(StorageTest, Data)
 {
-    for (std::size_t i = 0; const auto& Current : Storage.Element())
+    for (std::size_t i = 0u; const auto& Current : Storage.Element())
     {
         EXPECT_EQ(Current, GetComponentAtReversed(i));
         ++i;
@@ -266,7 +266,7 @@ TEST_F(StorageTest, Data)
 
 TEST_F(StorageTest, Each)
 {
-    for (std::size_t i = 0; const auto [Entity, Component] : Storage.Each())
+    for (std::size_t i = 0u; const auto [Entity, Component] : Storage.Each())
     {
         EXPECT_EQ(Storage.Get(Entity), Component);
         EXPECT_EQ(GetComponentAtReversed(i), Component);
@@ -276,7 +276,7 @@ TEST_F(StorageTest, Each)
 
 TEST_F(StorageTest, Get)
 {
-    for (std::size_t i = 0; const auto& Current : Storage)
+    for (std::size_t i = 0u; const auto& Current : Storage)
     {
         EXPECT_EQ(Storage.Get(Current), GetComponentAtReversed(i));
         ++i;
@@ -285,7 +285,7 @@ TEST_F(StorageTest, Get)
 
 TEST_F(StorageTest, GetAsTuple)
 {
-    for (std::size_t i = 0; const auto& Current : Storage)
+    for (std::size_t i = 0u; const auto& Current : Storage)
     {
         EXPECT_EQ(Storage.GetAsTuple(Current), std::forward_as_tuple(GetComponentAtReversed(i)));
         ++i;

@@ -24,12 +24,12 @@ namespace egg::Containers
         static constexpr float DefaultThreshold { 0.875f };
         static constexpr std::size_t MinimumCapacity { 8u };
 
-        using AllocatorTraits = AllocatorTraits<AllocatorParameter>;
+        using ContainerAllocatorTraits = AllocatorTraits<AllocatorParameter>;
 
         using NodeType = Internal::DenseMapNode<KeyParameter, ValueParameter>;
 
-        using SparseContainer = std::vector<std::size_t, typename AllocatorTraits::template rebind_alloc<std::size_t>>;
-        using PackedContainer = std::vector<NodeType, typename AllocatorTraits::template rebind_alloc<NodeType>>;
+        using SparseContainer = std::vector<std::size_t, typename ContainerAllocatorTraits::template rebind_alloc<std::size_t>>;
+        using PackedContainer = std::vector<NodeType, typename ContainerAllocatorTraits::template rebind_alloc<NodeType>>;
 
         using SparsePair = CompressedPair<SparseContainer, HashParameter>;
         using PackedPair = CompressedPair<PackedContainer, KeyEqualParameter>;
@@ -279,7 +279,7 @@ namespace egg::Containers
                     Element = (std::numeric_limits<std::size_t>::max)();
                 }
 
-                for (std::size_t Position = 0, Last = GetSize(); Position < Last; ++Position)
+                for (std::size_t Position = 0u, Last = GetSize(); Position < Last; ++Position)
                 {
                     const auto Index { GetBucketIndex(Packed.GetFirst()[Position].Value.first) };
                     Packed.GetFirst()[Position].Next = std::exchange(Sparse.GetFirst()[Index], Position);

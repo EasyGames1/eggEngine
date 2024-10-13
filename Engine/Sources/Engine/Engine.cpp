@@ -48,7 +48,7 @@ namespace egg
 
             for (auto* System : Systems)
             {
-                System->Update(0);
+                System->Update(0u);
             }
         }
     }

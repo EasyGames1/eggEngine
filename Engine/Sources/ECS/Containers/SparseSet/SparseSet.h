@@ -15,7 +15,7 @@ namespace egg::ECS::Containers
     template <ValidEntity Type, ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
     class SparseSet
     {
-        using AllocatorTraits = AllocatorTraits<AllocatorParameter>;
+        using ContainerAllocatorTraits = AllocatorTraits<AllocatorParameter>;
 
         using SparseContainer = PagedVector<Type, AllocatorParameter>;
         using PackedContainer = std::vector<Type, AllocatorParameter>;
@@ -48,7 +48,7 @@ namespace egg::ECS::Containers
         SparseSet(SparseSet&& Other, const AllocatorType& Allocator) : Sparse { std::move(Other.Sparse), Allocator },
                                                                        Packed { std::move(Other.Packed), Allocator }
         {
-            EGG_ASSERT(AllocatorTraits::is_always_equal::value || Packed.get_allocator() == Other.Packed.get_allocator(),
+            EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || Packed.get_allocator() == Other.Packed.get_allocator(),
                        "Cannot copy sparse set because it has a incompatible allocator");
         }
 
@@ -58,7 +58,7 @@ namespace egg::ECS::Containers
 
         SparseSet& operator=(SparseSet&& Other) noexcept(std::is_nothrow_move_assignable_v<SparseContainer>)
         {
-            EGG_ASSERT(AllocatorTraits::is_always_equal::value || Packed.get_allocator() == Other.Packed.get_allocator(),
+            EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || Packed.get_allocator() == Other.Packed.get_allocator(),
                        "Cannot copy sparse set because it has a incompatible allocator");
             Sparse = std::move(Other.Sparse);
             Packed = std::move(Other.Packed);
@@ -81,7 +81,7 @@ namespace egg::ECS::Containers
             auto Position { GetSize() };
             Packed.push_back(Entity);
             Element = TraitsType::Combine(static_cast<typename TraitsType::EntityType>(Position), TraitsType::ToIntegral(Entity));
-            return End() - (Position + 1);
+            return End() - (Position + 1u);
         }
 
         template <typename IteratorType>
@@ -110,7 +110,7 @@ namespace egg::ECS::Containers
         void Erase(const EntityType Entity)
         {
             const auto It { ToIterator(Entity) };
-            Pop(It, It + 1u);
+            Pop(It, It + 1);
         }
 
         template <typename It>
@@ -229,7 +229,7 @@ namespace egg::ECS::Containers
 
             Sort(Packed.rend() - Count, Packed.rend(), std::move(Compare), std::forward<Args>(Arguments)...);
 
-            for (std::size_t Position = 0; Position < Count; ++Position)
+            for (std::size_t Position = 0u; Position < Count; ++Position)
             {
                 std::size_t Current { Position };
                 std::size_t Next { GetIndex(Packed[Current]) };
@@ -418,14 +418,14 @@ namespace egg::ECS::Containers
             return Sparse.Assure(TraitsType::ToEntity(Entity));
         }
 
-        [[nodiscard]] ConstIterator ToIterator(const EntityType Entity) const
-        {
-            return End() - (GetIndex(Entity) + 1);
-        }
-
         [[nodiscard]] Iterator ToIterator(const EntityType Entity)
         {
-            return End() - (GetIndex(Entity) + 1);
+            return End() - (GetIndex(Entity) + 1u);
+        }
+
+        [[nodiscard]] ConstIterator ToIterator(const EntityType Entity) const
+        {
+            return End() - (GetIndex(Entity) + 1u);
         }
 
         SparseContainer Sparse;

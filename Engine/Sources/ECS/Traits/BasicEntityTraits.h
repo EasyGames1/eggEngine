@@ -32,8 +32,8 @@ namespace egg::ECS
         using EntityType = std::uint32_t;
         using VersionType = std::uint16_t;
 
-        static constexpr EntityType EntityMask { 0xFFFFF };
-        static constexpr VersionType VersionMask { 0xFFF };
+        static constexpr EntityType EntityMask { 0xFFFFFu };
+        static constexpr VersionType VersionMask { 0xFFFu };
     };
 
     template <>
@@ -45,8 +45,8 @@ namespace egg::ECS
         using EntityType = std::uint32_t;
         using VersionType = std::uint32_t;
 
-        static constexpr EntityType EntityMask { 0xFFFFFFFF };
-        static constexpr VersionType VersionMask { 0xFFFFFFFF };
+        static constexpr EntityType EntityMask { 0xFFFFFFFFu };
+        static constexpr VersionType VersionMask { 0xFFFFFFFFu };
     };
 }
 

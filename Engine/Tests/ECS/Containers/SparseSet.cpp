@@ -15,7 +15,7 @@ protected:
 
     SparseSetTest()
     {
-        for (std::size_t i = 0; i < IterationsCount; ++i)
+        for (std::size_t i = 0u; i < IterationsCount; ++i)
         {
             Sparse.Push(TraitsType::Construct(i, i));
         }
@@ -57,7 +57,7 @@ TEST_F(SparseSetTest, PushIterators)
 
 TEST_F(SparseSetTest, UpdateVersion)
 {
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         const EntityType CurrentEntity { GetEntityAt(i) };
         const TraitsType::VersionType Version { Sparse.GetVersion(CurrentEntity) };
@@ -69,7 +69,7 @@ TEST_F(SparseSetTest, UpdateVersion)
 
 TEST_F(SparseSetTest, Erase)
 {
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         const EntityType ToErase { GetEntityAt(i) };
         EXPECT_TRUE(Sparse.Contains(ToErase));
@@ -106,7 +106,7 @@ TEST_F(SparseSetTest, Clear)
 
 TEST_F(SparseSetTest, Remove)
 {
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         const EntityType EntityToRemove { GetEntityAt(i) };
         EXPECT_TRUE(Sparse.Remove(EntityToRemove));
@@ -137,7 +137,7 @@ TEST_F(SparseSetTest, RemoveIterators)
 
 TEST_F(SparseSetTest, SwapElements)
 {
-    for (std::size_t i = 1; i < IterationsCount; ++i)
+    for (std::size_t i = 1u; i < IterationsCount; ++i)
     {
         const EntityType PreviousEntity { GetEntityAt(i - 1u) };
         const EntityType CurrentEntity { GetEntityAt(i) };
@@ -180,7 +180,7 @@ TEST_F(SparseSetTest, GetExtent)
 TEST_F(SparseSetTest, GetData)
 {
     auto* First { Sparse.GetEntityData() };
-    for (std::size_t i = 0; i < IterationsCount; ++i, ++First)
+    for (std::size_t i = 0u; i < IterationsCount; ++i, ++First)
     {
         EXPECT_EQ(*First, GetEntityAt(i));
     }
@@ -188,7 +188,7 @@ TEST_F(SparseSetTest, GetData)
 
 TEST_F(SparseSetTest, IsContains)
 {
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         EXPECT_TRUE(Sparse.Contains(GetEntityAt(i)));
     }
@@ -196,7 +196,7 @@ TEST_F(SparseSetTest, IsContains)
 
 TEST_F(SparseSetTest, GetIndex)
 {
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         const EntityType EntityAtIndex { GetEntityAt(i) };
         EXPECT_EQ(Sparse[Sparse.GetIndex(EntityAtIndex)], EntityAtIndex);
@@ -205,7 +205,7 @@ TEST_F(SparseSetTest, GetIndex)
 
 TEST_F(SparseSetTest, GetVersion)
 {
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         const EntityType CurrentEntity { GetEntityAt(i) };
         EXPECT_EQ(Sparse.GetVersion(CurrentEntity), TraitsType::ToVersion(CurrentEntity));
@@ -215,7 +215,7 @@ TEST_F(SparseSetTest, GetVersion)
 TEST_F(SparseSetTest, Find)
 {
     EXPECT_EQ(Sparse.Find(GetEntityAt(IterationsCount)), Sparse.End());
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         EntityType CurrentEntity { GetEntityAt(i) };
         auto Found { Sparse.Find(CurrentEntity) };
@@ -237,15 +237,15 @@ TEST_F(SparseSetTest, Sort)
 
     for (std::size_t i = IterationsCount - 1u; i; --i)
     {
-        EXPECT_TRUE(Compare{}(Sparse[i], Sparse[i - 1]));
+        EXPECT_TRUE(Compare{}(Sparse[i], Sparse[i - 1u]));
     }
 
     Sparse.Clear();
 
-    for (std::size_t i = 0, Value = 1; i < IterationsCount; ++i)
+    for (std::size_t i = 0u, Value = 1u; i < IterationsCount; ++i)
     {
         Sparse.Push(GetEntityAt(Value));
-        if (i % 2) --Value;
+        if (i % 2u) --Value;
         else Value += 4u;
     }
 
@@ -253,12 +253,12 @@ TEST_F(SparseSetTest, Sort)
 
     for (std::size_t i = IterationsCount - 1u; i; --i)
     {
-        EXPECT_TRUE(Compare{}(Sparse[i], Sparse[i - 1]));
+        EXPECT_TRUE(Compare{}(Sparse[i], Sparse[i - 1u]));
     }
 
     Sparse.Clear();
 
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         Sparse.Push(GetEntityAt(i));
     }
@@ -267,7 +267,7 @@ TEST_F(SparseSetTest, Sort)
 
     for (std::size_t i = IterationsCount - 1u; i; --i)
     {
-        EXPECT_TRUE(Compare{}(Sparse[i], Sparse[i - 1]));
+        EXPECT_TRUE(Compare{}(Sparse[i], Sparse[i - 1u]));
     }
 
     Sparse.Clear();
@@ -275,21 +275,21 @@ TEST_F(SparseSetTest, Sort)
     std::vector<EntityType> Entities;
     Entities.reserve(IterationsCount);
 
-    for (std::size_t i = 0, Value = 1; i < IterationsCount; ++i)
+    for (std::size_t i = 0u, Value = 1u; i < IterationsCount; ++i)
     {
         Entities.emplace_back(GetEntityAt(i));
         Sparse.Push(GetEntityAt(Value));
-        if (i % 2) --Value;
+        if (i % 2u) --Value;
         else Value += 4u;
     }
 
     Sparse.SortAs(Entities.begin(), Entities.end());
 
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         if (auto First { Sparse.Find(Entities[i]) }; First != Sparse.End())
         {
-            for (std::size_t j = i + 1; j < IterationsCount; ++j)
+            for (std::size_t j = i + 1u; j < IterationsCount; ++j)
             {
                 if (auto Second { Sparse.Find(Entities[j]) }; Second != Sparse.End())
                 {
@@ -308,11 +308,11 @@ TEST_F(SparseSetTest, Sort)
 
     Sparse.SortAs(Entities.begin(), Entities.end());
 
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         if (auto First { Sparse.Find(Entities[i]) }; First != Sparse.End())
         {
-            for (std::size_t j = i + 1; j < IterationsCount; ++j)
+            for (std::size_t j = i + 1u; j < IterationsCount; ++j)
             {
                 if (auto Second { Sparse.Find(Entities[j]) }; Second != Sparse.End())
                 {
@@ -325,7 +325,7 @@ TEST_F(SparseSetTest, Sort)
 
 TEST_F(SparseSetTest, Subscript)
 {
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         EXPECT_EQ(Sparse[i], GetEntityAt(i));
     }
@@ -338,7 +338,7 @@ TEST_F(SparseSetTest, Iterable)
         EXPECT_EQ(*It, GetEntityAt(It.GetIndex()));
     }
 
-    std::size_t i { 0 };
+    std::size_t i { 0u };
     for (auto It = Sparse.ReverseBegin(), End = Sparse.ReverseEnd(); It != End; ++It, ++i)
     {
         EXPECT_EQ(*It, GetEntityAt(i));
@@ -372,7 +372,7 @@ TEST_F(SparseSetIteratorTest, NotEqual)
 TEST_F(SparseSetIteratorTest, Dereference)
 {
     auto It { Begin };
-    for (std::size_t i = 0; i < IterationsCount; ++i, ++It)
+    for (std::size_t i = 0u; i < IterationsCount; ++i, ++It)
     {
         EXPECT_EQ(*It, GetEntityAtReversed(i));
     }
@@ -381,9 +381,9 @@ TEST_F(SparseSetIteratorTest, Dereference)
 TEST_F(SparseSetIteratorTest, PreIncrement)
 {
     auto It { Begin };
-    for (std::size_t i = 0; i < IterationsCount - 1u; ++i)
+    for (std::size_t i = 0u; i < IterationsCount - 1u; ++i)
     {
-        EXPECT_EQ(*++It, GetEntityAtReversed(i + 1));
+        EXPECT_EQ(*++It, GetEntityAtReversed(i + 1u));
     }
     EXPECT_EQ(It, std::prev(End));
 }
@@ -391,7 +391,7 @@ TEST_F(SparseSetIteratorTest, PreIncrement)
 TEST_F(SparseSetIteratorTest, PostIncrement)
 {
     auto It { Begin };
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         EXPECT_EQ(*It++, GetEntityAtReversed(i));
     }
@@ -401,7 +401,7 @@ TEST_F(SparseSetIteratorTest, PostIncrement)
 TEST_F(SparseSetIteratorTest, PreDecrement)
 {
     auto It { End };
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         EXPECT_EQ(*--It, GetEntityAt(i));
     }
@@ -411,7 +411,7 @@ TEST_F(SparseSetIteratorTest, PreDecrement)
 TEST_F(SparseSetIteratorTest, PostDecrement)
 {
     auto It { std::prev(End) };
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         EXPECT_EQ(*It--, GetEntityAt(i));
     }
@@ -444,7 +444,7 @@ TEST_F(SparseSetIteratorTest, Subtraction)
 
 TEST_F(SparseSetIteratorTest, Subscript)
 {
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         EXPECT_EQ(End[i + 1u], Sparse[i]);
     }

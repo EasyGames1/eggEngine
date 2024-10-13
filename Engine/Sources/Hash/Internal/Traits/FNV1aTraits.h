@@ -12,8 +12,8 @@ namespace egg::Hash::Internal
     struct BasicFNV1aTraits<std::uint32_t>
     {
         using Type = std::uint32_t;
-        static constexpr Type Offset { 0x811c9dc5 };
-        static constexpr Type Prime { 0x01000193 };
+        static constexpr Type Offset { 0x811c9dc5u };
+        static constexpr Type Prime { 0x01000193u };
     };
 
     template <>

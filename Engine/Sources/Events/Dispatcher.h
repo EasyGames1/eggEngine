@@ -16,7 +16,7 @@ namespace egg::Events
         {
             auto& Handlers { GetHandlers<EventType>() };
             Handlers.push_back(Handler);
-            return Handlers.size() - 1;
+            return Handlers.size() - 1u;
         }
 
         template <typename EventType>

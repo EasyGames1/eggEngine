@@ -17,11 +17,11 @@ namespace egg::ECS::Containers
     class Storage : public SparseSet<EntityParameter,
                                      typename AllocatorTraits<AllocatorParameter>::template rebind_alloc<EntityParameter>>
     {
-        using StorageAllocatorTraits = AllocatorTraits<AllocatorParameter>;
+        using ContainerAllocatorTraits = AllocatorTraits<AllocatorParameter>;
         using ContainerType = PagedVector<Type, AllocatorParameter>;
 
     public:
-        using BaseType = SparseSet<EntityParameter, typename StorageAllocatorTraits::template rebind_alloc<EntityParameter>>;
+        using BaseType = SparseSet<EntityParameter, typename ContainerAllocatorTraits::template rebind_alloc<EntityParameter>>;
         using AllocatorType = AllocatorParameter;
 
         using ElementType = Type;
@@ -72,7 +72,7 @@ namespace egg::ECS::Containers
         Storage(Storage&& Other, const AllocatorType& Allocator) : BaseType { std::move(Other), Allocator },
                                                                    Payload { std::move(Other.Payload), Allocator }
         {
-            EGG_ASSERT(StorageAllocatorTraits::is_always_equal::value || Payload.GetAllocator() == Other.Payload.GetAllocator(),
+            EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || Payload.GetAllocator() == Other.Payload.GetAllocator(),
                        "Cannot copy storage because it has a incompatible allocator");
         }
 
@@ -86,7 +86,7 @@ namespace egg::ECS::Containers
         Storage& operator=(Storage&& Other)
             noexcept(std::is_nothrow_move_assignable_v<BaseType> && std::is_nothrow_move_assignable_v<ContainerType>)
         {
-            EGG_ASSERT(StorageAllocatorTraits::is_always_equal::value || Payload.GetAllocator() == Other.Payload.GetAllocator(),
+            EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || Payload.GetAllocator() == Other.Payload.GetAllocator(),
                        "Cannot copy storage because it has a incompatible allocator");
             ShrinkToSize(0u);
             BaseType::operator=(std::move(Other));
@@ -167,7 +167,7 @@ namespace egg::ECS::Containers
             for (auto First = BaseType::Begin(), Last = BaseType::End(); First != Last; ++First)
             {
                 BaseType::Erase(First);
-                StorageAllocatorTraits::destroy(Allocator, std::addressof(Payload.GetReference(First.GetIndex())));
+                ContainerAllocatorTraits::destroy(Allocator, std::addressof(Payload.GetReference(First.GetIndex())));
             }
         }
 
@@ -327,7 +327,7 @@ namespace egg::ECS::Containers
                 auto& Element { Payload.GetReference(BaseType::GetIndex(*First)) };
                 auto& Other { Payload.GetReference(BaseType::GetSize() - 1u) };
                 Element = std::move(Other);
-                StorageAllocatorTraits::destroy(Allocator, std::addressof(Other));
+                ContainerAllocatorTraits::destroy(Allocator, std::addressof(Other));
                 BaseType::Erase(First);
             }
         }

@@ -5,7 +5,7 @@
 
 namespace egg::Constants
 {
-    inline constexpr std::size_t PageSizeInBytes { 16384 };
+    inline constexpr std::size_t PageSizeInBytes { 16384u };
 
     template <typename Type> requires (sizeof(Type) != 0u)
     inline constexpr std::size_t PageSize { PageSizeInBytes / sizeof(Type) };

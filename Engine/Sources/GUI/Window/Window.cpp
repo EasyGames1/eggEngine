@@ -301,7 +301,7 @@ namespace egg::GUI
         return { Width, Height };
     }
 
-    std::array<Window::DimensionsType, 4> Window::GetFrameSize() const
+    std::array<Window::DimensionsType, 4u> Window::GetFrameSize() const
     {
         DimensionsType Left, Top, Right, Bottom;
         glfwGetWindowFrameSize(Data, &Left, &Top, &Right, &Bottom);

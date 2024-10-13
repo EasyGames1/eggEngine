@@ -98,7 +98,7 @@ namespace egg::Containers::Internal
 
         [[nodiscard]] constexpr reference operator*() const noexcept
         {
-            return operator[](0u);
+            return operator[](0);
         }
 
         template <typename OtherIteratorType>

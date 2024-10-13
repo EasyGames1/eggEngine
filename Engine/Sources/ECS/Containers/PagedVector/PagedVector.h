@@ -16,10 +16,10 @@ namespace egg::ECS::Containers
     template <typename Type, ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
     class PagedVector
     {
-        using AllocatorTraits = AllocatorTraits<AllocatorParameter>;
+        using ContainerAllocatorTraits = AllocatorTraits<AllocatorParameter>;
 
-        using ContainerType = std::vector<typename AllocatorTraits::pointer,
-                                          typename AllocatorTraits::template rebind_alloc<typename AllocatorTraits::pointer>>;
+        using ContainerType = std::vector<typename ContainerAllocatorTraits::pointer,
+                                          typename ContainerAllocatorTraits::template rebind_alloc<typename ContainerAllocatorTraits::pointer>>;
         using PayloadType = egg::Containers::CompressedPair<ContainerType, AllocatorParameter>;
 
         using PageSize = PageSizeTraits<Type>;
@@ -27,10 +27,10 @@ namespace egg::ECS::Containers
     public:
         using AllocatorType = AllocatorParameter;
 
-        using ValueType = typename AllocatorTraits::value_type;
+        using ValueType = typename ContainerAllocatorTraits::value_type;
 
-        using Pointer = typename AllocatorTraits::pointer;
-        using ConstPointer = typename AllocatorTraits::const_pointer;
+        using Pointer = typename ContainerAllocatorTraits::pointer;
+        using ConstPointer = typename ContainerAllocatorTraits::const_pointer;
 
         using Reference = ValueType&;
         using ConstReference = const ValueType&;
@@ -56,7 +56,7 @@ namespace egg::ECS::Containers
                 std::forward_as_tuple(Allocator)
             }
         {
-            EGG_ASSERT(AllocatorTraits::is_always_equal::value || GetAllocator() == Other.GetAllocator(),
+            EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || GetAllocator() == Other.GetAllocator(),
                        "Cannot copy paged vector because it has a incompatible allocator");
         }
 
@@ -69,7 +69,7 @@ namespace egg::ECS::Containers
 
         PagedVector& operator=(PagedVector&& Other) noexcept(std::is_nothrow_move_assignable_v<PayloadType>)
         {
-            EGG_ASSERT(AllocatorTraits::is_always_equal::value || GetAllocator() == Other.GetAllocator(),
+            EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || GetAllocator() == Other.GetAllocator(),
                        "Cannot copy paged vector because it has a incompatible allocator");
             ReleasePages();
             Payload = std::move(Other.Payload);
@@ -174,7 +174,7 @@ namespace egg::ECS::Containers
 
             if (!Payload.GetFirst()[Page])
             {
-                Payload.GetFirst()[Page] = AllocatorTraits::allocate(Payload.GetSecond(), PageSize::value);
+                Payload.GetFirst()[Page] = ContainerAllocatorTraits::allocate(Payload.GetSecond(), PageSize::value);
                 if constexpr (ValidEntity<Type>)
                 {
                     std::uninitialized_fill(
@@ -192,14 +192,14 @@ namespace egg::ECS::Containers
         {
             for (auto Position = Size; Position < AvailableElements; ++Position)
             {
-                AllocatorTraits::destroy(Payload.GetSecond(), std::addressof(GetReference(Position)));
+                ContainerAllocatorTraits::destroy(Payload.GetSecond(), std::addressof(GetReference(Position)));
             }
 
             const auto From { (Size + PageSize::value - 1u) / PageSize::value };
 
             for (auto Position = From; Position < Payload.GetFirst().size(); ++Position)
             {
-                AllocatorTraits::deallocate(Payload.GetSecond(), Payload.GetFirst()[Position], PageSize::value);
+                ContainerAllocatorTraits::deallocate(Payload.GetSecond(), Payload.GetFirst()[Position], PageSize::value);
             }
 
             Payload.GetFirst().resize(From);
@@ -212,7 +212,7 @@ namespace egg::ECS::Containers
             {
                 if (!Page) continue;
                 std::destroy(Page, Page + PageSize::value);
-                AllocatorTraits::deallocate(Payload.GetSecond(), Page, PageSize::value);
+                ContainerAllocatorTraits::deallocate(Payload.GetSecond(), Page, PageSize::value);
                 Page = nullptr;
             }
         }

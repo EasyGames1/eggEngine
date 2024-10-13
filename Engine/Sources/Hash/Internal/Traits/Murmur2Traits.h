@@ -38,7 +38,7 @@ namespace egg::Hash::Internal
         [[nodiscard]] static constexpr Type UnalignedLoad(const std::byte* Pointer) noexcept
         {
             Type Result {};
-            for (std::size_t i = 0; i < sizeof(Result); ++i)
+            for (std::size_t i = 0u; i < sizeof(Result); ++i)
             {
                 Result |= std::to_integer<Type>(Pointer[i]) << (i << 3u);
             }

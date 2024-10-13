@@ -301,7 +301,7 @@ namespace egg::GUI
         [[nodiscard]] std::pair<DimensionsType, DimensionsType> GetFrameBufferSize() const;
 
         //Returns Left, Top, Right, Bottom
-        [[nodiscard]] std::array<DimensionsType, 4> GetFrameSize() const;
+        [[nodiscard]] std::array<DimensionsType, 4u> GetFrameSize() const;
 
         [[nodiscard]] std::pair<ScalarType, ScalarType> GetContentScale() const;
 

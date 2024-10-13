@@ -21,7 +21,7 @@ protected:
     DenseMapTest()
     {
         DenseMap.Reserve(IterationsCount);
-        for (std::size_t i = 0; i < IterationsCount; ++i)
+        for (std::size_t i = 0u; i < IterationsCount; ++i)
         {
             DenseMap.Emplace(i, GetEntityAt(i));
         }
@@ -32,7 +32,7 @@ protected:
 
 TEST_F(DenseMapTest, Insert)
 {
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         auto [It, IsInserted] { DenseMap.Insert({ i, GetEntityAt(i) }) };
         EXPECT_FALSE(IsInserted);
@@ -72,7 +72,7 @@ TEST_F(DenseMapTest, InsertIterators)
 
 TEST_F(DenseMapTest, InsertOrAssign)
 {
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         auto [It, IsInserted] { DenseMap.InsertOrAssign(i, GetEntityAt(i)) };
         EXPECT_FALSE(IsInserted);
@@ -92,7 +92,7 @@ TEST_F(DenseMapTest, InsertOrAssign)
 
 TEST_F(DenseMapTest, Emplace)
 {
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         auto [It, IsInserted] { DenseMap.Emplace() };
         EXPECT_FALSE(IsInserted);
@@ -100,7 +100,7 @@ TEST_F(DenseMapTest, Emplace)
 
     EXPECT_EQ(DenseMap.GetSize(), IterationsCount);
 
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         std::pair<const KeyType, ValueType> Pair { i, GetEntityAt(i) };
         auto [It, IsInserted] { DenseMap.Emplace(Pair) };
@@ -123,7 +123,7 @@ TEST_F(DenseMapTest, Emplace)
 
     DenseMap.Clear();
 
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         auto [It, IsInserted] { DenseMap.Emplace(i, GetEntityAt(i)) };
         ASSERT_TRUE(IsInserted);
@@ -134,13 +134,13 @@ TEST_F(DenseMapTest, Emplace)
 
     EXPECT_EQ(DenseMap.GetSize(), IterationsCount);
 
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         auto [It, IsInserted] { DenseMap.Emplace(i, GetEntityAt(i)) };
         EXPECT_FALSE(IsInserted);
     }
 
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         auto [It, IsInserted] { DenseMap.Emplace(std::piecewise_construct, std::make_tuple(i), std::make_tuple(GetEntityAt(i))) };
         EXPECT_FALSE(IsInserted);
@@ -160,7 +160,7 @@ TEST_F(DenseMapTest, Emplace)
 
 TEST_F(DenseMapTest, TryEmplace)
 {
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         auto [It, IsInserted] { DenseMap.TryEmplace(i, GetEntityAt(i)) };
         EXPECT_FALSE(IsInserted);
@@ -180,7 +180,7 @@ TEST_F(DenseMapTest, Erase)
 {
     EXPECT_FALSE(DenseMap.Erase(IterationsCount));
 
-    for (std::size_t i = 0; i < IterationsCount; ++i)
+    for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
         EXPECT_TRUE(DenseMap.Erase(i));
         EXPECT_FALSE(DenseMap.Contains(i));

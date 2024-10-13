@@ -10,8 +10,8 @@ using EntityType = egg::ECS::Entity;
 
 using EntityTraitsType = egg::ECS::EntityTraits<EntityType>;
 
-constexpr std::size_t IterationsCount { 3 };
-static_assert(IterationsCount >= 3, "Iterations count is too small");
+constexpr std::size_t IterationsCount { 3u };
+static_assert(IterationsCount >= 3u, "Iterations count is too small");
 static_assert(IterationsCount < EntityTraitsType::VersionMask / 2u, "Iterations count causes a version overflow");
 static_assert(IterationsCount < EntityTraitsType::EntityMask / 2u, "Iterations count causes an entity overflow");
 

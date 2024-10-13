@@ -15,7 +15,7 @@ namespace egg::ECS::Containers::Internal
     {
         using ContainerType = std::remove_const_t<Container>;
         using ContainerAllocatorTraits = AllocatorTraits<typename ContainerType::allocator_type>;
-        using IteratorTraits = IteratorTraits<std::conditional_t<
+        using ContainerIteratorTraits = IteratorTraits<std::conditional_t<
             std::is_const_v<Container>,
             typename ContainerAllocatorTraits::template rebind_traits<typename std::pointer_traits<typename
                 ContainerType::value_type>::element_type>::const_pointer,
@@ -23,10 +23,10 @@ namespace egg::ECS::Containers::Internal
                 ContainerType::value_type>::element_type>::pointer>>;
 
     public:
-        using value_type = typename IteratorTraits::value_type;
-        using pointer = typename IteratorTraits::pointer;
-        using reference = typename IteratorTraits::reference;
-        using difference_type = typename IteratorTraits::difference_type;
+        using value_type = typename ContainerIteratorTraits::value_type;
+        using pointer = typename ContainerIteratorTraits::pointer;
+        using reference = typename ContainerIteratorTraits::reference;
+        using difference_type = typename ContainerIteratorTraits::difference_type;
         using iterator_category = std::random_access_iterator_tag;
         using iterator_concept = std::random_access_iterator_tag;
 
@@ -100,12 +100,12 @@ namespace egg::ECS::Containers::Internal
 
         [[nodiscard]] constexpr pointer operator->() const noexcept
         {
-            return std::addressof(operator[](0u));
+            return std::addressof(operator[](0));
         }
 
         [[nodiscard]] constexpr reference operator*() const noexcept
         {
-            return operator[](0u);
+            return operator[](0);
         }
 
         [[nodiscard]] constexpr difference_type GetIndex() const noexcept

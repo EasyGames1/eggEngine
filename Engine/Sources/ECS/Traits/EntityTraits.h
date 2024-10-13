@@ -15,8 +15,8 @@ namespace egg::ECS
 
         static constexpr auto Length { std::popcount(BaseType::EntityMask) };
 
-        static_assert(!(BaseType::EntityMask && BaseType::EntityMask & BaseType::EntityMask + 1), "Invalid entity mask");
-        static_assert(!(BaseType::VersionMask & BaseType::VersionMask + 1), "Invalid version mask");
+        static_assert(!(BaseType::EntityMask && BaseType::EntityMask & BaseType::EntityMask + 1u), "Invalid entity mask");
+        static_assert(!(BaseType::VersionMask & BaseType::VersionMask + 1u), "Invalid version mask");
 
     public:
         using ValueType = typename BaseType::ValueType;

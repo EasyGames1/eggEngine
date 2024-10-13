@@ -14,13 +14,13 @@ namespace egg::ECS::Containers
     template <ValidEntity EntityParameter, ValidAllocator<EntityParameter> AllocatorParameter = std::allocator<EntityParameter>>
     class Registry
     {
-        using AllocatorTraits = AllocatorTraits<AllocatorParameter>;
+        using ContainerAllocatorTraits = AllocatorTraits<AllocatorParameter>;
         using StorageBase = SparseSet<EntityParameter, AllocatorParameter>;
 
         using PoolContainer = egg::Containers::DenseMap<
             Types::TypeID, StorageBase*,
             std::identity, std::equal_to<>,
-            typename AllocatorTraits::template rebind_alloc<std::pair<const Types::TypeID, StorageBase*>>
+            typename ContainerAllocatorTraits::template rebind_alloc<std::pair<const Types::TypeID, StorageBase*>>
         >;
 
     public:
