@@ -13,6 +13,9 @@ namespace egg::Types
     {
         typename Type::is_transparent;
     };
+
+    template <typename AllocatorType, typename Type>
+    concept ValidAllocator = std::same_as<Type, typename std::allocator_traits<AllocatorType>::value_type>;
 }
 
 #endif // ENGINE_SOURCES_TYPE_TRAITS_FILE_CAPABILITIES_H

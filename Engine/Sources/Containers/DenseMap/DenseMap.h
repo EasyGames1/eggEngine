@@ -2,6 +2,7 @@
 #define ENGINE_SOURCES_CONTAINERS_DENSE_MAP_FILE_DENSE_MAP_H
 
 #include "../../Containers/Container.h"
+#include "../../Type/Traits/Capabilities.h"
 #include "../CompressedPair/CompressedPair.h"
 #include "./Internal/DenseMapIterator.h"
 #include "./Internal/DenseMapLocalIterator.h"
@@ -17,8 +18,9 @@
 namespace egg::Containers
 {
     template <typename KeyParameter, typename ValueParameter,
-              typename HashParameter, typename KeyEqualParameter,
-              ValidAllocator<std::pair<const KeyParameter, ValueParameter>> AllocatorParameter>
+              typename HashParameter = std::identity, typename KeyEqualParameter = std::equal_to<>,
+              Types::ValidAllocator<std::pair<const KeyParameter, ValueParameter>> AllocatorParameter
+              = std::allocator<std::pair<const KeyParameter, ValueParameter>>>
     class DenseMap
     {
         static constexpr float DefaultThreshold { 0.875f };
@@ -51,37 +53,38 @@ namespace egg::Containers
         using LocalIterator = Internal::DenseMapLocalIterator<typename PackedContainer::iterator>;
         using ConstLocalIterator = Internal::DenseMapLocalIterator<typename PackedContainer::const_iterator>;
 
-        DenseMap() : DenseMap { MinimumCapacity }
+        constexpr DenseMap() : DenseMap { MinimumCapacity }
         {
         }
 
-        explicit DenseMap(const AllocatorType& Allocator) : DenseMap { MinimumCapacity, Allocator }
+        constexpr explicit DenseMap(const AllocatorType& Allocator) : DenseMap { MinimumCapacity, Allocator }
         {
         }
 
-        DenseMap(const std::size_t BucketCount, const AllocatorType& Allocator) : DenseMap { BucketCount, DefaultThreshold, Allocator }
+        constexpr DenseMap(const std::size_t BucketCount, const AllocatorType& Allocator)
+            : DenseMap { BucketCount, DefaultThreshold, Allocator }
         {
         }
 
-        DenseMap(const std::size_t BucketCount, const float Threshold, const AllocatorType& Allocator)
+        constexpr DenseMap(const std::size_t BucketCount, const float Threshold, const AllocatorType& Allocator)
             : DenseMap { BucketCount, HashType {}, KeyEqualType {}, Allocator, Threshold }
         {
         }
 
-        DenseMap(const std::size_t BucketCount, const HashType& Hash, const AllocatorType& Allocator)
+        constexpr DenseMap(const std::size_t BucketCount, const HashType& Hash, const AllocatorType& Allocator)
             : DenseMap { BucketCount, Hash, KeyEqualType {}, Allocator, DefaultThreshold }
         {
         }
 
-        DenseMap(const std::size_t BucketCount, const KeyEqualType& KeyEqual, const AllocatorType& Allocator)
+        constexpr DenseMap(const std::size_t BucketCount, const KeyEqualType& KeyEqual, const AllocatorType& Allocator)
             : DenseMap { BucketCount, HashType {}, KeyEqual, Allocator, DefaultThreshold }
         {
         }
 
-        explicit DenseMap(const std::size_t BucketCount,
-                          const HashType& Hash = HashType {}, const KeyEqualType KeyEqual = KeyEqualType {},
-                          const AllocatorType& Allocator = AllocatorType {},
-                          const float Threshold = DefaultThreshold)
+        constexpr explicit DenseMap(const std::size_t BucketCount,
+                                    const HashType& Hash = HashType {}, const KeyEqualType KeyEqual = KeyEqualType {},
+                                    const AllocatorType& Allocator = AllocatorType {},
+                                    const float Threshold = DefaultThreshold)
             : Sparse { Allocator, Hash },
               Packed { Allocator, KeyEqual },
               Threshold { Threshold }
@@ -89,9 +92,9 @@ namespace egg::Containers
             Rehash(BucketCount);
         }
 
-        DenseMap(const DenseMap&) = default;
+        constexpr DenseMap(const DenseMap&) = default;
 
-        DenseMap(const DenseMap& Other, const AllocatorType& Allocator)
+        constexpr DenseMap(const DenseMap& Other, const AllocatorType& Allocator)
             : Sparse {
                   std::piecewise_construct,
                   std::forward_as_tuple(Other.Sparse.GetFirst(), Allocator),
@@ -106,10 +109,11 @@ namespace egg::Containers
         {
         }
 
-        DenseMap(DenseMap&&) noexcept (std::is_nothrow_move_constructible_v<SparsePair> && std::is_nothrow_move_constructible_v<PackedPair>)
+        constexpr DenseMap(
+            DenseMap&&) noexcept (std::is_nothrow_move_constructible_v<SparsePair> && std::is_nothrow_move_constructible_v<PackedPair>)
         = default;
 
-        DenseMap(DenseMap&& Other, const AllocatorType& Allocator)
+        constexpr DenseMap(DenseMap&& Other, const AllocatorType& Allocator)
             : Sparse {
                   std::piecewise_construct,
                   std::forward_as_tuple(std::move(Other.Sparse.GetFirst()), Allocator),
@@ -124,14 +128,14 @@ namespace egg::Containers
         {
         }
 
-        ~DenseMap() noexcept = default;
+        constexpr ~DenseMap() noexcept = default;
 
-        DenseMap& operator=(const DenseMap&) = default;
+        constexpr DenseMap& operator=(const DenseMap&) = default;
 
         DenseMap& operator=(DenseMap&&)
             noexcept (std::is_nothrow_move_assignable_v<SparsePair> && std::is_nothrow_move_assignable_v<PackedPair>) = default;
 
-        friend void swap(DenseMap& Left, DenseMap& Right)
+        friend constexpr void swap(DenseMap& Left, DenseMap& Right)
             noexcept(std::is_nothrow_swappable_v<SparsePair> && std::is_nothrow_swappable_v<PackedPair>)
         {
             using std::swap;
@@ -140,24 +144,24 @@ namespace egg::Containers
             swap(Left.Threshold, Right.Threshold);
         }
 
-        std::pair<Iterator, bool> Insert(const ValueType& Value)
+        constexpr std::pair<Iterator, bool> Insert(const ValueType& Value)
         {
             return InsertOrDoNothing(Value.first, Value.second);
         }
 
-        std::pair<Iterator, bool> Insert(ValueType&& Value)
+        constexpr std::pair<Iterator, bool> Insert(ValueType&& Value)
         {
             return InsertOrDoNothing(std::move(Value.first), std::move(Value.second));
         }
 
         template <typename Arg> requires std::is_constructible_v<ValueType, Arg&&>
-        std::pair<Iterator, bool> Insert(Arg&& Value)
+        constexpr std::pair<Iterator, bool> Insert(Arg&& Value)
         {
             return InsertOrDoNothing(std::forward<Arg>(Value).first, std::forward<Arg>(Value).second);
         }
 
         template <typename IteratorType>
-        void Insert(IteratorType First, IteratorType Last)
+        constexpr void Insert(IteratorType First, IteratorType Last)
         {
             for (; First != Last; ++First)
             {
@@ -166,19 +170,19 @@ namespace egg::Containers
         }
 
         template <typename Arg>
-        std::pair<Iterator, bool> InsertOrAssign(const KeyType& Key, Arg&& Value)
+        constexpr std::pair<Iterator, bool> InsertOrAssign(const KeyType& Key, Arg&& Value)
         {
             return InsertOrOverwrite(Key, std::forward<Arg>(Value));
         }
 
         template <typename Arg>
-        std::pair<Iterator, bool> InsertOrAssign(KeyType&& Key, Arg&& Value)
+        constexpr std::pair<Iterator, bool> InsertOrAssign(KeyType&& Key, Arg&& Value)
         {
             return InsertOrOverwrite(std::move(Key), std::forward<Arg>(Value));
         }
 
         template <typename... Args>
-        std::pair<Iterator, bool> Emplace(Args&&... Arguments)
+        constexpr std::pair<Iterator, bool> Emplace(Args&&... Arguments)
         {
             if constexpr (!sizeof...(Args))
             {
@@ -212,25 +216,25 @@ namespace egg::Containers
         }
 
         template <typename... Args>
-        std::pair<Iterator, bool> TryEmplace(const KeyType& Key, Args&&... Arguments)
+        constexpr std::pair<Iterator, bool> TryEmplace(const KeyType& Key, Args&&... Arguments)
         {
             return InsertOrDoNothing(Key, std::forward<Args>(Arguments)...);
         }
 
         template <typename... Args>
-        std::pair<Iterator, bool> TryEmplace(KeyType&& Key, Args&&... Arguments)
+        constexpr std::pair<Iterator, bool> TryEmplace(KeyType&& Key, Args&&... Arguments)
         {
             return InsertOrDoNothing(std::move(Key), std::forward<Args>(Arguments)...);
         }
 
-        Iterator Erase(ConstIterator Position)
+        constexpr Iterator Erase(ConstIterator Position)
         {
             const auto Difference { Position - ConstBegin() };
             Erase(Position->first);
             return Begin() + Difference;
         }
 
-        bool Erase(const KeyType& Key)
+        constexpr bool Erase(const KeyType& Key)
         {
             for (std::size_t* Current = &Sparse.GetFirst()[GetBucketIndex(Key)];
                  *Current != (std::numeric_limits<std::size_t>::max)();
@@ -248,20 +252,20 @@ namespace egg::Containers
             return false;
         }
 
-        void Clear() noexcept
+        constexpr void Clear() noexcept
         {
             Sparse.GetFirst().clear();
             Packed.GetFirst().clear();
             Rehash(0u);
         }
 
-        void Reserve(const std::size_t Count)
+        constexpr void Reserve(const std::size_t Count)
         {
             Packed.GetFirst().reserve(Count);
             Rehash(std::ceil(static_cast<float>(Count) / GetMaxLoadFactor()));
         }
 
-        void Rehash(const std::size_t BucketCount)
+        constexpr void Rehash(const std::size_t BucketCount)
         {
             const auto Value {
                 std::max(
@@ -287,211 +291,211 @@ namespace egg::Containers
             }
         }
 
-        void SetLoadFactor(const float Value)
+        constexpr void SetLoadFactor(const float Value)
         {
             EGG_ASSERT(Value > 0.f, "Invalid load factor");
             Threshold = Value;
             Rehash(0u);
         }
 
-        [[nodiscard]] Iterator Find(const KeyType& Key)
+        [[nodiscard]] constexpr Iterator Find(const KeyType& Key)
         {
             return FindInBucket(Key, GetBucketIndex(Key));
         }
 
-        [[nodiscard]] ConstIterator Find(const KeyType& Key) const
-        {
-            return FindInBucket(Key, GetBucketIndex(Key));
-        }
-
-        template <typename Other> requires (Types::Transparent<HashType> && Types::Transparent<KeyEqualType>)
-        [[nodiscard]] Iterator Find(const Other& Key)
+        [[nodiscard]] constexpr ConstIterator Find(const KeyType& Key) const
         {
             return FindInBucket(Key, GetBucketIndex(Key));
         }
 
         template <typename Other> requires (Types::Transparent<HashType> && Types::Transparent<KeyEqualType>)
-        [[nodiscard]] ConstIterator Find(const Other& Key) const
+        [[nodiscard]] constexpr Iterator Find(const Other& Key)
         {
             return FindInBucket(Key, GetBucketIndex(Key));
         }
 
-        [[nodiscard]] MappedType& At(const KeyType& Key)
+        template <typename Other> requires (Types::Transparent<HashType> && Types::Transparent<KeyEqualType>)
+        [[nodiscard]] constexpr ConstIterator Find(const Other& Key) const
+        {
+            return FindInBucket(Key, GetBucketIndex(Key));
+        }
+
+        [[nodiscard]] constexpr MappedType& At(const KeyType& Key)
         {
             auto It { Find(Key) };
             EGG_ASSERT(It != End(), "Invalid key");
             return It->second;
         }
 
-        [[nodiscard]] const MappedType& At(const KeyType& Key) const
+        [[nodiscard]] constexpr const MappedType& At(const KeyType& Key) const
         {
             auto It { Find(Key) };
             EGG_ASSERT(It != End(), "Invalid key");
             return It->second;
         }
 
-        [[nodiscard]] MappedType& operator[](const KeyType& Key)
+        [[nodiscard]] constexpr MappedType& operator[](const KeyType& Key)
         {
             return InsertOrDoNothing(Key).first->second;
         }
 
-        [[nodiscard]] MappedType& operator[](KeyType&& Key)
+        [[nodiscard]] constexpr MappedType& operator[](KeyType&& Key)
         {
             return InsertOrDoNothing(std::move(Key)).first->second;
         }
 
-        [[nodiscard]] bool Contains(const KeyType& Key) const
+        [[nodiscard]] constexpr bool Contains(const KeyType& Key) const
         {
             return Find(Key) != End();
         }
 
         template <typename Other> requires (Types::Transparent<HashType> && Types::Transparent<KeyEqualType>)
-        [[nodiscard]] bool Contains(const Other& Key) const
+        [[nodiscard]] constexpr bool Contains(const Other& Key) const
         {
             return Find(Key) != End();
         }
 
-        [[nodiscard]] std::size_t GetSize() const noexcept
+        [[nodiscard]] constexpr std::size_t GetSize() const noexcept
         {
             return Packed.GetFirst().size();
         }
 
-        [[nodiscard]] std::size_t GetMaxSize() const noexcept
+        [[nodiscard]] constexpr std::size_t GetMaxSize() const noexcept
         {
             return Packed.GetFirst().max_size();
         }
 
-        [[nodiscard]] bool Empty() const noexcept
+        [[nodiscard]] constexpr bool Empty() const noexcept
         {
             return Packed.GetFirst().empty();
         }
 
-        [[nodiscard]] std::size_t GetBucketCount() const noexcept
+        [[nodiscard]] constexpr std::size_t GetBucketCount() const noexcept
         {
             return Sparse.GetFirst().size();
         }
 
-        [[nodiscard]] std::size_t GetMaxBucketCount() const noexcept
+        [[nodiscard]] constexpr std::size_t GetMaxBucketCount() const noexcept
         {
             return Sparse.GetFirst().max_size();
         }
 
-        [[nodiscard]] std::size_t GetBucketSize(const std::size_t Index) const
+        [[nodiscard]] constexpr std::size_t GetBucketSize(const std::size_t Index) const
         {
             return static_cast<std::size_t>(std::distance(BucketBegin(Index), BucketEnd()));
         }
 
-        [[nodiscard]] std::size_t GetBucketIndex(const KeyType& Key) const noexcept
+        [[nodiscard]] constexpr std::size_t GetBucketIndex(const KeyType& Key) const noexcept
         {
             return Math::FastModulo(static_cast<std::size_t>(Sparse.GetSecond()(Key)), GetBucketCount());
         }
 
-        [[nodiscard]] float GetLoadFactor() const noexcept
+        [[nodiscard]] constexpr float GetLoadFactor() const noexcept
         {
             return GetSize() / static_cast<float>(GetBucketCount());
         }
 
-        [[nodiscard]] float GetMaxLoadFactor() const noexcept
+        [[nodiscard]] constexpr float GetMaxLoadFactor() const noexcept
         {
             return Threshold;
         }
 
-        [[nodiscard]] Iterator Begin() noexcept
+        [[nodiscard]] constexpr Iterator Begin() noexcept
         {
             return Iterator { Packed.GetFirst().begin() };
         }
 
-        [[nodiscard]] ConstIterator Begin() const noexcept
+        [[nodiscard]] constexpr ConstIterator Begin() const noexcept
         {
             return ConstIterator { Packed.GetFirst().begin() };
         }
 
-        [[nodiscard]] ConstIterator ConstBegin() const noexcept
+        [[nodiscard]] constexpr ConstIterator ConstBegin() const noexcept
         {
             return Begin();
         }
 
-        [[nodiscard]] Iterator End() noexcept
+        [[nodiscard]] constexpr Iterator End() noexcept
         {
             return Iterator { Packed.GetFirst().end() };
         }
 
-        [[nodiscard]] ConstIterator End() const noexcept
+        [[nodiscard]] constexpr ConstIterator End() const noexcept
         {
             return ConstIterator { Packed.GetFirst().end() };
         }
 
-        [[nodiscard]] ConstIterator ConstEnd() const noexcept
+        [[nodiscard]] constexpr ConstIterator ConstEnd() const noexcept
         {
             return End();
         }
 
-        [[nodiscard]] ReverseIterator ReverseBegin() noexcept
+        [[nodiscard]] constexpr ReverseIterator ReverseBegin() noexcept
         {
             return ReverseIterator { Packed.GetFirst().rbegin() };
         }
 
-        [[nodiscard]] ConstReverseIterator ReverseBegin() const noexcept
+        [[nodiscard]] constexpr ConstReverseIterator ReverseBegin() const noexcept
         {
             return ConstReverseIterator { Packed.GetFirst().rbegin() };
         }
 
-        [[nodiscard]] ConstReverseIterator ConstReverseBegin() const noexcept
+        [[nodiscard]] constexpr ConstReverseIterator ConstReverseBegin() const noexcept
         {
             return ReverseBegin();
         }
 
-        [[nodiscard]] ReverseIterator ReverseEnd() noexcept
+        [[nodiscard]] constexpr ReverseIterator ReverseEnd() noexcept
         {
             return ReverseIterator { Packed.GetFirst().rend() };
         }
 
-        [[nodiscard]] ConstReverseIterator ReverseEnd() const noexcept
+        [[nodiscard]] constexpr ConstReverseIterator ReverseEnd() const noexcept
         {
             return ConstReverseIterator { Packed.GetFirst().rend() };
         }
 
-        [[nodiscard]] ConstReverseIterator ConstReverseEnd() const noexcept
+        [[nodiscard]] constexpr ConstReverseIterator ConstReverseEnd() const noexcept
         {
             return ReverseEnd();
         }
 
-        [[nodiscard]] LocalIterator BucketBegin(const std::size_t Index)
+        [[nodiscard]] constexpr LocalIterator BucketBegin(const std::size_t Index)
         {
             return { Packed.GetFirst().begin(), Sparse.GetFirst()[Index] };
         }
 
-        [[nodiscard]] ConstLocalIterator BucketBegin(const std::size_t Index) const
+        [[nodiscard]] constexpr ConstLocalIterator BucketBegin(const std::size_t Index) const
         {
             return { Packed.GetFirst().begin(), Sparse.GetFirst()[Index] };
         }
 
-        [[nodiscard]] ConstLocalIterator BucketConstBegin(const std::size_t Index) const
+        [[nodiscard]] constexpr ConstLocalIterator BucketConstBegin(const std::size_t Index) const
         {
             return BucketBegin(Index);
         }
 
-        [[nodiscard]] LocalIterator BucketEnd() noexcept
+        [[nodiscard]] constexpr LocalIterator BucketEnd() noexcept
         {
             return { Packed.GetFirst().begin(), (std::numeric_limits<std::size_t>::max)() };
         }
 
-        [[nodiscard]] ConstLocalIterator BucketEnd() const noexcept
+        [[nodiscard]] constexpr ConstLocalIterator BucketEnd() const noexcept
         {
             return { Packed.GetFirst().begin(), (std::numeric_limits<std::size_t>::max)() };
         }
 
-        [[nodiscard]] ConstLocalIterator BucketConstEnd() const noexcept
+        [[nodiscard]] constexpr ConstLocalIterator BucketConstEnd() const noexcept
         {
             return BucketEnd();
         }
 
-        [[nodiscard]] HashType GetHash() const
+        [[nodiscard]] constexpr HashType GetHash() const
         {
             return Sparse.GetSecond();
         }
 
-        [[nodiscard]] KeyEqualType GetKeyEqual() const
+        [[nodiscard]] constexpr KeyEqualType GetKeyEqual() const
         {
             return Packed.GetSecond();
         }
@@ -503,7 +507,7 @@ namespace egg::Containers
 
     private:
         template <typename Other, typename... Args>
-        [[nodiscard]] std::pair<Iterator, bool> InsertOrDoNothing(Other&& Key, Args&&... Arguments)
+        [[nodiscard]] constexpr std::pair<Iterator, bool> InsertOrDoNothing(Other&& Key, Args&&... Arguments)
         {
             const auto Index { GetBucketIndex(Key) };
 
@@ -525,7 +529,7 @@ namespace egg::Containers
         }
 
         template <typename Other, typename Arg>
-        [[nodiscard]] std::pair<Iterator, bool> InsertOrOverwrite(Other&& Key, Arg&& Value)
+        [[nodiscard]] constexpr std::pair<Iterator, bool> InsertOrOverwrite(Other&& Key, Arg&& Value)
         {
             const auto Index { GetBucketIndex(Key) };
 
@@ -546,7 +550,7 @@ namespace egg::Containers
         }
 
         template <typename Other>
-        [[nodiscard]] Iterator FindInBucket(const Other& Key, const std::size_t Bucket)
+        [[nodiscard]] constexpr Iterator FindInBucket(const Other& Key, const std::size_t Bucket)
         {
             for (auto First = BucketBegin(Bucket), Last = BucketEnd(); First != Last; ++First)
             {
@@ -560,7 +564,7 @@ namespace egg::Containers
         }
 
         template <typename Other>
-        [[nodiscard]] ConstIterator FindInBucket(const Other& Key, const std::size_t Bucket) const
+        [[nodiscard]] constexpr ConstIterator FindInBucket(const Other& Key, const std::size_t Bucket) const
         {
             for (auto First = BucketBegin(Bucket), Last = BucketEnd(); First != Last; ++First)
             {
@@ -573,7 +577,7 @@ namespace egg::Containers
             return End();
         }
 
-        void MoveAndPop(const std::size_t Position)
+        constexpr void MoveAndPop(const std::size_t Position)
         {
             if (const auto Last = GetSize() - 1u; Position != Last)
             {
@@ -590,7 +594,7 @@ namespace egg::Containers
             Packed.GetFirst().pop_back();
         }
 
-        void RehashIfRequired()
+        constexpr void RehashIfRequired()
         {
             if (GetSize() > GetBucketCount() * GetMaxLoadFactor())
             {

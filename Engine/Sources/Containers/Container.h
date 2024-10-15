@@ -9,73 +9,77 @@
 namespace egg::Containers
 {
     template <typename ContainerType>
-    [[nodiscard]] auto begin(ContainerType& Container) noexcept -> decltype(std::declval<ContainerType>().Begin())
+    [[nodiscard]] constexpr auto begin(ContainerType& Container) noexcept -> decltype(std::declval<ContainerType>().Begin())
     {
         return Container.Begin();
     }
 
     template <typename ContainerType>
-    [[nodiscard]] auto begin(const ContainerType& Container) noexcept -> decltype(std::declval<const ContainerType>().Begin())
+    [[nodiscard]] constexpr auto begin(const ContainerType& Container) noexcept -> decltype(std::declval<const ContainerType>().Begin())
     {
         return Container.Begin();
     }
 
     template <typename ContainerType>
-    [[nodiscard]] auto cbegin(const ContainerType& Container) noexcept -> decltype(std::declval<const ContainerType>().ConstBegin())
+    [[nodiscard]] constexpr auto cbegin(
+        const ContainerType& Container) noexcept -> decltype(std::declval<const ContainerType>().ConstBegin())
     {
         return Container.ConstBegin();
     }
 
     template <typename ContainerType>
-    [[nodiscard]] auto end(ContainerType& Container) noexcept -> decltype(std::declval<ContainerType>().End())
+    [[nodiscard]] constexpr auto end(ContainerType& Container) noexcept -> decltype(std::declval<ContainerType>().End())
     {
         return Container.End();
     }
 
     template <typename ContainerType>
-    [[nodiscard]] auto end(const ContainerType& Container) noexcept -> decltype(std::declval<const ContainerType>().End())
+    [[nodiscard]] constexpr auto end(const ContainerType& Container) noexcept -> decltype(std::declval<const ContainerType>().End())
     {
         return Container.End();
     }
 
     template <typename ContainerType>
-    [[nodiscard]] auto cend(const ContainerType& Container) noexcept -> decltype(std::declval<const ContainerType>().ConstEnd())
+    [[nodiscard]] constexpr auto cend(const ContainerType& Container) noexcept -> decltype(std::declval<const ContainerType>().ConstEnd())
     {
         return Container.ConstEnd();
     }
 
     template <typename ContainerType>
-    [[nodiscard]] auto rbegin(ContainerType& Container) noexcept -> decltype(std::declval<ContainerType>().ReverseBegin())
+    [[nodiscard]] constexpr auto rbegin(ContainerType& Container) noexcept -> decltype(std::declval<ContainerType>().ReverseBegin())
     {
         return Container.ReverseBegin();
     }
 
     template <typename ContainerType>
-    [[nodiscard]] auto rbegin(const ContainerType& Container) noexcept -> decltype(std::declval<const ContainerType>().ReverseBegin())
+    [[nodiscard]] constexpr auto rbegin(
+        const ContainerType& Container) noexcept -> decltype(std::declval<const ContainerType>().ReverseBegin())
     {
         return Container.ReverseBegin();
     }
 
     template <typename ContainerType>
-    [[nodiscard]] auto crbegin(const ContainerType& Container) noexcept -> decltype(std::declval<const ContainerType>().ConstReverseBegin())
+    [[nodiscard]] constexpr auto crbegin(
+        const ContainerType& Container) noexcept -> decltype(std::declval<const ContainerType>().ConstReverseBegin())
     {
         return Container.ConstReverseBegin();
     }
 
     template <typename ContainerType>
-    [[nodiscard]] auto rend(ContainerType& Container) noexcept -> decltype(std::declval<ContainerType>().ReverseEnd())
+    [[nodiscard]] constexpr auto rend(ContainerType& Container) noexcept -> decltype(std::declval<ContainerType>().ReverseEnd())
     {
         return Container.ReverseEnd();
     }
 
     template <typename ContainerType>
-    [[nodiscard]] auto rend(const ContainerType& Container) noexcept -> decltype(std::declval<const ContainerType>().ReverseEnd())
+    [[nodiscard]] constexpr auto rend(const ContainerType& Container) noexcept -> decltype(std::declval<const ContainerType>().ReverseEnd())
     {
         return Container.ReverseEnd();
     }
 
     template <typename ContainerType>
-    [[nodiscard]] auto crend(const ContainerType& Container) noexcept -> decltype(std::declval<const ContainerType>().ConstReverseEnd())
+    [[nodiscard]] constexpr auto crend(
+        const ContainerType& Container) noexcept -> decltype(std::declval<const ContainerType>().ConstReverseEnd())
     {
         return Container.ConstReverseEnd();
     }
@@ -94,9 +98,6 @@ namespace egg::Containers
 
     template <typename Type>
     using IteratorTraits = std::iterator_traits<Type>;
-
-    template <typename AllocatorType, typename Type>
-    concept ValidAllocator = std::is_same_v<Type, typename AllocatorTraits<AllocatorType>::value_type>;
 }
 
 #endif // ENGINE_SOURCES_CONTAINERS_FILE_CONTAINER_H

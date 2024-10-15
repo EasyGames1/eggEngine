@@ -5,6 +5,7 @@
 
 namespace egg::Events
 {
+    ///@deprecated
     class Dispatcher
     {
     public:

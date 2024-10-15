@@ -61,6 +61,7 @@ add_library(VulkanEngine_lib
         Sources/ECS/Containers/Storage/Internal/StorageIterator.h
         Sources/ECS/Containers/PagedVector/Internal/PagedVectorIterator.h
         Sources/Type/Traits/Capabilities.h
+        Sources/Events/Signal.h
 )
 
 find_package(Vulkan REQUIRED)

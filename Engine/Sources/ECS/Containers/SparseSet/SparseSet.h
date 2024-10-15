@@ -6,13 +6,14 @@
 #include "Algorithms/Sorting/StandardSorting.h"
 #include "ECS/Containers/PagedVector/PagedVector.h"
 #include "./Internal/SparseSetIterator.h"
+#include "Type/Traits/Capabilities.h"
 
 #include <memory>
 #include <vector>
 
 namespace egg::ECS::Containers
 {
-    template <ValidEntity Type, ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
+    template <ValidEntity Type, Types::ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
     class SparseSet
     {
         using ContainerAllocatorTraits = AllocatorTraits<AllocatorParameter>;
@@ -37,22 +38,22 @@ namespace egg::ECS::Containers
         using ConstReverseIterator = std::reverse_iterator<ConstIterator>;
 
 
-        explicit SparseSet(const AllocatorType& Allocator = {})
+        constexpr explicit SparseSet(const AllocatorType& Allocator = {})
             noexcept(std::is_nothrow_constructible_v<SparseContainer, const AllocatorType&>)
             : Sparse { Allocator }, Packed { Allocator }
         {
         }
 
-        SparseSet(SparseSet&& Other) noexcept(std::is_nothrow_move_constructible_v<SparseContainer>) = default;
+        constexpr SparseSet(SparseSet&& Other) noexcept(std::is_nothrow_move_constructible_v<SparseContainer>) = default;
 
-        SparseSet(SparseSet&& Other, const AllocatorType& Allocator) : Sparse { std::move(Other.Sparse), Allocator },
-                                                                       Packed { std::move(Other.Packed), Allocator }
+        constexpr SparseSet(SparseSet&& Other, const AllocatorType& Allocator) : Sparse { std::move(Other.Sparse), Allocator },
+                                                                                 Packed { std::move(Other.Packed), Allocator }
         {
             EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || Packed.get_allocator() == Other.Packed.get_allocator(),
                        "Cannot copy sparse set because it has a incompatible allocator");
         }
 
-        virtual ~SparseSet() noexcept = default;
+        constexpr virtual ~SparseSet() noexcept = default;
 
         SparseSet& operator=(const SparseSet&) = delete;
 
@@ -65,7 +66,7 @@ namespace egg::ECS::Containers
             return *this;
         }
 
-        friend void swap(SparseSet& Left, SparseSet& Right)
+        friend constexpr void swap(SparseSet& Left, SparseSet& Right)
             noexcept(std::is_nothrow_swappable_v<SparseContainer> && std::is_nothrow_swappable_v<PackedContainer>)
         {
             using std::swap;
@@ -73,7 +74,7 @@ namespace egg::ECS::Containers
             swap(Left.Packed, Right.Packed);
         }
 
-        virtual Iterator Push(const EntityType Entity)
+        constexpr virtual Iterator Push(const EntityType Entity)
         {
             EGG_ASSERT(Entity != TraitsType::Tombstone, "The entity cannot be a tombstone");
             auto& Element { Assure(Entity) };
@@ -85,7 +86,7 @@ namespace egg::ECS::Containers
         }
 
         template <typename IteratorType>
-        Iterator Push(IteratorType First, IteratorType Last)
+        constexpr Iterator Push(IteratorType First, IteratorType Last)
         {
             auto Current { End() };
 
@@ -97,7 +98,7 @@ namespace egg::ECS::Containers
             return Current;
         }
 
-        VersionType UpdateVersion(const EntityType Entity)
+        constexpr VersionType UpdateVersion(const EntityType Entity)
         {
             EGG_ASSERT(Entity != TraitsType::Tombstone, "Invalid entity");
             auto& Element { GetReference(Entity) };
@@ -107,14 +108,14 @@ namespace egg::ECS::Containers
             return TraitsType::ToVersion(Entity);
         }
 
-        void Erase(const EntityType Entity)
+        constexpr void Erase(const EntityType Entity)
         {
             const auto It { ToIterator(Entity) };
             Pop(It, It + 1);
         }
 
         template <typename It>
-        void Erase(It First, It Last)
+        constexpr void Erase(It First, It Last)
         {
             if constexpr (std::is_same_v<It, Iterator>)
             {
@@ -129,7 +130,7 @@ namespace egg::ECS::Containers
             }
         }
 
-        virtual void Clear()
+        constexpr virtual void Clear()
         {
             for (auto Entity : *this)
             {
@@ -138,7 +139,7 @@ namespace egg::ECS::Containers
             Packed.clear();
         }
 
-        bool Remove(const EntityType Entity)
+        constexpr bool Remove(const EntityType Entity)
         {
             const bool Exists { Contains(Entity) };
             if (Exists) Erase(Entity);
@@ -146,7 +147,7 @@ namespace egg::ECS::Containers
         }
 
         template <typename It>
-        std::size_t Remove(It First, It Last)
+        constexpr std::size_t Remove(It First, It Last)
         {
             std::size_t Count {};
 
@@ -173,57 +174,57 @@ namespace egg::ECS::Containers
             return Count;
         }
 
-        void SwapElements(const EntityType Left, const EntityType Right)
+        constexpr void SwapElements(const EntityType Left, const EntityType Right)
         {
             SwapAt(GetIndex(Left), GetIndex(Right));
         }
 
-        virtual void Reserve(const std::size_t Capacity)
+        constexpr virtual void Reserve(const std::size_t Capacity)
         {
             Packed.reserve(Capacity);
         }
 
-        virtual void ShrinkToFit()
+        constexpr virtual void ShrinkToFit()
         {
             Packed.shrink_to_fit();
         }
 
-        [[nodiscard]] bool Contains(const EntityType Entity) const noexcept
+        [[nodiscard]] constexpr bool Contains(const EntityType Entity) const noexcept
         {
             const auto* Element { GetPointer(Entity) };
             return Element && (TraitsType::ToVersionPart(Entity) ^ TraitsType::ToIntegral(*Element)) < TraitsType::EntityMask;
         }
 
-        [[nodiscard]] std::size_t GetIndex(const EntityType Entity) const noexcept
+        [[nodiscard]] constexpr std::size_t GetIndex(const EntityType Entity) const noexcept
         {
             EGG_ASSERT(Contains(Entity), "Set does not contain entity");
             return TraitsType::ToEntity(GetReference(Entity));
         }
 
-        [[nodiscard]] VersionType GetVersion(const EntityType Entity) const noexcept
+        [[nodiscard]] constexpr VersionType GetVersion(const EntityType Entity) const noexcept
         {
             const auto* Element { GetPointer(Entity) };
             return Element ? TraitsType::ToVersion(*Element) : TraitsType::ToVersion(TraitsType::Tombstone);
         }
 
-        [[nodiscard]] ConstIterator Find(const EntityType Entity) const noexcept
+        [[nodiscard]] constexpr ConstIterator Find(const EntityType Entity) const noexcept
         {
             return Contains(Entity) ? ToIterator(Entity) : End();
         }
 
-        [[nodiscard]] Iterator Find(const EntityType Entity) noexcept
+        [[nodiscard]] constexpr Iterator Find(const EntityType Entity) noexcept
         {
             return Contains(Entity) ? ToIterator(Entity) : End();
         }
 
         template <typename CompareType, typename SortType = Algorithms::Sorting::StandardSorting, typename... Args>
-        void Sort(CompareType Compare, SortType Sort = SortType {}, Args&&... Arguments)
+        constexpr void Sort(CompareType Compare, SortType Sort = SortType {}, Args&&... Arguments)
         {
             SortCount(GetSize(), std::move(Compare), std::move(Sort), std::forward<Args>(Arguments)...);
         }
 
         template <typename CompareType, typename SortType = Algorithms::Sorting::StandardSorting, typename... Args>
-        void SortCount(const std::size_t Count, CompareType Compare, SortType Sort = SortType {}, Args&&... Arguments)
+        constexpr void SortCount(const std::size_t Count, CompareType Compare, SortType Sort = SortType {}, Args&&... Arguments)
         {
             EGG_ASSERT(Count <= GetSize(), "Count of elements to sort exceeds the number of elements");
 
@@ -244,7 +245,7 @@ namespace egg::ECS::Containers
         }
 
         template <typename IteratorType>
-        Iterator SortAs(IteratorType First, IteratorType Last)
+        constexpr Iterator SortAs(IteratorType First, IteratorType Last)
         {
             auto It { Begin() };
 
@@ -266,99 +267,99 @@ namespace egg::ECS::Containers
             return It;
         }
 
-        [[nodiscard]] std::size_t GetSize() const noexcept
+        [[nodiscard]] constexpr std::size_t GetSize() const noexcept
         {
             return Packed.size();
         }
 
-        [[nodiscard]] bool Empty() const noexcept
+        [[nodiscard]] constexpr bool Empty() const noexcept
         {
             return Packed.empty();
         }
 
-        [[nodiscard]] std::size_t GetExtent() const noexcept
+        [[nodiscard]] constexpr std::size_t GetExtent() const noexcept
         {
             return Sparse.GetExtent();
         }
 
-        [[nodiscard]] ConstPointer GetEntityData() const noexcept
+        [[nodiscard]] constexpr ConstPointer GetEntityData() const noexcept
         {
             return Packed.data();
         }
 
-        [[nodiscard]] EntityType operator[](const std::size_t Position) const noexcept
+        [[nodiscard]] constexpr EntityType operator[](const std::size_t Position) const noexcept
         {
             EGG_ASSERT(Position < Packed.size(), "Index out of bounds");
             return Packed[Position];
         }
 
-        [[nodiscard]] virtual std::size_t GetCapacity() const noexcept
+        [[nodiscard]] constexpr virtual std::size_t GetCapacity() const noexcept
         {
             return Packed.capacity();
         }
 
-        [[nodiscard]] Iterator Begin() noexcept
+        [[nodiscard]] constexpr Iterator Begin() noexcept
         {
             return { Packed, Packed.size() };
         }
 
-        [[nodiscard]] ConstIterator Begin() const noexcept
+        [[nodiscard]] constexpr ConstIterator Begin() const noexcept
         {
             return { Packed, Packed.size() };
         }
 
-        [[nodiscard]] ConstIterator ConstBegin() const noexcept
+        [[nodiscard]] constexpr ConstIterator ConstBegin() const noexcept
         {
             return Begin();
         }
 
-        [[nodiscard]] Iterator End() noexcept
+        [[nodiscard]] constexpr Iterator End() noexcept
         {
             return { Packed, {} };
         }
 
-        [[nodiscard]] ConstIterator End() const noexcept
+        [[nodiscard]] constexpr ConstIterator End() const noexcept
         {
             return { Packed, {} };
         }
 
-        [[nodiscard]] ConstIterator ConstEnd() const noexcept
+        [[nodiscard]] constexpr ConstIterator ConstEnd() const noexcept
         {
             return End();
         }
 
-        [[nodiscard]] ReverseIterator ReverseBegin() noexcept
+        [[nodiscard]] constexpr ReverseIterator ReverseBegin() noexcept
         {
             return std::make_reverse_iterator(End());
         }
 
-        [[nodiscard]] ConstReverseIterator ReverseBegin() const noexcept
+        [[nodiscard]] constexpr ConstReverseIterator ReverseBegin() const noexcept
         {
             return std::make_reverse_iterator(End());
         }
 
-        [[nodiscard]] ConstReverseIterator ConstReverseBegin() const noexcept
+        [[nodiscard]] constexpr ConstReverseIterator ConstReverseBegin() const noexcept
         {
             return ReverseBegin();
         }
 
-        [[nodiscard]] ReverseIterator ReverseEnd() noexcept
+        [[nodiscard]] constexpr ReverseIterator ReverseEnd() noexcept
         {
             return std::make_reverse_iterator(Begin());
         }
 
-        [[nodiscard]] ConstReverseIterator ReverseEnd() const noexcept
+        [[nodiscard]] constexpr ConstReverseIterator ReverseEnd() const noexcept
         {
             return std::make_reverse_iterator(Begin());
         }
 
-        [[nodiscard]] ConstReverseIterator ConstReverseEnd() const noexcept
+        [[nodiscard]] constexpr ConstReverseIterator ConstReverseEnd() const noexcept
         {
             return ReverseEnd();
         }
 
     protected:
-        virtual void UpdateToPacked(
+        constexpr virtual void UpdateToPacked(
             const std::size_t CurrentIndex,
             [[maybe_unused]] const std::size_t LeftIndex,
             [[maybe_unused]] const std::size_t RightIndex)
@@ -369,7 +370,7 @@ namespace egg::ECS::Containers
             );
         }
 
-        virtual void Pop(Iterator First, Iterator Last)
+        constexpr virtual void Pop(Iterator First, Iterator Last)
         {
             for (; First != Last; ++First)
             {
@@ -377,7 +378,7 @@ namespace egg::ECS::Containers
             }
         }
 
-        void Erase(Iterator It)
+        constexpr void Erase(Iterator It)
         {
             EGG_ASSERT(Contains(*It), "Sparse does not contain entity to remove");
             auto& Index { GetReference(*It) };
@@ -390,7 +391,7 @@ namespace egg::ECS::Containers
             Packed.pop_back();
         }
 
-        virtual void SwapAt(const std::size_t Left, const std::size_t Right)
+        constexpr virtual void SwapAt(const std::size_t Left, const std::size_t Right)
         {
             auto& From { Packed[Left] };
             auto& To { Packed[Right] };
@@ -403,27 +404,27 @@ namespace egg::ECS::Containers
         }
 
     private:
-        [[nodiscard]] ConstPointer GetPointer(const EntityType Entity) const
+        [[nodiscard]] constexpr ConstPointer GetPointer(const EntityType Entity) const
         {
             return Sparse.GetPointer(TraitsType::ToEntity(Entity));
         }
 
-        [[nodiscard]] Reference GetReference(const EntityType Entity) const
+        [[nodiscard]] constexpr Reference GetReference(const EntityType Entity) const
         {
             return Sparse.GetReference(TraitsType::ToEntity(Entity));
         }
 
-        [[nodiscard]] Reference Assure(const EntityType Entity)
+        [[nodiscard]] constexpr Reference Assure(const EntityType Entity)
         {
             return Sparse.Assure(TraitsType::ToEntity(Entity));
         }
 
-        [[nodiscard]] Iterator ToIterator(const EntityType Entity)
+        [[nodiscard]] constexpr Iterator ToIterator(const EntityType Entity)
         {
             return End() - (GetIndex(Entity) + 1u);
         }
 
-        [[nodiscard]] ConstIterator ToIterator(const EntityType Entity) const
+        [[nodiscard]] constexpr ConstIterator ToIterator(const EntityType Entity) const
         {
             return End() - (GetIndex(Entity) + 1u);
         }

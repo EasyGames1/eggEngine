@@ -22,9 +22,6 @@ namespace egg::ECS::Containers
 
     template <typename Type>
     using IteratorTraits = egg::Containers::IteratorTraits<Type>;
-
-    template <typename AllocatorType, typename Type>
-    concept ValidAllocator = egg::Containers::ValidAllocator<AllocatorType, Type>;
 }
 
 
