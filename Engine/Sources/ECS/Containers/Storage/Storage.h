@@ -59,7 +59,7 @@ namespace egg::ECS::Containers
         {
         }
 
-        constexpr constexpr explicit Storage(const AllocatorType& Allocator)
+        constexpr explicit Storage(const AllocatorType& Allocator)
             noexcept(
                 std::is_nothrow_constructible_v<BaseType, const AllocatorType&> &&
                 std::is_nothrow_constructible_v<ContainerType, const AllocatorType&>)
