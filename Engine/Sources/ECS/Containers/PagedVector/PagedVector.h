@@ -7,19 +7,21 @@
 #include "ECS/Traits/PageSizeTraits.h"
 #include "./Internal/PagedVectorIterator.h"
 #include "Math/Math.h"
+#include "Type/Traits/Capabilities.h"
 
 #include <memory>
 #include <vector>
 
 namespace egg::ECS::Containers
 {
-    template <typename Type, ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
+    template <typename Type, Types::ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
     class PagedVector
     {
         using ContainerAllocatorTraits = AllocatorTraits<AllocatorParameter>;
 
         using ContainerType = std::vector<typename ContainerAllocatorTraits::pointer,
-                                          typename ContainerAllocatorTraits::template rebind_alloc<typename ContainerAllocatorTraits::pointer>>;
+                                          typename ContainerAllocatorTraits::template rebind_alloc<typename
+                                              ContainerAllocatorTraits::pointer>>;
         using PayloadType = egg::Containers::CompressedPair<ContainerType, AllocatorParameter>;
 
         using PageSize = PageSizeTraits<Type>;
@@ -41,15 +43,15 @@ namespace egg::ECS::Containers
         using ConstReverseIterator = std::reverse_iterator<ConstIterator>;
 
 
-        explicit PagedVector(const AllocatorType& Allocator = {})
+        constexpr explicit PagedVector(const AllocatorType& Allocator = {})
             noexcept(std::is_nothrow_constructible_v<PayloadType, const AllocatorType&, const AllocatorType&>)
             : Payload { Allocator, Allocator }
         {
         }
 
-        PagedVector(PagedVector&& Other) noexcept(std::is_nothrow_move_constructible_v<PayloadType>) = default;
+        constexpr PagedVector(PagedVector&& Other) noexcept(std::is_nothrow_move_constructible_v<PayloadType>) = default;
 
-        PagedVector(PagedVector&& Other, const AllocatorType& Allocator)
+        constexpr PagedVector(PagedVector&& Other, const AllocatorType& Allocator)
             : Payload {
                 std::piecewise_construct,
                 std::forward_as_tuple(std::move(Other.Payload.GetFirst()), Allocator),
@@ -60,7 +62,7 @@ namespace egg::ECS::Containers
                        "Cannot copy paged vector because it has a incompatible allocator");
         }
 
-        ~PagedVector() noexcept
+        constexpr ~PagedVector() noexcept
         {
             ReleasePages();
         }
@@ -76,13 +78,13 @@ namespace egg::ECS::Containers
             return *this;
         }
 
-        friend void swap(PagedVector& Left, PagedVector& Right) noexcept(std::is_nothrow_swappable_v<PayloadType>)
+        friend constexpr void swap(PagedVector& Left, PagedVector& Right) noexcept(std::is_nothrow_swappable_v<PayloadType>)
         {
             using std::swap;
             swap(Left.Payload, Right.Payload);
         }
 
-        [[nodiscard]] std::size_t GetExtent() const noexcept
+        [[nodiscard]] constexpr std::size_t GetExtent() const noexcept
         {
             return Payload.GetFirst().size() * PageSize::value;
         }
@@ -92,7 +94,7 @@ namespace egg::ECS::Containers
             return Payload.GetSecond();
         }
 
-        [[nodiscard]] Pointer GetPointer(const std::size_t Position) const
+        [[nodiscard]] constexpr Pointer GetPointer(const std::size_t Position) const
         {
             const auto Page { Position / PageSize::value };
             return Page < Payload.GetFirst().size() && Payload.GetFirst()[Page]
@@ -100,73 +102,73 @@ namespace egg::ECS::Containers
                        : nullptr;
         }
 
-        [[nodiscard]] Reference GetReference(const std::size_t Position) const
+        [[nodiscard]] constexpr Reference GetReference(const std::size_t Position) const
         {
             EGG_ASSERT(GetPointer(Position), "Payload not contain position");
             return Payload.GetFirst()[Position / PageSize::value][Math::FastModulo(Position, PageSize::value)];
         }
 
-        [[nodiscard]] Iterator Begin(const std::size_t AvailableElements) noexcept
+        [[nodiscard]] constexpr Iterator Begin(const std::size_t AvailableElements) noexcept
         {
             return { &Payload.GetFirst(), AvailableElements };
         }
 
-        [[nodiscard]] ConstIterator Begin(const std::size_t AvailableElements) const noexcept
+        [[nodiscard]] constexpr ConstIterator Begin(const std::size_t AvailableElements) const noexcept
         {
             return { &Payload.GetFirst(), AvailableElements };
         }
 
-        [[nodiscard]] ConstIterator ConstBegin(const std::size_t AvailableElements) const noexcept
+        [[nodiscard]] constexpr ConstIterator ConstBegin(const std::size_t AvailableElements) const noexcept
         {
             return Begin(AvailableElements);
         }
 
-        [[nodiscard]] Iterator End() noexcept
+        [[nodiscard]] constexpr Iterator End() noexcept
         {
             return { &Payload.GetFirst(), {} };
         }
 
-        [[nodiscard]] ConstIterator End() const noexcept
+        [[nodiscard]] constexpr ConstIterator End() const noexcept
         {
             return { &Payload.GetFirst(), {} };
         }
 
-        [[nodiscard]] ConstIterator ConstEnd() const noexcept
+        [[nodiscard]] constexpr ConstIterator ConstEnd() const noexcept
         {
             return End();
         }
 
-        [[nodiscard]] ReverseIterator ReverseBegin() noexcept
+        [[nodiscard]] constexpr ReverseIterator ReverseBegin() noexcept
         {
             return std::make_reverse_iterator(End());
         }
 
-        [[nodiscard]] ConstReverseIterator ReverseBegin() const noexcept
+        [[nodiscard]] constexpr ConstReverseIterator ReverseBegin() const noexcept
         {
             return std::make_reverse_iterator(End());
         }
 
-        [[nodiscard]] ConstReverseIterator ConstReverseBegin() const noexcept
+        [[nodiscard]] constexpr ConstReverseIterator ConstReverseBegin() const noexcept
         {
             return ReverseBegin();
         }
 
-        [[nodiscard]] ReverseIterator ReverseEnd(const std::size_t AvailableElements) noexcept
+        [[nodiscard]] constexpr ReverseIterator ReverseEnd(const std::size_t AvailableElements) noexcept
         {
             return std::make_reverse_iterator(Begin(AvailableElements));
         }
 
-        [[nodiscard]] ConstReverseIterator ReverseEnd(const std::size_t AvailableElements) const noexcept
+        [[nodiscard]] constexpr ConstReverseIterator ReverseEnd(const std::size_t AvailableElements) const noexcept
         {
             return std::make_reverse_iterator(Begin(AvailableElements));
         }
 
-        [[nodiscard]] ConstReverseIterator ConstReverseEnd(const std::size_t AvailableElements) const noexcept
+        [[nodiscard]] constexpr ConstReverseIterator ConstReverseEnd(const std::size_t AvailableElements) const noexcept
         {
             return ReverseEnd(AvailableElements);
         }
 
-        Reference Assure(const std::size_t Position)
+        constexpr Reference Assure(const std::size_t Position)
         {
             const auto Page { Position / PageSize::value };
 
@@ -188,7 +190,7 @@ namespace egg::ECS::Containers
             return Payload.GetFirst()[Page][Math::FastModulo(Position, PageSize::value)];
         }
 
-        void Shrink(const std::size_t Size, const std::size_t AvailableElements)
+        constexpr void Shrink(const std::size_t Size, const std::size_t AvailableElements)
         {
             for (auto Position = Size; Position < AvailableElements; ++Position)
             {
@@ -206,7 +208,7 @@ namespace egg::ECS::Containers
         }
 
     private:
-        void ReleasePages()
+        constexpr void ReleasePages()
         {
             for (auto&& Page : Payload.GetFirst())
             {

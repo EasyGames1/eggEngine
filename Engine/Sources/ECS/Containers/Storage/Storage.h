@@ -6,6 +6,7 @@
 #include "../SparseSet/SparseSet.h"
 #include "./Internal/StorageIterator.h"
 #include "ECS/Entity.h"
+#include "Type/Traits/Capabilities.h"
 
 #include <stdexcept>
 #include <type_traits>
@@ -13,7 +14,7 @@
 
 namespace egg::ECS::Containers
 {
-    template <typename Type, ValidEntity EntityParameter, ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
+    template <typename Type, ValidEntity EntityParameter, Types::ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
     class Storage : public SparseSet<EntityParameter,
                                      typename AllocatorTraits<AllocatorParameter>::template rebind_alloc<EntityParameter>>
     {
@@ -54,11 +55,11 @@ namespace egg::ECS::Containers
         using ConstReverseEachIterable = egg::Containers::IterableAdaptor<ConstReverseEachIterator>;
 
 
-        Storage() : Storage { AllocatorType {} }
+        constexpr Storage() : Storage { AllocatorType {} }
         {
         }
 
-        explicit Storage(const AllocatorType& Allocator)
+        constexpr constexpr explicit Storage(const AllocatorType& Allocator)
             noexcept(
                 std::is_nothrow_constructible_v<BaseType, const AllocatorType&> &&
                 std::is_nothrow_constructible_v<ContainerType, const AllocatorType&>)
@@ -66,17 +67,17 @@ namespace egg::ECS::Containers
         {
         }
 
-        Storage(Storage&& Other)
+        constexpr Storage(Storage&& Other)
             noexcept(std::is_nothrow_move_constructible_v<BaseType> && std::is_nothrow_move_constructible_v<ContainerType>) = default;
 
-        Storage(Storage&& Other, const AllocatorType& Allocator) : BaseType { std::move(Other), Allocator },
-                                                                   Payload { std::move(Other.Payload), Allocator }
+        constexpr Storage(Storage&& Other, const AllocatorType& Allocator) : BaseType { std::move(Other), Allocator },
+                                                                             Payload { std::move(Other.Payload), Allocator }
         {
             EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || Payload.GetAllocator() == Other.Payload.GetAllocator(),
                        "Cannot copy storage because it has a incompatible allocator");
         }
 
-        ~Storage() noexcept override
+        constexpr ~Storage() noexcept override
         {
             ShrinkToSize(0u);
         }
@@ -94,7 +95,7 @@ namespace egg::ECS::Containers
             return *this;
         }
 
-        friend void swap(Storage& Left, Storage& Right)
+        friend constexpr void swap(Storage& Left, Storage& Right)
             noexcept(std::is_nothrow_swappable_v<BaseType> && std::is_nothrow_swappable_v<ContainerType>)
         {
             using std::swap;
@@ -103,7 +104,7 @@ namespace egg::ECS::Containers
         }
 
         template <typename... Args>
-        Reference Emplace(const EntityType Entity, Args&&... Arguments)
+        constexpr Reference Emplace(const EntityType Entity, Args&&... Arguments)
         {
             if constexpr (std::is_aggregate_v<ElementType> && (sizeof...(Arguments) || !std::is_default_constructible_v<ElementType>))
             {
@@ -118,7 +119,7 @@ namespace egg::ECS::Containers
         }
 
         template <typename IteratorType>
-        Iterator Insert(IteratorType First, IteratorType Last, ConstReference Value = {})
+        constexpr Iterator Insert(IteratorType First, IteratorType Last, ConstReference Value = {})
         {
             for (; First != Last; ++First)
             {
@@ -130,7 +131,7 @@ namespace egg::ECS::Containers
 
         template <typename EntityIteratorType, typename ContainerIteratorType>
             requires (std::is_same_v<typename IteratorTraits<ContainerIteratorType>::value_type, ElementType>)
-        Iterator Insert(EntityIteratorType First, EntityIteratorType Last, ContainerIteratorType From)
+        constexpr Iterator Insert(EntityIteratorType First, EntityIteratorType Last, ContainerIteratorType From)
         {
             for (; First != Last; ++First, ++From)
             {
@@ -140,7 +141,7 @@ namespace egg::ECS::Containers
             return Payload.Begin(BaseType::GetSize());
         }
 
-        typename BaseType::Iterator Push(const EntityType Entity) override
+        constexpr typename BaseType::Iterator Push(const EntityType Entity) override
         {
             if constexpr (std::is_default_constructible_v<ElementType>)
             {
@@ -153,14 +154,14 @@ namespace egg::ECS::Containers
         }
 
         template <typename... Func>
-        Reference Patch(const EntityType Entity, Func&&... Functions)
+        constexpr Reference Patch(const EntityType Entity, Func&&... Functions)
         {
             auto& Element { Payload.GetReference(BaseType::GetIndex(Entity)) };
             (std::forward<Func>(Functions)(Element), ...);
             return Element;
         }
 
-        void Clear() override
+        constexpr void Clear() override
         {
             AllocatorType Allocator { Payload.GetAllocator() };
 
@@ -171,50 +172,50 @@ namespace egg::ECS::Containers
             }
         }
 
-        void Reserve(const std::size_t Capacity) override
+        constexpr void Reserve(const std::size_t Capacity) override
         {
             if (!Capacity) return;
             BaseType::Reserve(Capacity);
             Payload.Assure(Capacity - 1u);
         }
 
-        void ShrinkToFit() override
+        constexpr void ShrinkToFit() override
         {
             BaseType::ShrinkToFit();
             ShrinkToSize(BaseType::GetSize());
         }
 
-        [[nodiscard]] ElementIterable Element() noexcept
+        [[nodiscard]] constexpr ElementIterable Element() noexcept
         {
             return { Payload.Begin(BaseType::GetSize()), Payload.End() };
         }
 
-        [[nodiscard]] ConstElementIterable Element() const noexcept
+        [[nodiscard]] constexpr ConstElementIterable Element() const noexcept
         {
             return { Payload.Begin(BaseType::GetSize()), Payload.End() };
         }
 
-        [[nodiscard]] ConstElementIterable ConstElement() const noexcept
+        [[nodiscard]] constexpr ConstElementIterable ConstElement() const noexcept
         {
             return Element();
         }
 
-        [[nodiscard]] ReverseElementIterable ReverseElement() noexcept
+        [[nodiscard]] constexpr ReverseElementIterable ReverseElement() noexcept
         {
             return { Payload.ReverseBegin(), Payload.ReverseEnd(BaseType::GetSize()) };
         }
 
-        [[nodiscard]] ConstReverseElementIterable ReverseElement() const noexcept
+        [[nodiscard]] constexpr ConstReverseElementIterable ReverseElement() const noexcept
         {
             return { Payload.ReverseBegin(), Payload.ReverseEnd(BaseType::GetSize()) };
         }
 
-        [[nodiscard]] ConstReverseElementIterable ConstReverseElement() const noexcept
+        [[nodiscard]] constexpr ConstReverseElementIterable ConstReverseElement() const noexcept
         {
             return ReverseElement();
         }
 
-        [[nodiscard]] EachIterable Each() noexcept
+        [[nodiscard]] constexpr EachIterable Each() noexcept
         {
             return {
                 EachIterator { BaseType::Begin(), Payload.Begin(BaseType::GetSize()) },
@@ -222,7 +223,7 @@ namespace egg::ECS::Containers
             };
         }
 
-        [[nodiscard]] ConstEachIterable Each() const noexcept
+        [[nodiscard]] constexpr ConstEachIterable Each() const noexcept
         {
             return {
                 ConstEachIterator { BaseType::Begin(), Payload.Begin(BaseType::GetSize()) },
@@ -230,12 +231,12 @@ namespace egg::ECS::Containers
             };
         }
 
-        [[nodiscard]] ConstEachIterable ConstEach() const noexcept
+        [[nodiscard]] constexpr ConstEachIterable ConstEach() const noexcept
         {
             return Each();
         }
 
-        [[nodiscard]] ReverseEachIterable ReverseEach() noexcept
+        [[nodiscard]] constexpr ReverseEachIterable ReverseEach() noexcept
         {
             return {
                 ReverseEachIterator { BaseType::ReverseBegin(), Payload.ReverseBegin() },
@@ -243,7 +244,7 @@ namespace egg::ECS::Containers
             };
         }
 
-        [[nodiscard]] ConstReverseEachIterable ReverseEach() const noexcept
+        [[nodiscard]] constexpr ConstReverseEachIterable ReverseEach() const noexcept
         {
             return {
                 ConstReverseEachIterator { BaseType::ReverseBegin(), Payload.ReverseBegin() },
@@ -251,39 +252,39 @@ namespace egg::ECS::Containers
             };
         }
 
-        [[nodiscard]] ConstReverseEachIterable ConstReverseEach() const noexcept
+        [[nodiscard]] constexpr ConstReverseEachIterable ConstReverseEach() const noexcept
         {
             return ReverseEach();
         }
 
-        [[nodiscard]] Reference Get(const EntityType Entity) noexcept
+        [[nodiscard]] constexpr Reference Get(const EntityType Entity) noexcept
         {
             return Payload.GetReference(BaseType::GetIndex(Entity));
         }
 
-        [[nodiscard]] ConstReference Get(const EntityType Entity) const noexcept
+        [[nodiscard]] constexpr ConstReference Get(const EntityType Entity) const noexcept
         {
             return Payload.GetReference(BaseType::GetIndex(Entity));
         }
 
-        [[nodiscard]] std::tuple<Reference> GetAsTuple(const EntityType Entity) noexcept
+        [[nodiscard]] constexpr std::tuple<Reference> GetAsTuple(const EntityType Entity) noexcept
         {
             return std::forward_as_tuple(Get(Entity));
         }
 
-        [[nodiscard]] std::tuple<ConstReference> GetAsTuple(const EntityType Entity) const noexcept
+        [[nodiscard]] constexpr std::tuple<ConstReference> GetAsTuple(const EntityType Entity) const noexcept
         {
             return std::forward_as_tuple(Get(Entity));
         }
 
-        [[nodiscard]] std::size_t GetCapacity() const noexcept override
+        [[nodiscard]] constexpr std::size_t GetCapacity() const noexcept override
         {
             return Payload.GetExtent();
         }
 
     private:
         template <typename... Args>
-        typename BaseType::Iterator EmplaceElement(const EntityType Entity, Args&&... Arguments)
+        constexpr typename BaseType::Iterator EmplaceElement(const EntityType Entity, Args&&... Arguments)
         {
             const auto It { BaseType::Push(Entity) };
 
@@ -301,26 +302,26 @@ namespace egg::ECS::Containers
             return It;
         }
 
-        void UpdateToPacked(const std::size_t Index, const std::size_t LeftIndex, const std::size_t RightIndex) override
+        constexpr void UpdateToPacked(const std::size_t Index, const std::size_t LeftIndex, const std::size_t RightIndex) override
         {
             BaseType::UpdateToPacked(Index, LeftIndex, RightIndex);
             SwapPayloadAt(LeftIndex, RightIndex);
         }
 
-        void SwapAt(const std::size_t Left, const std::size_t Right) override
+        constexpr void SwapAt(const std::size_t Left, const std::size_t Right) override
         {
             BaseType::SwapAt(Left, Right);
             SwapPayloadAt(Left, Right);
         }
 
-        void SwapPayloadAt(const std::size_t Left, const std::size_t Right)
+        constexpr void SwapPayloadAt(const std::size_t Left, const std::size_t Right)
         {
             static_assert(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>, "Non-movable type");
             using std::swap;
             swap(Payload.GetReference(Left), Payload.GetReference(Right));
         }
 
-        void Pop(typename BaseType::Iterator First, typename BaseType::Iterator Last) override
+        constexpr void Pop(typename BaseType::Iterator First, typename BaseType::Iterator Last) override
         {
             for (AllocatorType Allocator { Payload.GetAllocator() }; First != Last; ++First)
             {
@@ -332,7 +333,7 @@ namespace egg::ECS::Containers
             }
         }
 
-        void ShrinkToSize(const std::size_t Size)
+        constexpr void ShrinkToSize(const std::size_t Size)
         {
             Payload.Shrink(Size, BaseType::GetSize());
         }
@@ -340,7 +341,7 @@ namespace egg::ECS::Containers
         ContainerType Payload;
     };
 
-    template <typename Type, ValidEntity EntityParameter, ValidAllocator<Type> AllocatorParameter>
+    template <typename Type, ValidEntity EntityParameter, Types::ValidAllocator<Type> AllocatorParameter>
         requires std::is_same_v<Type, EntityParameter> || (!PageSizeTraits<Type>::value)
     class Storage<Type, EntityParameter, AllocatorParameter>
         : public SparseSet<EntityParameter, typename AllocatorTraits<AllocatorParameter>::template rebind_alloc<EntityParameter>>
@@ -361,22 +362,22 @@ namespace egg::ECS::Containers
         using ConstReference = typename ContainerType::ConstReference;
 
 
-        Storage() : Storage { AllocatorType {} }
+        constexpr Storage() : Storage { AllocatorType {} }
         {
         }
 
-        explicit Storage(const AllocatorType& Allocator) noexcept(std::is_nothrow_constructible_v<BaseType, const AllocatorType&>)
+        constexpr explicit Storage(const AllocatorType& Allocator) noexcept(std::is_nothrow_constructible_v<BaseType, const AllocatorType&>)
             : BaseType { Allocator }
         {
         }
 
-        Storage(Storage&& Other) noexcept(std::is_nothrow_move_constructible_v<BaseType>) = default;
+        constexpr Storage(Storage&& Other) noexcept(std::is_nothrow_move_constructible_v<BaseType>) = default;
 
-        Storage(Storage&& Other, const AllocatorType& Allocator) : BaseType { std::move(Other), Allocator }
+        constexpr Storage(Storage&& Other, const AllocatorType& Allocator) : BaseType { std::move(Other), Allocator }
         {
         }
 
-        ~Storage() noexcept override = default;
+        constexpr ~Storage() noexcept override = default;
 
         Storage& operator=(const Storage&) = delete;
 

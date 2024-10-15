@@ -29,6 +29,7 @@ namespace egg::Events
         using FunctionType = ResultType(Args...);
         using WrappedFunctionType = ResultType(const void*, Args...);
 
+
         constexpr Delegate() noexcept = default;
 
         template <auto Candidate>

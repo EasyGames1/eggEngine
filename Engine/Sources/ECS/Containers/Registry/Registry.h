@@ -6,12 +6,13 @@
 #include "Containers/DenseMap/DenseMap.h"
 #include "ECS/Containers/SparseSet/SparseSet.h"
 #include "Type/TypeID.h"
+#include "Type/Traits/Capabilities.h"
 
 #include <functional>
 
 namespace egg::ECS::Containers
 {
-    template <ValidEntity EntityParameter, ValidAllocator<EntityParameter> AllocatorParameter = std::allocator<EntityParameter>>
+    template <ValidEntity EntityParameter, Types::ValidAllocator<EntityParameter> AllocatorParameter = std::allocator<EntityParameter>>
     class Registry
     {
         using ContainerAllocatorTraits = AllocatorTraits<AllocatorParameter>;
