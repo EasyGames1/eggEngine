@@ -66,7 +66,7 @@ namespace egg::ECS::Containers
             return *this;
         }
 
-        friend constexpr void swap(SparseSet& Left, SparseSet& Right)
+        constexpr friend void swap(SparseSet& Left, SparseSet& Right)
             noexcept(std::is_nothrow_swappable_v<SparseContainer> && std::is_nothrow_swappable_v<PackedContainer>)
         {
             using std::swap;

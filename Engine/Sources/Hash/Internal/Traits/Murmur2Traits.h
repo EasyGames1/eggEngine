@@ -53,7 +53,7 @@ namespace egg::Hash::Internal
         [[nodiscard]] static constexpr Type LoadBytes(const std::span<const std::byte> Bytes)
         {
             Type Result {};
-            for (const std::byte Byte : std::ranges::reverse_view { Bytes })
+            for (const auto Byte : Bytes | std::views::reverse)
             {
                 Result <<= 8u;
                 Result += std::to_integer<Type>(Byte);

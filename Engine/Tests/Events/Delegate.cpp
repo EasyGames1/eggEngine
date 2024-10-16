@@ -395,71 +395,71 @@ TYPED_TEST(DelegateTest, Connect)
 
 TYPED_TEST(DelegateTest, Constructors)
 {
-    egg::Events::Delegate DelegateFree { egg::Events::ConnectionArgument<this->Free> {} };
+    egg::Events::Delegate DelegateFree { egg::Events::ConnectionArgument<this->Free> };
     EXPECT_TRUE(DelegateFree);
 
-    egg::Events::Delegate DelegateFreeNoExcept { egg::Events::ConnectionArgument<this->FreeNoExcept> {} };
+    egg::Events::Delegate DelegateFreeNoExcept { egg::Events::ConnectionArgument<this->FreeNoExcept> };
     EXPECT_TRUE(DelegateFreeNoExcept);
 
 
     Helper HelperObject;
-    egg::Events::Delegate DelegateMemberFunction { egg::Events::ConnectionArgument<this->MemberFunction> {}, HelperObject };
+    egg::Events::Delegate DelegateMemberFunction { egg::Events::ConnectionArgument<this->MemberFunction>, HelperObject };
     EXPECT_TRUE(DelegateMemberFunction);
 
     egg::Events::Delegate DelegateMemberFunctionWithPointer {
-        egg::Events::ConnectionArgument<this->MemberFunction> {}, &HelperObject
+        egg::Events::ConnectionArgument<this->MemberFunction>, &HelperObject
     };
     EXPECT_TRUE(DelegateMemberFunctionWithPointer);
 
     egg::Events::Delegate DelegateMemberFunctionNoExcept {
-        egg::Events::ConnectionArgument<this->MemberFunctionNoExcept> {}, HelperObject
+        egg::Events::ConnectionArgument<this->MemberFunctionNoExcept>, HelperObject
     };
     EXPECT_TRUE(DelegateMemberFunctionNoExcept);
 
     egg::Events::Delegate DelegateMemberFunctionNoExceptWithPointer {
-        egg::Events::ConnectionArgument<this->MemberFunctionNoExcept> {}, &HelperObject
+        egg::Events::ConnectionArgument<this->MemberFunctionNoExcept>, &HelperObject
     };
     EXPECT_TRUE(DelegateMemberFunctionNoExceptWithPointer);
 
 
     egg::Events::Delegate DelegateMemberValue {
-        egg::Events::ConnectionArgument<this->MemberValue> {}, HelperObject
+        egg::Events::ConnectionArgument<this->MemberValue>, HelperObject
     };
     EXPECT_TRUE(DelegateMemberValue);
 
     egg::Events::Delegate DelegateMemberValueWithPointer {
-        egg::Events::ConnectionArgument<this->MemberValue> {}, &HelperObject
+        egg::Events::ConnectionArgument<this->MemberValue>, &HelperObject
     };
     EXPECT_TRUE(DelegateMemberValueWithPointer);
 
 
     FunctorsHelper<false> FunctorHelperObject;
     egg::Events::Delegate DelegateMemberFunctor {
-        egg::Events::ConnectionArgument<this->MemberFunctor> {}, FunctorHelperObject
+        egg::Events::ConnectionArgument<this->MemberFunctor>, FunctorHelperObject
     };
     EXPECT_TRUE(DelegateMemberFunctor);
 
     egg::Events::Delegate DelegateMemberFunctorWithPointer {
-        egg::Events::ConnectionArgument<this->MemberFunctor> {}, &FunctorHelperObject
+        egg::Events::ConnectionArgument<this->MemberFunctor>, &FunctorHelperObject
     };
     EXPECT_TRUE(DelegateMemberFunctorWithPointer);
 
     FunctorsHelper<true> FunctorHelperNoExceptObject;
     egg::Events::Delegate DelegateMemberFunctorNoExcept {
-        egg::Events::ConnectionArgument<this->MemberFunctorNoExcept> {}, FunctorHelperNoExceptObject
+        egg::Events::ConnectionArgument<this->MemberFunctorNoExcept>, FunctorHelperNoExceptObject
     };
     EXPECT_TRUE(DelegateMemberFunctorNoExcept);
 
     egg::Events::Delegate DelegateMemberFunctorNoExceptWithPointer {
-        egg::Events::ConnectionArgument<this->MemberFunctorNoExcept> {}, &FunctorHelperNoExceptObject
+        egg::Events::ConnectionArgument<this->MemberFunctorNoExcept>, &FunctorHelperNoExceptObject
     };
     EXPECT_TRUE(DelegateMemberFunctorNoExceptWithPointer);
 
 
-    egg::Events::Delegate DelegateLambda { egg::Events::ConnectionArgument<this->Lambda> {} };
+    egg::Events::Delegate DelegateLambda { egg::Events::ConnectionArgument<this->Lambda> };
     EXPECT_TRUE(DelegateLambda);
 
-    egg::Events::Delegate DelegateLambdaNoExcept { egg::Events::ConnectionArgument<this->LambdaNoExcept> {} };
+    egg::Events::Delegate DelegateLambdaNoExcept { egg::Events::ConnectionArgument<this->LambdaNoExcept> };
     EXPECT_TRUE(DelegateLambdaNoExcept);
 }
 

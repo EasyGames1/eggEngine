@@ -78,7 +78,7 @@ namespace egg::ECS::Containers
             return *this;
         }
 
-        friend constexpr void swap(PagedVector& Left, PagedVector& Right) noexcept(std::is_nothrow_swappable_v<PayloadType>)
+        constexpr friend void swap(PagedVector& Left, PagedVector& Right) noexcept(std::is_nothrow_swappable_v<PayloadType>)
         {
             using std::swap;
             swap(Left.Payload, Right.Payload);

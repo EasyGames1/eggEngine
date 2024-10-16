@@ -79,9 +79,9 @@ namespace egg::Hash
 
             SizeType Hash { TraitsType::Offset };
 
-            for (auto Current : Data)
+            for (const auto Byte : Data)
             {
-                Hash = (Hash ^ std::to_integer<SizeType>(Current)) * TraitsType::Prime;
+                Hash = (Hash ^ std::to_integer<SizeType>(Byte)) * TraitsType::Prime;
             }
 
             return Hash;

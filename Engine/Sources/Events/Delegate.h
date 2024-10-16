@@ -13,10 +13,14 @@
 namespace egg::Events
 {
     template <auto>
-    struct ConnectionArgument
+    struct ConnectionArgumentType
     {
-        constexpr explicit ConnectionArgument() = default;
+        constexpr explicit ConnectionArgumentType() = default;
     };
+
+    template <auto Candidate>
+    inline constexpr ConnectionArgumentType<Candidate> ConnectionArgument {};
+
 
     template <typename>
     class Delegate;
@@ -33,19 +37,19 @@ namespace egg::Events
         constexpr Delegate() noexcept = default;
 
         template <auto Candidate>
-        constexpr explicit Delegate(ConnectionArgument<Candidate>) noexcept
+        constexpr explicit Delegate(ConnectionArgumentType<Candidate>) noexcept
         {
             Connect<Candidate>();
         }
 
         template <auto Candidate, ValidValueOrInstance<decltype(Candidate)> Type>
-        constexpr Delegate(ConnectionArgument<Candidate>, Type& ValueOrInstance) noexcept
+        constexpr Delegate(ConnectionArgumentType<Candidate>, Type& ValueOrInstance) noexcept
         {
             Connect<Candidate>(ValueOrInstance);
         }
 
         template <auto Candidate, ValidValueOrInstance<decltype(Candidate)> Type>
-        constexpr Delegate(ConnectionArgument<Candidate>, Type* ValueOrInstance) noexcept
+        constexpr Delegate(ConnectionArgumentType<Candidate>, Type* ValueOrInstance) noexcept
         {
             Connect<Candidate>(ValueOrInstance);
         }
@@ -282,13 +286,13 @@ namespace egg::Events
     };
 
     template <auto Candidate>
-    Delegate(ConnectionArgument<Candidate>) -> Delegate<typename FunctionPointerTraits<decltype(Candidate)>::Type>;
+    Delegate(ConnectionArgumentType<Candidate>) -> Delegate<typename FunctionPointerTraits<decltype(Candidate)>::Type>;
 
     template <auto Candidate, ValidValueOrInstance<decltype(Candidate)> Type>
-    Delegate(ConnectionArgument<Candidate>, Type&) -> Delegate<typename FunctionPointerTraits<decltype(Candidate)>::Type>;
+    Delegate(ConnectionArgumentType<Candidate>, Type&) -> Delegate<typename FunctionPointerTraits<decltype(Candidate)>::Type>;
 
     template <auto Candidate, ValidValueOrInstance<decltype(Candidate)> Type>
-    Delegate(ConnectionArgument<Candidate>, Type*) -> Delegate<typename FunctionPointerTraits<decltype(Candidate)>::Type>;
+    Delegate(ConnectionArgumentType<Candidate>, Type*) -> Delegate<typename FunctionPointerTraits<decltype(Candidate)>::Type>;
 
     template <typename ReturnType, typename... Args>
     Delegate(ReturnType (*)(const void*, Args...), const void* = nullptr) -> Delegate<ReturnType(Args...)>;

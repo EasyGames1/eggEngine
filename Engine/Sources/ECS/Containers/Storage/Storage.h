@@ -95,7 +95,7 @@ namespace egg::ECS::Containers
             return *this;
         }
 
-        friend constexpr void swap(Storage& Left, Storage& Right)
+        constexpr friend void swap(Storage& Left, Storage& Right)
             noexcept(std::is_nothrow_swappable_v<BaseType> && std::is_nothrow_swappable_v<ContainerType>)
         {
             using std::swap;
