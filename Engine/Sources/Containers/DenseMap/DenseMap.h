@@ -132,7 +132,7 @@ namespace egg::Containers
 
         constexpr DenseMap& operator=(const DenseMap&) = default;
 
-        DenseMap& operator=(DenseMap&&)
+        constexpr DenseMap& operator=(DenseMap&&)
             noexcept (std::is_nothrow_move_assignable_v<SparsePair> && std::is_nothrow_move_assignable_v<PackedPair>) = default;
 
         constexpr friend void swap(DenseMap& Left, DenseMap& Right)

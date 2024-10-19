@@ -20,7 +20,7 @@ namespace egg::Hash
         {
         }
 
-        [[nodiscard]] constexpr std::uint32_t Murmur2() const noexcept requires std::is_same_v<SizeType, std::uint32_t>
+        [[nodiscard]] constexpr SizeType Murmur2() const noexcept requires std::is_same_v<SizeType, std::uint32_t>
         {
             using TraitsType = Internal::Murmur2Traits<SizeType>;
 

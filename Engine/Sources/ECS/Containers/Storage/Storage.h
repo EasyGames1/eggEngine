@@ -84,7 +84,7 @@ namespace egg::ECS::Containers
 
         Storage& operator=(const Storage&) = delete;
 
-        Storage& operator=(Storage&& Other)
+        constexpr Storage& operator=(Storage&& Other)
             noexcept(std::is_nothrow_move_assignable_v<BaseType> && std::is_nothrow_move_assignable_v<ContainerType>)
         {
             EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || Payload.GetAllocator() == Other.Payload.GetAllocator(),
@@ -381,7 +381,7 @@ namespace egg::ECS::Containers
 
         Storage& operator=(const Storage&) = delete;
 
-        Storage& operator=(Storage&& Other) noexcept(std::is_nothrow_move_assignable_v<BaseType>) = default;
+        constexpr Storage& operator=(Storage&& Other) noexcept(std::is_nothrow_move_assignable_v<BaseType>) = default;
     };
 }
 

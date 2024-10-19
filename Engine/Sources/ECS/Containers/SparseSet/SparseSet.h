@@ -57,7 +57,7 @@ namespace egg::ECS::Containers
 
         SparseSet& operator=(const SparseSet&) = delete;
 
-        SparseSet& operator=(SparseSet&& Other) noexcept(std::is_nothrow_move_assignable_v<SparseContainer>)
+        constexpr SparseSet& operator=(SparseSet&& Other) noexcept(std::is_nothrow_move_assignable_v<SparseContainer>)
         {
             EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || Packed.get_allocator() == Other.Packed.get_allocator(),
                        "Cannot copy sparse set because it has a incompatible allocator");

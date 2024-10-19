@@ -69,7 +69,7 @@ namespace egg::ECS::Containers
 
         PagedVector& operator=(const PagedVector&) = delete;
 
-        PagedVector& operator=(PagedVector&& Other) noexcept(std::is_nothrow_move_assignable_v<PayloadType>)
+        constexpr PagedVector& operator=(PagedVector&& Other) noexcept(std::is_nothrow_move_assignable_v<PayloadType>)
         {
             EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || GetAllocator() == Other.GetAllocator(),
                        "Cannot copy paged vector because it has a incompatible allocator");
