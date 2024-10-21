@@ -3,7 +3,7 @@
 
 namespace egg::Types::Internal
 {
-    template <typename SizeType, typename = void>
+    template <std::unsigned_integral SizeType, typename = void>
     class TypeIndex final
     {
     public:
@@ -20,7 +20,7 @@ namespace egg::Types::Internal
         static IndexType Counter;
     };
 
-    template <typename SizeType, typename Group>
+    template <std::unsigned_integral SizeType, typename Group>
     typename TypeIndex<SizeType, Group>::IndexType TypeIndex<SizeType, Group>::Counter {};
 }
 

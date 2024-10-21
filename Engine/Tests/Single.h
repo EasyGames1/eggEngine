@@ -4,8 +4,6 @@
 #include "../Sources/ECS/Entity.h"
 #include "../Sources/ECS/Traits/EntityTraits.h"
 
-#include <random>
-
 using EntityType = egg::ECS::Entity;
 
 using EntityTraitsType = egg::ECS::EntityTraits<EntityType>;

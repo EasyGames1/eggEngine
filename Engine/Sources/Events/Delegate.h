@@ -285,6 +285,7 @@ namespace egg::Events
         WrappedFunctionType* Function {};
     };
 
+
     template <auto Candidate>
     Delegate(ConnectionArgumentType<Candidate>) -> Delegate<typename FunctionPointerTraits<decltype(Candidate)>::Type>;
 

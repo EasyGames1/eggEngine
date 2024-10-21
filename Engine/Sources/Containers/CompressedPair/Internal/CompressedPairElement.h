@@ -51,6 +51,7 @@ namespace egg::Containers::Internal
         Type Value;
     };
 
+
     template <Types::EBCOEligible Type, std::size_t Position>
     class CompressedPairElement<Type, Position> : public Type
     {

@@ -4,6 +4,8 @@
 
 #include <gtest/gtest.h>
 
+#include <cmath>
+
 struct Velocity
 {
     bool operator==(const Velocity& Other) const

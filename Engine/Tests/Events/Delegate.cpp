@@ -1,5 +1,4 @@
 #include "Events/Delegate.h"
-#include "../Single.h"
 
 #include <gtest/gtest.h>
 
@@ -152,11 +151,13 @@ struct Traits
 template <typename FunctionType, bool IsNoExcept, FunctionKind Kind>
 struct PointerTraits;
 
+
 template <bool IsNoExcept>
 struct PointerTraits<void(), IsNoExcept, FunctionKind::Free> :
     Traits<&FreeFunctions::VoidNoArgs<IsNoExcept>>
 {
 };
+
 
 template <bool IsNoExcept>
 struct PointerTraits<void(int), IsNoExcept, FunctionKind::Free> :
@@ -164,11 +165,13 @@ struct PointerTraits<void(int), IsNoExcept, FunctionKind::Free> :
 {
 };
 
+
 template <bool IsNoExcept>
 struct PointerTraits<void(Helper&), IsNoExcept, FunctionKind::Free> :
     Traits<&FreeFunctions::VoidObject<IsNoExcept>>
 {
 };
+
 
 template <bool IsNoExcept>
 struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::Free> :
@@ -176,11 +179,13 @@ struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::Free> :
 {
 };
 
+
 template <bool IsNoExcept>
 struct PointerTraits<void(), IsNoExcept, FunctionKind::MemberFunction> :
     Traits<&Helper::VoidNoArgs<IsNoExcept>>
 {
 };
+
 
 template <bool IsNoExcept>
 struct PointerTraits<void(int), IsNoExcept, FunctionKind::MemberFunction> :
@@ -188,11 +193,13 @@ struct PointerTraits<void(int), IsNoExcept, FunctionKind::MemberFunction> :
 {
 };
 
+
 template <bool IsNoExcept>
 struct PointerTraits<void(Helper&), IsNoExcept, FunctionKind::MemberFunction> :
     Traits<&Helper::VoidObject<IsNoExcept>>
 {
 };
+
 
 template <bool IsNoExcept>
 struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::MemberFunction> :
@@ -200,11 +207,13 @@ struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::MemberFunctio
 {
 };
 
+
 template <bool IsNoExcept>
 struct PointerTraits<void(), IsNoExcept, FunctionKind::MemberValue> :
     Traits<&Helper::Value>
 {
 };
+
 
 template <bool IsNoExcept>
 struct PointerTraits<void(int), IsNoExcept, FunctionKind::MemberValue> :
@@ -212,11 +221,13 @@ struct PointerTraits<void(int), IsNoExcept, FunctionKind::MemberValue> :
 {
 };
 
+
 template <bool IsNoExcept>
 struct PointerTraits<void(Helper&), IsNoExcept, FunctionKind::MemberValue> :
     Traits<&Helper::Value>
 {
 };
+
 
 template <bool IsNoExcept>
 struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::MemberValue> :
@@ -224,11 +235,13 @@ struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::MemberValue> 
 {
 };
 
+
 template <bool IsNoExcept>
 struct PointerTraits<void(), IsNoExcept, FunctionKind::MemberFunctor> :
     Traits<&FunctorsHelper<IsNoExcept>::FunctorVoidNoArgs>
 {
 };
+
 
 template <bool IsNoExcept>
 struct PointerTraits<void(int), IsNoExcept, FunctionKind::MemberFunctor> :
@@ -236,11 +249,13 @@ struct PointerTraits<void(int), IsNoExcept, FunctionKind::MemberFunctor> :
 {
 };
 
+
 template <bool IsNoExcept>
 struct PointerTraits<void(Helper&), IsNoExcept, FunctionKind::MemberFunctor> :
     Traits<&FunctorsHelper<IsNoExcept>::FunctorVoidObject>
 {
 };
+
 
 template <bool IsNoExcept>
 struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::MemberFunctor> :
@@ -248,11 +263,13 @@ struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::MemberFunctor
 {
 };
 
+
 template <bool IsNoExcept>
 struct PointerTraits<void(), IsNoExcept, FunctionKind::Lambda>
     : Traits<+Lambdas::VoidNoArgs<IsNoExcept>()>
 {
 };
+
 
 template <bool IsNoExcept>
 struct PointerTraits<void(int), IsNoExcept, FunctionKind::Lambda> :
@@ -260,11 +277,13 @@ struct PointerTraits<void(int), IsNoExcept, FunctionKind::Lambda> :
 {
 };
 
+
 template <bool IsNoExcept>
 struct PointerTraits<void(Helper&), IsNoExcept, FunctionKind::Lambda> :
     Traits<+Lambdas::VoidObject<IsNoExcept>()>
 {
 };
+
 
 template <bool IsNoExcept>
 struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::Lambda> :
@@ -272,10 +291,12 @@ struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::Lambda> :
 {
 };
 
+
 template <typename FunctionType>
 class DelegateTest : public DelegateTest<std::pair<FunctionType, FunctionType>>
 {
 };
+
 
 template <typename DelegatePointerType, typename FunctionPointerType>
 class DelegateTest<std::pair<DelegatePointerType, FunctionPointerType>> : public testing::Test
@@ -312,6 +333,7 @@ using FunctionTypes = testing::Types<
     std::pair<void(*)(Helper&, int), void(*)(int)>
 >;
 TYPED_TEST_SUITE(DelegateTest, FunctionTypes);
+
 
 TYPED_TEST(DelegateTest, Connect)
 {
@@ -393,6 +415,7 @@ TYPED_TEST(DelegateTest, Connect)
     this->Delegate.Reset();
 }
 
+
 TYPED_TEST(DelegateTest, Constructors)
 {
     egg::Events::Delegate DelegateFree { egg::Events::ConnectionArgument<this->Free> };
@@ -462,6 +485,7 @@ TYPED_TEST(DelegateTest, Constructors)
     egg::Events::Delegate DelegateLambdaNoExcept { egg::Events::ConnectionArgument<this->LambdaNoExcept> };
     EXPECT_TRUE(DelegateLambdaNoExcept);
 }
+
 
 TYPED_TEST(DelegateTest, Reset)
 {

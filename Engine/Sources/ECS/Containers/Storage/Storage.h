@@ -341,6 +341,7 @@ namespace egg::ECS::Containers
         ContainerType Payload;
     };
 
+
     template <typename Type, ValidEntity EntityParameter, Types::ValidAllocator<Type> AllocatorParameter>
         requires std::is_same_v<Type, EntityParameter> || (!PageSizeTraits<Type>::value)
     class Storage<Type, EntityParameter, AllocatorParameter>

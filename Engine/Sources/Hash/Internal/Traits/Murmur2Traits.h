@@ -2,7 +2,6 @@
 #define ENGINE_SOURCES_HASH_TRAITS_FILE_MURMUR2_H
 
 #include <cstdint>
-#include <cstring>
 #include <ranges>
 
 namespace egg::Hash::Internal
@@ -10,13 +9,19 @@ namespace egg::Hash::Internal
     template <typename>
     struct BasicMurmur2Traits;
 
+
     template <>
     struct BasicMurmur2Traits<std::uint32_t>
     {
         using Type = std::uint32_t;
         static constexpr Type Multiplier { 0x5bd1e995u };
         static constexpr Type BlockSize { sizeof(Type) };
+        static constexpr Type ShiftBits { 24u };
+        static constexpr Type ByteShift { 3u };
+        static constexpr Type FirstFinalShiftBits { 13u };
+        static constexpr Type SecondFinalShiftBits { 15u };
     };
+
 
     template <>
     struct BasicMurmur2Traits<std::uint64_t>
@@ -24,6 +29,7 @@ namespace egg::Hash::Internal
         using Type = std::uint64_t;
         static constexpr Type Multiplier { (0xc6a4a793ull << 32ull) + static_cast<Type>(BasicMurmur2Traits<std::uint32_t>::Multiplier) };
     };
+
 
     template <typename SizeType>
     class Murmur2Traits : public BasicMurmur2Traits<SizeType>

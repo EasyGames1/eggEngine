@@ -1,6 +1,7 @@
 #ifndef ENGINE_SOURCES_EVENTS_TRAITS_FILE_FUNCTOR_OVERLOAD_TRAITS_H
 #define ENGINE_SOURCES_EVENTS_TRAITS_FILE_FUNCTOR_OVERLOAD_TRAITS_H
 
+#include "../../Config/Config.h"
 #include "Internal/FunctorOverloadTraits.h"
 
 namespace egg::Events

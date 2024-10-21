@@ -8,6 +8,7 @@ namespace egg::Hash::Internal
     template <typename>
     struct BasicFNV1aTraits;
 
+
     template <>
     struct BasicFNV1aTraits<std::uint32_t>
     {
@@ -16,6 +17,7 @@ namespace egg::Hash::Internal
         static constexpr Type Prime { 0x01000193u };
     };
 
+
     template <>
     struct BasicFNV1aTraits<std::uint64_t>
     {
@@ -23,6 +25,7 @@ namespace egg::Hash::Internal
         static constexpr Type Offset { 0xcbf29ce484222325ull };
         static constexpr Type Prime { 0x100000001b3ull };
     };
+
 
     template <typename SizeType>
     class FNV1aTraits : public BasicFNV1aTraits<SizeType>

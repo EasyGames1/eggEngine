@@ -62,7 +62,10 @@ add_library(VulkanEngine_lib
         Sources/ECS/Containers/PagedVector/Internal/PagedVectorIterator.h
         Sources/Type/Traits/Capabilities.h
         Sources/Events/Signal.h
+        Sources/Events/Connection.h
 )
+
+target_include_directories(VulkanEngine_lib PRIVATE Sources)
 
 find_package(Vulkan REQUIRED)
 target_link_libraries(VulkanEngine_lib PRIVATE Vulkan::Vulkan)

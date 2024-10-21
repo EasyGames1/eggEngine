@@ -5,7 +5,7 @@
 
 namespace egg::Types
 {
-    using TypeID = std::uint64_t;
+    using TypeID = std::uint32_t;
 }
 
 #endif // ENGINE_SOURCES_TYPE_INFO_FILE_ID_TYPE_H

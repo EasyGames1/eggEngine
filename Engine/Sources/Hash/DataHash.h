@@ -6,7 +6,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <iterator>
 #include <ranges>
 
 namespace egg::Hash
@@ -24,30 +23,29 @@ namespace egg::Hash
         {
             using TraitsType = Internal::Murmur2Traits<SizeType>;
 
-            constexpr SizeType BlockSize { TraitsType::BlockSize };
+            SizeType Hash = Seed ^ static_cast<SizeType>(Data.size());
 
-            SizeType Hash { Seed ^ static_cast<SizeType>(Data.size()) };
+            const std::byte* First { Data.data() };
+            const std::byte* End { Data.data() + Data.size() };
 
-            const std::byte* Buffer { Data.data() };
-            const std::byte* const End { Buffer + Data.size() - BlockSize };
-
-            for (; Buffer <= End; Buffer += BlockSize)
+            for (const std::byte* Last = End - TraitsType::BlockSize; First < Last; First += TraitsType::BlockSize)
             {
-                const SizeType Chunk { TraitsType::UnalignedLoad(Buffer) * TraitsType::Multiplier };
-                Hash = Hash * TraitsType::Multiplier ^ (Chunk ^ (Chunk >> 24u) * TraitsType::Multiplier);
+                const SizeType Chunk { TraitsType::UnalignedLoad(First) * TraitsType::Multiplier };
+                Hash = Hash * TraitsType::Multiplier ^ (Chunk ^ Chunk >> TraitsType::ShiftBits) * TraitsType::Multiplier;
             }
 
-            const SizeType Remainder { static_cast<SizeType>(std::distance(Buffer, End)) };
-            for (SizeType i = Remainder; i--;)
+            if (auto Remainder { static_cast<SizeType>(std::distance(First, End)) })
             {
-                Hash ^= std::to_integer<SizeType>(Buffer[i]) << (i << 3u);
+                while (Remainder--)
+                {
+                    Hash ^= std::to_integer<SizeType>(First[Remainder]) << (Remainder << TraitsType::ByteShift);
+                }
+                Hash *= TraitsType::Multiplier;
             }
 
-            if (Remainder) Hash *= TraitsType::Multiplier;
+            Hash = (Hash ^ Hash >> TraitsType::FirstFinalShiftBits) * TraitsType::Multiplier;
 
-            Hash = (Hash ^ Hash >> 13u) * TraitsType::Multiplier;
-
-            return Hash ^ Hash >> 15u;
+            return Hash ^ Hash >> TraitsType::SecondFinalShiftBits;
         }
 
         [[nodiscard]] constexpr SizeType Murmur2() const noexcept requires std::is_same_v<SizeType, std::uint64_t>

@@ -8,5 +8,7 @@ add_executable(VulkanGame
         Sources/main.cpp
 )
 
+target_include_directories(VulkanGame PRIVATE Sources)
+
 target_include_directories(VulkanGame PRIVATE "${CMAKE_SOURCE_DIR}/Engine/Sources")
 target_link_libraries(VulkanGame PRIVATE VulkanEngine_lib)

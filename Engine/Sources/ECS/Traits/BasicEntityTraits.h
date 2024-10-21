@@ -11,17 +11,20 @@ namespace egg::ECS
     template <ValidEntity>
     struct BasicEntityTraits;
 
+
     template <ValidEntity Type> requires std::is_class_v<Type>
     struct BasicEntityTraits<Type> : BasicEntityTraits<typename Type::EntityType>
     {
         using ValueType = Type;
     };
 
+
     template <ValidEntity Type> requires std::is_enum_v<Type>
     struct BasicEntityTraits<Type> : BasicEntityTraits<std::underlying_type_t<Type>>
     {
         using ValueType = Type;
     };
+
 
     template <>
     struct BasicEntityTraits<std::uint32_t>
@@ -35,6 +38,7 @@ namespace egg::ECS
         static constexpr EntityType EntityMask { 0xFFFFFu };
         static constexpr VersionType VersionMask { 0xFFFu };
     };
+
 
     template <>
     struct BasicEntityTraits<std::uint64_t>

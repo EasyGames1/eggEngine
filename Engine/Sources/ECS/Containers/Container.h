@@ -17,6 +17,7 @@ namespace egg::ECS::Containers
     using egg::Containers::rend;
     using egg::Containers::crend;
 
+
     template <typename Type>
     using AllocatorTraits = egg::Containers::AllocatorTraits<Type>;
 
