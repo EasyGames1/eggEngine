@@ -98,14 +98,14 @@ namespace egg::ECS::Containers
         {
             const auto Page { Position / PageSize::value };
             return Page < Payload.GetFirst().size() && Payload.GetFirst()[Page]
-                       ? Payload.GetFirst()[Page] + Math::FastModulo(Position, PageSize::value)
+                       ? Payload.GetFirst()[Page] + Math::FastModulo<std::size_t>(Position, PageSize::value)
                        : nullptr;
         }
 
         [[nodiscard]] constexpr Reference GetReference(const std::size_t Position) const
         {
             EGG_ASSERT(GetPointer(Position), "Payload not contain position");
-            return Payload.GetFirst()[Position / PageSize::value][Math::FastModulo(Position, PageSize::value)];
+            return Payload.GetFirst()[Position / PageSize::value][Math::FastModulo<std::size_t>(Position, PageSize::value)];
         }
 
         [[nodiscard]] constexpr Iterator Begin(const std::size_t AvailableElements) noexcept
@@ -187,7 +187,7 @@ namespace egg::ECS::Containers
                 }
             }
 
-            return Payload.GetFirst()[Page][Math::FastModulo(Position, PageSize::value)];
+            return Payload.GetFirst()[Page][Math::FastModulo<std::size_t>(Position, PageSize::value)];
         }
 
         constexpr void Shrink(const std::size_t Size, const std::size_t AvailableElements)

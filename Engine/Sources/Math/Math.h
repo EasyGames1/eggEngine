@@ -7,7 +7,8 @@
 
 namespace egg::Math
 {
-    [[nodiscard]] constexpr std::size_t FastModulo(const std::size_t Value, const std::size_t Modulo) noexcept
+    template <std::unsigned_integral Type>
+    [[nodiscard]] constexpr Type FastModulo(const Type Value, const Type Modulo) noexcept
     {
         EGG_ASSERT(std::has_single_bit(Modulo), "Modulo must be a power of two");
         return Value & Modulo - 1u;

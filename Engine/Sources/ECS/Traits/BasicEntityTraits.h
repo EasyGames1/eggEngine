@@ -12,7 +12,7 @@ namespace egg::ECS
     struct BasicEntityTraits;
 
 
-    template <ValidEntity Type> requires std::is_class_v<Type>
+    template <ValidEntity Type> requires std::is_class_v<Type> && requires { typename Type::EntityType; }
     struct BasicEntityTraits<Type> : BasicEntityTraits<typename Type::EntityType>
     {
         using ValueType = Type;

@@ -63,6 +63,8 @@ add_library(VulkanEngine_lib
         Sources/Type/Traits/Capabilities.h
         Sources/Events/Signal.h
         Sources/Events/Connection.h
+        Sources/Utils/Memory.h
+        Sources/Math/Traits/Capabilities.h
 )
 
 target_include_directories(VulkanEngine_lib PRIVATE Sources)

@@ -10,7 +10,7 @@
 
 namespace egg::Hash
 {
-    template <typename SizeType>
+    template <std::unsigned_integral SizeType>
     class DataHash
     {
     public:
@@ -26,26 +26,29 @@ namespace egg::Hash
             SizeType Hash = Seed ^ static_cast<SizeType>(Data.size());
 
             const std::byte* First { Data.data() };
-            const std::byte* End { Data.data() + Data.size() };
+            const std::byte* const End { Data.data() + Data.size() };
 
             for (const std::byte* Last = End - TraitsType::BlockSize; First < Last; First += TraitsType::BlockSize)
             {
-                const SizeType Chunk { TraitsType::UnalignedLoad(First) * TraitsType::Multiplier };
-                Hash = Hash * TraitsType::Multiplier ^ (Chunk ^ Chunk >> TraitsType::ShiftBits) * TraitsType::Multiplier;
+                const SizeType Chunk { Utils::Memory::UnalignedLoad<SizeType>(First) * TraitsType::Multiplier };
+                Hash *= TraitsType::Multiplier;
+                Hash ^= Utils::Memory::ShiftMix(Chunk, TraitsType::ShiftBits) * TraitsType::Multiplier;
             }
 
-            if (auto Remainder { static_cast<SizeType>(std::distance(First, End)) })
+            if (auto Remainder = static_cast<SizeType>(std::distance(First, End)))
             {
                 while (Remainder--)
                 {
-                    Hash ^= std::to_integer<SizeType>(First[Remainder]) << (Remainder << TraitsType::ByteShift);
+                    Hash ^= std::to_integer<SizeType>(First[Remainder]) << Utils::Memory::ToBits(Remainder);
                 }
                 Hash *= TraitsType::Multiplier;
             }
 
-            Hash = (Hash ^ Hash >> TraitsType::FirstFinalShiftBits) * TraitsType::Multiplier;
+            Hash = Utils::Memory::ShiftMix(Hash, TraitsType::FirstFinalShiftBits);
+            Hash *= TraitsType::Multiplier;
+            Hash = Utils::Memory::ShiftMix(Hash, TraitsType::SecondFinalShiftBits);
 
-            return Hash ^ Hash >> TraitsType::SecondFinalShiftBits;
+            return Hash;
         }
 
         [[nodiscard]] constexpr SizeType Murmur2() const noexcept requires std::is_same_v<SizeType, std::uint64_t>
@@ -54,21 +57,28 @@ namespace egg::Hash
 
             constexpr SizeType AlignMask { 0x7ull };
 
-            const std::byte* const End { Data.data() + (Data.size() & ~AlignMask) };
             SizeType Hash { Seed ^ Data.size() * TraitsType::Multiplier };
 
-            for (const std::byte* Buffer = Data.data(); Buffer != End; Buffer += 8)
+            const std::byte* const End { Data.data() + (Data.size() & ~AlignMask) };
+
+            for (const std::byte* First = Data.data(); First != End; First += 8)
             {
-                Hash ^= TraitsType::ShiftMix(TraitsType::UnalignedLoad(Buffer) * TraitsType::Multiplier) * TraitsType::Multiplier;
+                const SizeType Chunk { Utils::Memory::UnalignedLoad<SizeType>(First) * TraitsType::Multiplier };
+                Hash ^= Utils::Memory::ShiftMix(Chunk, TraitsType::ShiftBits) * TraitsType::Multiplier;
                 Hash *= TraitsType::Multiplier;
             }
 
             if (Data.size() & AlignMask)
             {
-                Hash = (Hash ^ TraitsType::LoadBytes({ End, Data.size() & AlignMask })) * TraitsType::Multiplier;
+                Hash ^= Utils::Memory::LoadBytes<SizeType>({ End, Data.size() & AlignMask });
+                Hash *= TraitsType::Multiplier;
             }
 
-            return TraitsType::ShiftMix(TraitsType::ShiftMix(Hash) * TraitsType::Multiplier);
+            Hash = Utils::Memory::ShiftMix(Hash, TraitsType::ShiftBits);
+            Hash *= TraitsType::Multiplier;
+            Hash = Utils::Memory::ShiftMix(Hash, TraitsType::ShiftBits);
+
+            return Hash;
         }
 
         [[nodiscard]] constexpr SizeType FNV1a() const noexcept
@@ -79,7 +89,8 @@ namespace egg::Hash
 
             for (const auto Byte : Data)
             {
-                Hash = (Hash ^ std::to_integer<SizeType>(Byte)) * TraitsType::Prime;
+                Hash ^= std::to_integer<SizeType>(Byte);
+                Hash *= TraitsType::Prime;
             }
 
             return Hash;

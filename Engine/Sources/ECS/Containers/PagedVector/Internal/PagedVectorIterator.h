@@ -95,7 +95,7 @@ namespace egg::ECS::Containers::Internal
         {
             const auto Position { GetIndex() - Value };
             constexpr auto PageSize { PageSizeTraits<value_type>::value };
-            return (*Payload)[Position / PageSize][Math::FastModulo(Position, PageSize)];
+            return (*Payload)[Position / PageSize][Math::FastModulo<std::size_t>(Position, PageSize)];
         }
 
         [[nodiscard]] constexpr pointer operator->() const noexcept
