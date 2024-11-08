@@ -1,295 +1,8 @@
 #include "Events/Delegate.h"
 
+#include "../CommonFunctions.h"
+
 #include <gtest/gtest.h>
-
-namespace Functors
-{
-    template <bool IsNoExcept>
-    struct VoidNoArgs
-    {
-        void operator()() noexcept(IsNoExcept)
-        {
-        }
-    };
-
-    template <bool IsNoExcept>
-    struct VoidInt
-    {
-        void operator()(const int) noexcept(IsNoExcept)
-        {
-        }
-    };
-
-    template <bool IsNoExcept>
-    struct VoidObject
-    {
-        void operator()() noexcept(IsNoExcept)
-        {
-        }
-    };
-
-    template <bool IsNoExcept>
-    struct VoidObjectInt
-    {
-        void operator()(const int) noexcept(IsNoExcept)
-        {
-        }
-    };
-}
-
-struct Helper
-{
-    template <bool IsNoExcept>
-    void VoidNoArgs() noexcept(IsNoExcept)
-    {
-        ++Value;
-    }
-
-    template <bool IsNoExcept>
-    void VoidInt(const int Value) noexcept(IsNoExcept)
-    {
-        this->Value = Value;
-    }
-
-    template <bool IsNoExcept>
-    void VoidObject() noexcept(IsNoExcept)
-    {
-        VoidNoArgs<IsNoExcept>();
-    }
-
-    template <bool IsNoExcept>
-    void VoidObjectInt(const int Value) noexcept(IsNoExcept)
-    {
-        return VoidInt<IsNoExcept>(Value);
-    }
-
-    int Value {};
-};
-
-template <bool IsNoExcept>
-struct FunctorsHelper
-{
-    Functors::VoidNoArgs<IsNoExcept> FunctorVoidNoArgs {};
-    Functors::VoidInt<IsNoExcept> FunctorVoidInt {};
-    Functors::VoidObject<IsNoExcept> FunctorVoidObject {};
-    Functors::VoidObjectInt<IsNoExcept> FunctorVoidObjectInt {};
-};
-
-namespace FreeFunctions
-{
-    template <bool IsNoExcept>
-    static void VoidNoArgs() noexcept(IsNoExcept)
-    {
-    }
-
-    template <bool IsNoExcept>
-    static void VoidInt(const int) noexcept(IsNoExcept)
-    {
-    }
-
-    template <bool IsNoExcept>
-    static void VoidObject(Helper&) noexcept(IsNoExcept)
-    {
-    }
-
-    template <bool IsNoExcept>
-    static void VoidObjectInt(Helper&, const int) noexcept(IsNoExcept)
-    {
-    }
-}
-
-namespace Lambdas
-{
-    template <bool IsNoExcept>
-    [[nodiscard]] consteval static auto VoidNoArgs() noexcept(IsNoExcept)
-    {
-        return []() -> void
-        {
-        };
-    }
-
-    template <bool IsNoExcept>
-    [[nodiscard]] consteval static auto VoidInt() noexcept(IsNoExcept)
-    {
-        return [](int) -> void
-        {
-        };
-    }
-
-    template <bool IsNoExcept>
-    [[nodiscard]] consteval static auto VoidObject() noexcept(IsNoExcept)
-    {
-        return [](Helper&) -> void
-        {
-        };
-    }
-
-    template <bool IsNoExcept>
-    [[nodiscard]] consteval static auto VoidObjectInt() noexcept(IsNoExcept)
-    {
-        return [](Helper&, int) -> void
-        {
-        };
-    }
-}
-
-enum class FunctionKind
-{
-    Free,
-    MemberFunction,
-    MemberValue,
-    MemberFunctor,
-    Lambda,
-};
-
-template <auto Candidate>
-struct Traits
-{
-    static constexpr auto Pointer { Candidate };
-};
-
-template <typename FunctionType, bool IsNoExcept, FunctionKind Kind>
-struct PointerTraits;
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(), IsNoExcept, FunctionKind::Free> :
-    Traits<&FreeFunctions::VoidNoArgs<IsNoExcept>>
-{
-};
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(int), IsNoExcept, FunctionKind::Free> :
-    Traits<&FreeFunctions::VoidInt<IsNoExcept>>
-{
-};
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(Helper&), IsNoExcept, FunctionKind::Free> :
-    Traits<&FreeFunctions::VoidObject<IsNoExcept>>
-{
-};
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::Free> :
-    Traits<&FreeFunctions::VoidObjectInt<IsNoExcept>>
-{
-};
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(), IsNoExcept, FunctionKind::MemberFunction> :
-    Traits<&Helper::VoidNoArgs<IsNoExcept>>
-{
-};
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(int), IsNoExcept, FunctionKind::MemberFunction> :
-    Traits<&Helper::VoidInt<IsNoExcept>>
-{
-};
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(Helper&), IsNoExcept, FunctionKind::MemberFunction> :
-    Traits<&Helper::VoidObject<IsNoExcept>>
-{
-};
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::MemberFunction> :
-    Traits<&Helper::VoidObjectInt<IsNoExcept>>
-{
-};
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(), IsNoExcept, FunctionKind::MemberValue> :
-    Traits<&Helper::Value>
-{
-};
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(int), IsNoExcept, FunctionKind::MemberValue> :
-    Traits<&Helper::Value>
-{
-};
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(Helper&), IsNoExcept, FunctionKind::MemberValue> :
-    Traits<&Helper::Value>
-{
-};
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::MemberValue> :
-    Traits<&Helper::Value>
-{
-};
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(), IsNoExcept, FunctionKind::MemberFunctor> :
-    Traits<&FunctorsHelper<IsNoExcept>::FunctorVoidNoArgs>
-{
-};
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(int), IsNoExcept, FunctionKind::MemberFunctor> :
-    Traits<&FunctorsHelper<IsNoExcept>::FunctorVoidInt>
-{
-};
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(Helper&), IsNoExcept, FunctionKind::MemberFunctor> :
-    Traits<&FunctorsHelper<IsNoExcept>::FunctorVoidObject>
-{
-};
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::MemberFunctor> :
-    Traits<&FunctorsHelper<IsNoExcept>::FunctorVoidObjectInt>
-{
-};
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(), IsNoExcept, FunctionKind::Lambda>
-    : Traits<+Lambdas::VoidNoArgs<IsNoExcept>()>
-{
-};
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(int), IsNoExcept, FunctionKind::Lambda> :
-    Traits<+Lambdas::VoidInt<IsNoExcept>()>
-{
-};
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(Helper&), IsNoExcept, FunctionKind::Lambda> :
-    Traits<+Lambdas::VoidObject<IsNoExcept>()>
-{
-};
-
-
-template <bool IsNoExcept>
-struct PointerTraits<void(Helper&, int), IsNoExcept, FunctionKind::Lambda> :
-    Traits<+Lambdas::VoidObjectInt<IsNoExcept>()>
-{
-};
 
 
 template <typename FunctionType>
@@ -298,39 +11,61 @@ class DelegateTest : public DelegateTest<std::pair<FunctionType, FunctionType>>
 };
 
 
-template <typename DelegatePointerType, typename FunctionPointerType>
-class DelegateTest<std::pair<DelegatePointerType, FunctionPointerType>> : public testing::Test
+template <typename SignaturePointerType, typename FunctionPointerType>
+class DelegateTest<std::pair<SignaturePointerType, FunctionPointerType>> : public testing::Test
 {
 protected:
-    using DelegateType = std::remove_pointer_t<DelegatePointerType>;
-    using FunctionType = std::remove_pointer_t<FunctionPointerType>;
+    using Signature = std::remove_pointer_t<SignaturePointerType>;
+    using FunctionSignature = std::remove_pointer_t<FunctionPointerType>;
 
-    egg::Events::Delegate<DelegateType> Delegate;
+    egg::Events::Delegate<Signature> Delegate;
 
-    static constexpr auto Free { PointerTraits<FunctionType, false, FunctionKind::Free>::Pointer };
-    static constexpr auto FreeNoExcept { PointerTraits<FunctionType, true, FunctionKind::Free>::Pointer };
+    static constexpr auto Free {
+        CommonFunctions::PointerTraits<FunctionSignature, false, CommonFunctions::FunctionKind::Free>::Pointer
+    };
+    static constexpr auto FreeNoExcept {
+        CommonFunctions::PointerTraits<FunctionSignature, true, CommonFunctions::FunctionKind::Free>::Pointer
+    };
 
-    static constexpr auto MemberFunction { PointerTraits<FunctionType, false, FunctionKind::MemberFunction>::Pointer };
-    static constexpr auto MemberFunctionNoExcept { PointerTraits<FunctionType, true, FunctionKind::MemberFunction>::Pointer };
 
-    static constexpr auto MemberValue { PointerTraits<FunctionType, false, FunctionKind::MemberValue>::Pointer };
+    static constexpr auto MemberFunction {
+        CommonFunctions::PointerTraits<FunctionSignature, false, CommonFunctions::FunctionKind::MemberFunction>::Pointer
+    };
+    static constexpr auto MemberFunctionNoExcept {
+        CommonFunctions::PointerTraits<FunctionSignature, true, CommonFunctions::FunctionKind::MemberFunction>::Pointer
+    };
 
-    static constexpr auto MemberFunctor { PointerTraits<FunctionType, false, FunctionKind::MemberFunctor>::Pointer };
-    static constexpr auto MemberFunctorNoExcept { PointerTraits<FunctionType, true, FunctionKind::MemberFunctor>::Pointer };
 
-    static constexpr auto Lambda { PointerTraits<FunctionType, false, FunctionKind::Lambda>::Pointer };
-    static constexpr auto LambdaNoExcept { PointerTraits<FunctionType, true, FunctionKind::Lambda>::Pointer };
+    static constexpr auto MemberValue {
+        CommonFunctions::PointerTraits<FunctionSignature, false, CommonFunctions::FunctionKind::MemberValue>::Pointer
+    };
+
+
+    static constexpr auto MemberFunctor {
+        CommonFunctions::PointerTraits<FunctionSignature, false, CommonFunctions::FunctionKind::MemberFunctor>::Pointer
+    };
+    static constexpr auto MemberFunctorNoExcept {
+        CommonFunctions::PointerTraits<FunctionSignature, true, CommonFunctions::FunctionKind::MemberFunctor>::Pointer
+    };
+
+
+    static constexpr auto Lambda {
+        CommonFunctions::PointerTraits<FunctionSignature, false, CommonFunctions::FunctionKind::Lambda>::Pointer
+    };
+    static constexpr auto LambdaNoExcept {
+        CommonFunctions::PointerTraits<FunctionSignature, true, CommonFunctions::FunctionKind::Lambda>::Pointer
+    };
 };
 
 using FunctionTypes = testing::Types<
     void(),
     void(int),
-    void(Helper&),
-    void(Helper&, int),
+    void(CommonFunctions::Helper&),
+    void(CommonFunctions::Helper&, int),
     std::pair<void(*)(int, int), void(*)()>,
     std::pair<void(*)(int, int), void(*)(int)>,
-    std::pair<void(*)(Helper&, int), void(*)()>,
-    std::pair<void(*)(Helper&, int), void(*)(int)>
+    std::pair<void(*)(CommonFunctions::Helper&, int), void(*)()>,
+    std::pair<void(*)(CommonFunctions::Helper&, int), void(*)(int)>
 >;
 TYPED_TEST_SUITE(DelegateTest, FunctionTypes);
 
@@ -348,7 +83,7 @@ TYPED_TEST(DelegateTest, Connect)
     this->Delegate.Reset();
 
 
-    Helper HelperObject;
+    CommonFunctions::Helper HelperObject;
     EXPECT_FALSE(this->Delegate);
     this->Delegate.template Connect<this->MemberFunction>(HelperObject);
     EXPECT_TRUE(this->Delegate);
@@ -381,7 +116,7 @@ TYPED_TEST(DelegateTest, Connect)
     this->Delegate.Reset();
 
 
-    FunctorsHelper<false> FunctorHelperObject;
+    CommonFunctions::FunctorsHelper<false> FunctorHelperObject;
     EXPECT_FALSE(this->Delegate);
     this->Delegate.template Connect<this->MemberFunctor>(FunctorHelperObject);
     EXPECT_TRUE(this->Delegate);
@@ -392,7 +127,7 @@ TYPED_TEST(DelegateTest, Connect)
     EXPECT_TRUE(this->Delegate);
     this->Delegate.Reset();
 
-    FunctorsHelper<true> FunctorHelperNoExceptObject;
+    CommonFunctions::FunctorsHelper<true> FunctorHelperNoExceptObject;
     EXPECT_FALSE(this->Delegate);
     this->Delegate.template Connect<this->MemberFunctorNoExcept>(FunctorHelperNoExceptObject);
     EXPECT_TRUE(this->Delegate);
@@ -425,7 +160,7 @@ TYPED_TEST(DelegateTest, Constructors)
     EXPECT_TRUE(DelegateFreeNoExcept);
 
 
-    Helper HelperObject;
+    CommonFunctions::Helper HelperObject;
     egg::Events::Delegate DelegateMemberFunction { egg::Events::ConnectionArgument<this->MemberFunction>, HelperObject };
     EXPECT_TRUE(DelegateMemberFunction);
 
@@ -456,7 +191,7 @@ TYPED_TEST(DelegateTest, Constructors)
     EXPECT_TRUE(DelegateMemberValueWithPointer);
 
 
-    FunctorsHelper<false> FunctorHelperObject;
+    CommonFunctions::FunctorsHelper<false> FunctorHelperObject;
     egg::Events::Delegate DelegateMemberFunctor {
         egg::Events::ConnectionArgument<this->MemberFunctor>, FunctorHelperObject
     };
@@ -467,7 +202,7 @@ TYPED_TEST(DelegateTest, Constructors)
     };
     EXPECT_TRUE(DelegateMemberFunctorWithPointer);
 
-    FunctorsHelper<true> FunctorHelperNoExceptObject;
+    CommonFunctions::FunctorsHelper<true> FunctorHelperNoExceptObject;
     egg::Events::Delegate DelegateMemberFunctorNoExcept {
         egg::Events::ConnectionArgument<this->MemberFunctorNoExcept>, FunctorHelperNoExceptObject
     };
@@ -500,7 +235,7 @@ TYPED_TEST(DelegateTest, Reset)
     EXPECT_FALSE(this->Delegate);
 
 
-    Helper HelperObject;
+    CommonFunctions::Helper HelperObject;
     this->Delegate.template Connect<this->MemberFunction>(HelperObject);
     EXPECT_TRUE(this->Delegate);
     this->Delegate.Reset();
@@ -518,13 +253,13 @@ TYPED_TEST(DelegateTest, Reset)
     EXPECT_FALSE(this->Delegate);
 
 
-    FunctorsHelper<false> FunctorHelperObject;
+    CommonFunctions::FunctorsHelper<false> FunctorHelperObject;
     this->Delegate.template Connect<this->MemberFunctor>(FunctorHelperObject);
     EXPECT_TRUE(this->Delegate);
     this->Delegate.Reset();
     EXPECT_FALSE(this->Delegate);
 
-    FunctorsHelper<true> FunctorHelperNoExceptObject;
+    CommonFunctions::FunctorsHelper<true> FunctorHelperNoExceptObject;
     this->Delegate.template Connect<this->MemberFunctorNoExcept>(FunctorHelperNoExceptObject);
     EXPECT_TRUE(this->Delegate);
     this->Delegate.Reset();

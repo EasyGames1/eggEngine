@@ -33,9 +33,8 @@ namespace egg::Containers::Internal
         {
         }
 
-        template <typename OtherType>
-            requires (!std::is_same_v<IteratorType, OtherType> && std::is_constructible_v<IteratorType, OtherType>)
-        explicit constexpr DenseMapLocalIterator(const DenseMapLocalIterator<OtherType>& Other) noexcept
+        template <std::convertible_to<IteratorType> OtherType> requires (!std::same_as<IteratorType, OtherType>)
+        constexpr explicit DenseMapLocalIterator(const DenseMapLocalIterator<OtherType>& Other) noexcept
             : Iterator { Other.Iterator }, Offset { Other.Offset }
         {
         }

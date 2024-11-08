@@ -19,19 +19,19 @@ namespace egg::Containers::Internal
 
         constexpr CompressedPairElement()
             noexcept (std::is_nothrow_default_constructible_v<Type>)
-            requires (std::is_default_constructible_v<Type>)
+            requires (std::default_initializable<Type>)
             : Value {}
         {
         }
 
-        template <typename Arg> requires (!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Arg>>, CompressedPairElement>)
-        explicit constexpr CompressedPairElement(Arg&& Argument) noexcept (std::is_nothrow_constructible_v<Type, Arg>)
+        template <typename Arg> requires (!std::same_as<std::remove_cvref_t<Arg>, CompressedPairElement>)
+        constexpr explicit CompressedPairElement(Arg&& Argument) noexcept (std::is_nothrow_constructible_v<Type, Arg&&>)
             : Value { std::forward<Arg>(Argument) }
         {
         }
 
         template <typename... Args, std::size_t ... Indices>
-        constexpr CompressedPairElement(std::tuple<Args...> Arguments,
+        constexpr CompressedPairElement([[maybe_unused]] std::tuple<Args...> Arguments,
                                         std::index_sequence<Indices...>) noexcept (std::is_nothrow_constructible_v<Type, Args...>)
             : Value { std::forward<Args>(std::get<Indices>(Arguments))... }
         {
@@ -63,19 +63,19 @@ namespace egg::Containers::Internal
 
         constexpr CompressedPairElement()
             noexcept (std::is_nothrow_default_constructible_v<BaseType>)
-            requires (std::is_default_constructible_v<BaseType>)
+            requires (std::default_initializable<BaseType>)
             : BaseType {}
         {
         }
 
-        template <typename Arg> requires (!std::is_same_v<std::remove_cv_t<std::remove_reference_t<Arg>>, CompressedPairElement>)
-        explicit constexpr CompressedPairElement(Arg&& Argument) noexcept (std::is_nothrow_constructible_v<BaseType, Arg>)
+        template <typename Arg> requires (!std::same_as<std::remove_cvref_t<Arg>, CompressedPairElement>)
+        constexpr explicit CompressedPairElement(Arg&& Argument) noexcept (std::is_nothrow_constructible_v<BaseType, Arg&&>)
             : BaseType { std::forward<Arg>(Argument) }
         {
         }
 
         template <typename... Args, std::size_t... Indices>
-        constexpr CompressedPairElement(std::tuple<Args...> Arguments,
+        constexpr CompressedPairElement([[maybe_unused]] std::tuple<Args...> Arguments,
                                         std::index_sequence<Indices...>) noexcept (std::is_nothrow_constructible_v<BaseType, Args...>)
             : BaseType { std::forward<Args>(std::get<Indices>(Arguments))... }
         {

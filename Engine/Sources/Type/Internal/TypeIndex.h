@@ -1,6 +1,8 @@
 #ifndef ENGINE_SOURCES_TYPE_INFO_INTERNAL_FILE_TYPE_INDEX_H
 #define ENGINE_SOURCES_TYPE_INFO_INTERNAL_FILE_TYPE_INDEX_H
 
+#include <concepts>
+
 namespace egg::Types::Internal
 {
     template <std::unsigned_integral SizeType, typename = void>

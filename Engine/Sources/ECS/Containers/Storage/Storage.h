@@ -67,6 +67,8 @@ namespace egg::ECS::Containers
         {
         }
 
+        Storage(const Storage&) = delete;
+
         constexpr Storage(Storage&& Other)
             noexcept(std::is_nothrow_move_constructible_v<BaseType> && std::is_nothrow_move_constructible_v<ContainerType>) = default;
 
@@ -106,7 +108,7 @@ namespace egg::ECS::Containers
         template <typename... Args>
         constexpr Reference Emplace(const EntityType Entity, Args&&... Arguments)
         {
-            if constexpr (std::is_aggregate_v<ElementType> && (sizeof...(Arguments) || !std::is_default_constructible_v<ElementType>))
+            if constexpr (std::is_aggregate_v<ElementType> && (sizeof...(Arguments) || !std::default_initializable<ElementType>))
             {
                 const auto It { EmplaceElement(Entity, Type { std::forward<Args>(Arguments)... }) };
                 return Payload.GetReference(It.GetIndex());
@@ -130,7 +132,7 @@ namespace egg::ECS::Containers
         }
 
         template <typename EntityIteratorType, typename ContainerIteratorType>
-            requires (std::is_same_v<typename IteratorTraits<ContainerIteratorType>::value_type, ElementType>)
+            requires (std::same_as<typename IteratorTraits<ContainerIteratorType>::value_type, ElementType>)
         constexpr Iterator Insert(EntityIteratorType First, EntityIteratorType Last, ContainerIteratorType From)
         {
             for (; First != Last; ++First, ++From)
@@ -139,18 +141,6 @@ namespace egg::ECS::Containers
             }
 
             return Payload.Begin(BaseType::GetSize());
-        }
-
-        constexpr typename BaseType::Iterator Push(const EntityType Entity) override
-        {
-            if constexpr (std::is_default_constructible_v<ElementType>)
-            {
-                return EmplaceElement(Entity);
-            }
-            else
-            {
-                return BaseType::End();
-            }
         }
 
         template <typename... Func>
@@ -286,7 +276,7 @@ namespace egg::ECS::Containers
         template <typename... Args>
         constexpr typename BaseType::Iterator EmplaceElement(const EntityType Entity, Args&&... Arguments)
         {
-            const auto It { BaseType::Push(Entity) };
+            const auto It { BaseType::TryEmplace(Entity) };
 
             try
             {
@@ -300,6 +290,18 @@ namespace egg::ECS::Containers
             }
 
             return It;
+        }
+
+        constexpr typename BaseType::Iterator TryEmplace(const EntityType Entity) override
+        {
+            if constexpr (std::default_initializable<ElementType>)
+            {
+                return EmplaceElement(Entity);
+            }
+            else
+            {
+                return BaseType::End();
+            }
         }
 
         constexpr void UpdateToPacked(const std::size_t Index, const std::size_t LeftIndex, const std::size_t RightIndex) override
@@ -316,7 +318,7 @@ namespace egg::ECS::Containers
 
         constexpr void SwapPayloadAt(const std::size_t Left, const std::size_t Right)
         {
-            static_assert(std::is_move_constructible_v<Type> && std::is_move_assignable_v<Type>, "Non-movable type");
+            static_assert(std::move_constructible<Type> && std::is_move_assignable_v<Type>, "Non-movable type");
             using std::swap;
             swap(Payload.GetReference(Left), Payload.GetReference(Right));
         }
@@ -343,7 +345,7 @@ namespace egg::ECS::Containers
 
 
     template <typename Type, ValidEntity EntityParameter, Types::ValidAllocator<Type> AllocatorParameter>
-        requires std::is_same_v<Type, EntityParameter> || (!PageSizeTraits<Type>::value)
+        requires std::same_as<Type, EntityParameter> || (!PageSizeTraits<Type>::value)
     class Storage<Type, EntityParameter, AllocatorParameter>
         : public SparseSet<EntityParameter, typename AllocatorTraits<AllocatorParameter>::template rebind_alloc<EntityParameter>>
     {

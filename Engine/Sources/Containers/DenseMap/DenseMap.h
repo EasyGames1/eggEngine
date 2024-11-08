@@ -109,8 +109,8 @@ namespace egg::Containers
         {
         }
 
-        constexpr DenseMap(
-            DenseMap&&) noexcept (std::is_nothrow_move_constructible_v<SparsePair> && std::is_nothrow_move_constructible_v<PackedPair>)
+        constexpr DenseMap(DenseMap&&)
+            noexcept (std::is_nothrow_move_constructible_v<SparsePair> && std::is_nothrow_move_constructible_v<PackedPair>)
         = default;
 
         constexpr DenseMap(DenseMap&& Other, const AllocatorType& Allocator)
@@ -154,7 +154,7 @@ namespace egg::Containers
             return InsertOrDoNothing(std::move(Value.first), std::move(Value.second));
         }
 
-        template <typename Arg> requires std::is_constructible_v<ValueType, Arg&&>
+        template <std::convertible_to<ValueType> Arg>
         constexpr std::pair<Iterator, bool> Insert(Arg&& Value)
         {
             return InsertOrDoNothing(std::forward<Arg>(Value).first, std::forward<Arg>(Value).second);
@@ -182,7 +182,7 @@ namespace egg::Containers
         }
 
         template <typename... Args>
-        constexpr std::pair<Iterator, bool> Emplace(Args&&... Arguments)
+        constexpr std::pair<Iterator, bool> Emplace([[maybe_unused]] Args&&... Arguments)
         {
             if constexpr (!sizeof...(Args))
             {

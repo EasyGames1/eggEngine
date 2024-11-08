@@ -49,6 +49,8 @@ namespace egg::ECS::Containers
         {
         }
 
+        PagedVector(const PagedVector&) = delete;
+
         constexpr PagedVector(PagedVector&& Other) noexcept(std::is_nothrow_move_constructible_v<PayloadType>) = default;
 
         constexpr PagedVector(PagedVector&& Other, const AllocatorType& Allocator)
@@ -172,17 +174,17 @@ namespace egg::ECS::Containers
         {
             const auto Page { Position / PageSize::value };
 
-            if (Page >= Payload.GetFirst().size()) Payload.GetFirst().resize(Page + 1u, nullptr);
+            if (Page >= Payload.GetFirst().size()) Payload.GetFirst().resize(Page + 1u);
 
             if (!Payload.GetFirst()[Page])
             {
                 Payload.GetFirst()[Page] = ContainerAllocatorTraits::allocate(Payload.GetSecond(), PageSize::value);
-                if constexpr (ValidEntity<Type>)
+                if constexpr (ValidEntity<ValueType>)
                 {
                     std::uninitialized_fill(
                         Payload.GetFirst()[Page],
                         Payload.GetFirst()[Page] + PageSize::value,
-                        EntityTraits<Type>::Tombstone
+                        EntityTraits<ValueType>::Tombstone
                     );
                 }
             }

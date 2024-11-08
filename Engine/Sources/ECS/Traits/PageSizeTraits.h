@@ -18,7 +18,7 @@ namespace egg::ECS
     {
     };
 
-    template <typename Type> requires requires { Type::PageSize; } && std::is_integral_v<decltype(Type::PageSize)>
+    template <typename Type> requires requires { Type::PageSize; } && std::integral<decltype(Type::PageSize)>
     struct PageSizeTraits<Type> : std::integral_constant<std::size_t, Constants::Memory::PageSize<typename Type::PageSize>>
     {
     };

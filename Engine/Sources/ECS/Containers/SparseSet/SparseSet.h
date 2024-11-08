@@ -44,6 +44,8 @@ namespace egg::ECS::Containers
         {
         }
 
+        SparseSet(const SparseSet&) = delete;
+
         constexpr SparseSet(SparseSet&& Other) noexcept(std::is_nothrow_move_constructible_v<SparseContainer>) = default;
 
         constexpr SparseSet(SparseSet&& Other, const AllocatorType& Allocator) : Sparse { std::move(Other.Sparse), Allocator },
@@ -74,15 +76,9 @@ namespace egg::ECS::Containers
             swap(Left.Packed, Right.Packed);
         }
 
-        constexpr virtual Iterator Push(const EntityType Entity)
+        constexpr Iterator Push(const EntityType Entity)
         {
-            EGG_ASSERT(Entity != TraitsType::Tombstone, "The entity cannot be a tombstone");
-            auto& Element { Assure(Entity) };
-            EGG_ASSERT(Element == TraitsType::Tombstone, "Slot not available");
-            auto Position { GetSize() };
-            Packed.push_back(Entity);
-            Element = TraitsType::Combine(static_cast<typename TraitsType::EntityType>(Position), TraitsType::ToIntegral(Entity));
-            return End() - (Position + 1u);
+            return TryEmplace(Entity);
         }
 
         template <typename IteratorType>
@@ -92,7 +88,7 @@ namespace egg::ECS::Containers
 
             for (; First != Last; ++First)
             {
-                Current = Push(*First);
+                Current = TryEmplace(*First);
             }
 
             return Current;
@@ -117,7 +113,7 @@ namespace egg::ECS::Containers
         template <typename It>
         constexpr void Erase(It First, It Last)
         {
-            if constexpr (std::is_same_v<It, Iterator>)
+            if constexpr (std::same_as<It, Iterator>)
             {
                 Pop(First, Last);
             }
@@ -151,7 +147,7 @@ namespace egg::ECS::Containers
         {
             std::size_t Count {};
 
-            if constexpr (std::is_same_v<It, Iterator>)
+            if constexpr (std::same_as<It, Iterator>)
             {
                 while (First != Last)
                 {
@@ -368,6 +364,17 @@ namespace egg::ECS::Containers
                 static_cast<typename TraitsType::EntityType>(CurrentIndex),
                 TraitsType::ToIntegral(Packed[CurrentIndex])
             );
+        }
+
+        constexpr virtual Iterator TryEmplace(const EntityType Entity)
+        {
+            EGG_ASSERT(Entity != TraitsType::Tombstone, "The entity cannot be a tombstone");
+            auto& Element { Assure(Entity) };
+            EGG_ASSERT(Element == TraitsType::Tombstone, "Slot not available");
+            auto Position { GetSize() };
+            Packed.push_back(Entity);
+            Element = TraitsType::Combine(static_cast<typename TraitsType::EntityType>(Position), TraitsType::ToIntegral(Entity));
+            return End() - (Position + 1u);
         }
 
         constexpr virtual void Pop(Iterator First, Iterator Last)

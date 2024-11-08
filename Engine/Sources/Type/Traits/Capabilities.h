@@ -1,6 +1,7 @@
 #ifndef ENGINE_SOURCES_TYPE_TRAITS_FILE_CAPABILITIES_H
 #define ENGINE_SOURCES_TYPE_TRAITS_FILE_CAPABILITIES_H
 
+#include <memory>
 #include <type_traits>
 
 namespace egg::Types

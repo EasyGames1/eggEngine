@@ -3,7 +3,9 @@
 
 #include "./Internal/Traits/FNV1aTraits.h"
 #include "./Internal/Traits/Murmur2Traits.h"
+#include "Utils/Memory.h"
 
+#include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <ranges>
@@ -14,12 +16,12 @@ namespace egg::Hash
     class DataHash
     {
     public:
-        explicit constexpr DataHash(const std::span<const std::byte> Data, const SizeType Seed = 0xc70f6907ull)
+        constexpr explicit DataHash(const std::span<const std::byte> Data, const SizeType Seed = 0xc70f6907ull)
             : Data { Data }, Seed { Seed }
         {
         }
 
-        [[nodiscard]] constexpr SizeType Murmur2() const noexcept requires std::is_same_v<SizeType, std::uint32_t>
+        [[nodiscard]] constexpr SizeType Murmur2() const noexcept requires std::same_as<SizeType, std::uint32_t>
         {
             using TraitsType = Internal::Murmur2Traits<SizeType>;
 
@@ -51,7 +53,7 @@ namespace egg::Hash
             return Hash;
         }
 
-        [[nodiscard]] constexpr SizeType Murmur2() const noexcept requires std::is_same_v<SizeType, std::uint64_t>
+        [[nodiscard]] constexpr SizeType Murmur2() const noexcept requires std::same_as<SizeType, std::uint64_t>
         {
             using TraitsType = Internal::Murmur2Traits<SizeType>;
 

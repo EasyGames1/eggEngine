@@ -29,10 +29,8 @@ namespace egg::ECS::Containers::Internal
         {
         }
 
-        template <typename... Args> requires
-            std::conjunction_v<std::negation<std::is_same<OtherTypes, Args>>...> &&
-            std::conjunction_v<std::is_constructible<OtherTypes, Args>...>
-        explicit constexpr StorageIterator(const StorageIterator<IteratorType, Args...>& Other) : Iterators { Other.Iterators }
+        template <std::convertible_to<OtherTypes>... Args> requires (!std::same_as<Args, OtherTypes> && ...)
+        constexpr explicit StorageIterator(const StorageIterator<IteratorType, Args...>& Other) : Iterators { Other.Iterators }
         {
         }
 

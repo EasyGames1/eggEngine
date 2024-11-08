@@ -18,8 +18,8 @@ namespace egg::Containers
         using SecondType = Second;
 
         constexpr CompressedPair()
-            noexcept (std::is_nothrow_default_constructible_v<FirstBase> && std::is_nothrow_constructible_v<SecondBase>)
-            requires (std::is_default_constructible_v<FirstType> && std::is_default_constructible_v<SecondType>)
+            noexcept (std::is_nothrow_default_constructible_v<FirstBase> && std::is_nothrow_default_constructible_v<SecondBase>)
+            requires (std::default_initializable<FirstType> && std::default_initializable<SecondType>)
             : FirstBase {}, SecondBase {}
         {
         }
@@ -32,7 +32,7 @@ namespace egg::Containers
 
         template <typename Arg, typename OtherType>
         constexpr CompressedPair(Arg&& Argument, OtherType&& Other)
-            noexcept (std::is_nothrow_constructible_v<FirstBase, Arg> && std::is_nothrow_constructible_v<SecondBase, OtherType>)
+            noexcept (std::is_nothrow_constructible_v<FirstBase, Arg&&> && std::is_nothrow_constructible_v<SecondBase, OtherType&&>)
             : FirstBase { std::forward<Arg>(Argument) },
               SecondBase { std::forward<OtherType>(Other) }
         {

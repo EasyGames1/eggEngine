@@ -10,6 +10,7 @@ add_executable(VulkanEngine_test WindowCreating.cpp
         Containers/DenseMap.cpp
         Single.h
         Events/Delegate.cpp
+        CommonFunctions.h
 )
 
 find_package(GTest REQUIRED)

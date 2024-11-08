@@ -2,8 +2,8 @@
 #define ENGINE_SOURCES_HASH_TRAITS_FILE_MURMUR2_H
 
 #include "Constants/Memory.h"
-#include "Utils/Memory.h"
 
+#include <concepts>
 #include <cstdint>
 
 namespace egg::Hash::Internal

@@ -4,6 +4,7 @@
 #include "../Config/Config.h"
 
 #include <bit>
+#include <concepts>
 
 namespace egg::Math
 {

@@ -10,7 +10,7 @@ namespace egg::ECS
     };
 
     template <typename Type>
-    concept ValidEntity = std::is_enum_v<Type> || std::is_unsigned_v<Type> || (std::is_class_v<Type> && requires
+    concept ValidEntity = std::is_enum_v<Type> || std::unsigned_integral<Type> || (std::is_class_v<Type> && requires
     {
         typename Type::EntityType;
     });

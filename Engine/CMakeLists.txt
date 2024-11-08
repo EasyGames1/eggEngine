@@ -46,7 +46,7 @@ add_library(VulkanEngine_lib
         Sources/Hash/Internal/Traits/Fnv1aTraits.h
         Sources/ECS/Containers/Registry/Registry.h
         Sources/Events/Delegate.h
-        Sources/Events/Traits/FunctionPointerTraits.h
+        Sources/Events/Traits/InvocablePointerTraits.h
         Sources/Type/Internal/FunctionNameUtils.h
         Sources/Type/Internal/TypeNameUtils.h
         Sources/Type/Internal/TypeIndex.h
@@ -62,9 +62,11 @@ add_library(VulkanEngine_lib
         Sources/ECS/Containers/PagedVector/Internal/PagedVectorIterator.h
         Sources/Type/Traits/Capabilities.h
         Sources/Events/Signal.h
-        Sources/Events/Connection.h
+        Sources/Events/Action.h
         Sources/Utils/Memory.h
         Sources/Math/Traits/Capabilities.h
+        Sources/Events/Traits/Internal/FunctionPointerTraits.h
+        Sources/Events/Traits/FunctionTraits.h
 )
 
 target_include_directories(VulkanEngine_lib PRIVATE Sources)

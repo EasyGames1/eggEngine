@@ -21,12 +21,12 @@ namespace egg::Utils::Memory
     }
 
     template <std::unsigned_integral Type>
-    [[nodiscard]] constexpr Type UnalignedLoad(const std::byte* Pointer) noexcept
+    [[nodiscard]] constexpr Type UnalignedLoad(const std::byte* Bytes) noexcept
     {
         Type Result {};
         for (Type i = 0u; i < sizeof(Result); ++i)
         {
-            Result |= std::to_integer<Type>(Pointer[i]) << ToBits(i);
+            Result |= std::to_integer<Type>(Bytes[i]) << ToBits(i);
         }
         return Result;
     }
@@ -34,11 +34,12 @@ namespace egg::Utils::Memory
     template <std::unsigned_integral Type>
     [[nodiscard]] constexpr Type LoadBytes(const std::span<const std::byte> Bytes) noexcept
     {
+        EGG_ASSERT(Bytes.size() <= sizeof(Type), "The Type cannot accommodate so many Bytes");
         Type Result {};
         for (const auto Byte : Bytes | std::views::reverse)
         {
             Result <<= Constants::Memory::BitsIn<static_cast<Type>(1u)>;
-            Result += std::to_integer<Type>(Byte);
+            Result |= std::to_integer<Type>(Byte);
         }
         return Result;
     }

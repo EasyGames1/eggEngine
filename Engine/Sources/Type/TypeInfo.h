@@ -7,6 +7,7 @@
 #include "./Internal/TypeIndex.h"
 #include "./Internal/TypeNameUtils.h"
 
+#include <concepts>
 #include <span>
 #include <string_view>
 

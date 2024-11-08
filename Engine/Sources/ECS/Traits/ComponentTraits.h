@@ -7,7 +7,7 @@
 
 namespace egg::ECS
 {
-    template <typename ComponentType, typename = void> requires std::is_same_v<std::decay_t<ComponentType>, ComponentType>
+    template <typename ComponentType> requires std::same_as<std::decay_t<ComponentType>, ComponentType>
     struct ComponentTraits
     {
         using Type = ComponentType;

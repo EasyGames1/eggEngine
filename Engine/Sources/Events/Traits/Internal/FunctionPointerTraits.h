@@ -1,23 +1,12 @@
-#ifndef ENGINE_SOURCES_EVENTS_TRAITS_FILE_FUNCTION_POINTER_TRAITS_H
-#define ENGINE_SOURCES_EVENTS_TRAITS_FILE_FUNCTION_POINTER_TRAITS_H
+#ifndef ENGINE_SOURCES_EVENTS_TRAITS_INTERNAL_FILE_FUNCTION_POINTER_TRAITS_H
+#define ENGINE_SOURCES_EVENTS_TRAITS_INTERNAL_FILE_FUNCTION_POINTER_TRAITS_H
+
+#include "../FunctionTraits.h"
 
 #include <tuple>
 
-namespace egg::Events
+namespace egg::Events::Internal
 {
-    template <typename ReturnType, typename... Args>
-    struct FunctionTraits
-    {
-        using Type = ReturnType(Args...);
-        using Pointer = Type*;
-        using ResultType = ReturnType;
-        using ArgumentsTuple = std::tuple<Args...>;
-
-        template <typename... Before>
-        using IndexSequenceFor = std::index_sequence_for<Before..., Args...>;
-    };
-
-
     template <typename, typename...>
     struct FunctionPointerTraits;
 
@@ -81,17 +70,7 @@ namespace egg::Events
     {
         using InstanceType = Class;
     };
-
-
-    template <typename Type>
-    concept FreeFunctionPointer = !requires { typename FunctionPointerTraits<Type>::InstanceType; };
-
-    template <typename Type, typename FunctionPointerType>
-    concept ValidInstance =
-        std::is_same_v<std::remove_cvref_t<std::remove_pointer_t<Type>>, typename FunctionPointerTraits<FunctionPointerType>::InstanceType>;
-
-    template <typename Type, typename FunctionPointerType>
-    concept ValidValueOrInstance = FreeFunctionPointer<FunctionPointerType> || ValidInstance<Type, FunctionPointerType>;
 }
 
-#endif // ENGINE_SOURCES_EVENTS_TRAITS_FILE_FUNCTION_POINTER_TRAITS_H
+
+#endif // ENGINE_SOURCES_EVENTS_TRAITS_INTERNAL_FILE_FUNCTION_POINTER_TRAITS_H

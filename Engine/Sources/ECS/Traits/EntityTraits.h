@@ -13,7 +13,7 @@ namespace egg::ECS
     {
         using BaseType = BasicEntityTraits<Type>;
 
-        static constexpr auto Length { std::popcount(BaseType::EntityMask) };
+        static constexpr std::size_t Length { std::popcount(BaseType::EntityMask) };
 
         static_assert(!(BaseType::EntityMask && BaseType::EntityMask & BaseType::EntityMask + 1u), "Invalid entity mask");
         static_assert(!(BaseType::VersionMask & BaseType::VersionMask + 1u), "Invalid version mask");
@@ -94,7 +94,7 @@ namespace egg::ECS
         }
 
         static constexpr EntityType PageSize { PageSizeTraits<ValueType>::value };
-        static_assert(std::is_same_v<typename PageSizeTraits<ValueType>::value_type, EntityType>, "Page size type must be entity type");
+        static_assert(std::same_as<typename PageSizeTraits<ValueType>::value_type, EntityType>, "Page size type must be entity type");
         static_assert(std::has_single_bit(PageSize), "Page size must be a power of two");
 
         static constexpr ValueType Tombstone { Construct(EntityMask, VersionMask) };
