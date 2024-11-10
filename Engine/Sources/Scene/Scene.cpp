@@ -2,7 +2,7 @@
 
 namespace egg
 {
-    Events::Dispatcher& Scene::GetDispatcher()
+    Events::Dispatcher_Deprecated& Scene::GetDispatcher()
     {
         return Get().Dispatcher;
     }

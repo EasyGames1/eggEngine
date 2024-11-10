@@ -176,7 +176,7 @@ namespace egg::Events
             DisconnectIf([Pointer](const SlotType& Element) -> bool { return Element.GetInstance() == Pointer; });
         }
 
-        constexpr void Disconnect()
+        constexpr void Disconnect() noexcept
         {
             Slots.clear();
         }

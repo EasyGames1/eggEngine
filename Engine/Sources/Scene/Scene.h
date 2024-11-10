@@ -1,7 +1,7 @@
 #ifndef ENGINE_SOURCES_SCENE_FILE_SCENE_H
 #define ENGINE_SOURCES_SCENE_FILE_SCENE_H
 
-#include "../Events/Dispatcher.h"
+#include "../Events/Dispatcher_Deprecated.h"
 
 namespace egg
 {
@@ -12,14 +12,14 @@ namespace egg
 
         const Scene& operator=(const Scene&) = delete;
 
-        [[nodiscard]] static Events::Dispatcher& GetDispatcher();
+        [[nodiscard]] static Events::Dispatcher_Deprecated& GetDispatcher();
 
     private:
         Scene() = default;
 
         static Scene& Get();
 
-        Events::Dispatcher Dispatcher;
+        Events::Dispatcher_Deprecated Dispatcher;
     };
 }
 
