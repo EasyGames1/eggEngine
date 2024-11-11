@@ -27,11 +27,19 @@ namespace egg::Events
         using SinkType = Sink<SignalType>;
 
 
-        explicit EventLoop(const AllocatorType& Allocator) : Signal { Allocator }, Events { Allocator }
+        constexpr EventLoop()
+            noexcept(
+                std::is_nothrow_default_constructible_v<SignalType> &&
+                std::is_nothrow_default_constructible_v<ContainerType>)
+        = default;
+
+        constexpr explicit EventLoop(const AllocatorType& Allocator)
+            noexcept(std::is_nothrow_constructible_v<SignalType, const AllocatorType&>)
+            : Signal { Allocator }, Events { Allocator }
         {
         }
 
-        void Publish()
+        constexpr void Publish()
         {
             for (auto& Event : Events)
             {
@@ -40,13 +48,13 @@ namespace egg::Events
             Clear();
         }
 
-        void Trigger(Type Event)
+        constexpr void Trigger(Type Event)
         {
             Signal.Publish(Event);
         }
 
         template <typename... Args>
-        void Enqueue(Args&&... Arguments)
+        constexpr void Enqueue(Args&&... Arguments)
         {
             if constexpr (std::is_aggregate_v<Type> && (sizeof...(Args) != 0u || !std::default_initializable<Type>))
             {
@@ -58,17 +66,17 @@ namespace egg::Events
             }
         }
 
-        void Clear() noexcept
+        constexpr void Clear() noexcept
         {
             Events.clear();
         }
 
-        [[nodiscard]] SinkType GetSink() noexcept
+        [[nodiscard]] constexpr SinkType GetSink() noexcept
         {
             return SinkType { Signal };
         }
 
-        [[nodiscard]] std::size_t GetSize() const noexcept
+        [[nodiscard]] constexpr std::size_t GetSize() const noexcept
         {
             return Events.size();
         }

@@ -19,7 +19,7 @@ namespace egg::Events
         using WrappedSignature = typename SignalType::WrappedSignature;
 
 
-        explicit Sink(SignalType& Connections) : Connections { Connections }
+        explicit Sink(SignalType& Connections) noexcept : Connections { Connections }
         {
         }
 
