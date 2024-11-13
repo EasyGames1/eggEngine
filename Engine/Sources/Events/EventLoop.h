@@ -1,6 +1,7 @@
 #ifndef ENGINE_SOURCES_EVENTS_FILE_EVENT_LOOP_H
 #define ENGINE_SOURCES_EVENTS_FILE_EVENT_LOOP_H
 
+#include "EventLoopInterface.h"
 #include "Signal.h"
 #include "Sink.h"
 #include "Type/Traits/Capabilities.h"
@@ -11,8 +12,9 @@
 
 namespace egg::Events
 {
-    template <typename Type, Types::ValidAllocator<Type> AllocatorParameter> requires std::same_as<Type, std::decay_t<Type>>
-    class EventLoop final
+    template <typename Type, Types::ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
+        requires std::same_as<Type, std::decay_t<Type>>
+    class EventLoop final : public EventLoopInterface
     {
         using LoopAllocatorTraits = std::allocator_traits<AllocatorParameter>;
 
@@ -25,6 +27,7 @@ namespace egg::Events
         using AllocatorType = AllocatorParameter;
 
         using SinkType = Sink<SignalType>;
+        using EventType = Type;
 
 
         constexpr EventLoop()
@@ -39,7 +42,7 @@ namespace egg::Events
         {
         }
 
-        constexpr void Publish()
+        constexpr void Publish() override
         {
             for (auto& Event : Events)
             {
@@ -48,7 +51,7 @@ namespace egg::Events
             Clear();
         }
 
-        constexpr void Trigger(Type Event)
+        constexpr void Trigger(EventType Event)
         {
             Signal.Publish(Event);
         }
@@ -56,9 +59,9 @@ namespace egg::Events
         template <typename... Args>
         constexpr void Enqueue(Args&&... Arguments)
         {
-            if constexpr (std::is_aggregate_v<Type> && (sizeof...(Args) != 0u || !std::default_initializable<Type>))
+            if constexpr (std::is_aggregate_v<EventType> && (sizeof...(Args) != 0u || !std::default_initializable<EventType>))
             {
-                Events.push_back(Type { std::forward<Args>(Arguments)... });
+                Events.push_back(EventType { std::forward<Args>(Arguments)... });
             }
             else
             {
@@ -66,7 +69,7 @@ namespace egg::Events
             }
         }
 
-        constexpr void Clear() noexcept
+        constexpr void Clear() noexcept override
         {
             Events.clear();
         }
@@ -76,7 +79,7 @@ namespace egg::Events
             return SinkType { Signal };
         }
 
-        [[nodiscard]] constexpr std::size_t GetSize() const noexcept
+        [[nodiscard]] constexpr std::size_t GetSize() const noexcept override
         {
             return Events.size();
         }

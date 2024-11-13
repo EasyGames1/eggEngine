@@ -76,7 +76,7 @@ namespace egg::ECS::Containers
                                                                              Payload { std::move(Other.Payload), Allocator }
         {
             EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || Payload.GetAllocator() == Other.Payload.GetAllocator(),
-                       "Cannot copy storage because it has a incompatible allocator");
+                       "Cannot move storage because it has an incompatible allocator");
         }
 
         constexpr ~Storage() noexcept override
@@ -90,7 +90,7 @@ namespace egg::ECS::Containers
             noexcept(std::is_nothrow_move_assignable_v<BaseType> && std::is_nothrow_move_assignable_v<ContainerType>)
         {
             EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || Payload.GetAllocator() == Other.Payload.GetAllocator(),
-                       "Cannot copy storage because it has a incompatible allocator");
+                       "Cannot move storage because it has an incompatible allocator");
             ShrinkToSize(0u);
             BaseType::operator=(std::move(Other));
             Payload = std::move(Other.Payload);

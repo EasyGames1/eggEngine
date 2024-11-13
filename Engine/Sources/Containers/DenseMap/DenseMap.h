@@ -62,7 +62,7 @@ namespace egg::Containers
         }
 
         constexpr DenseMap(const std::size_t BucketCount, const AllocatorType& Allocator)
-            : DenseMap { BucketCount, DefaultThreshold, Allocator }
+            : DenseMap { BucketCount, HashType {}, KeyEqualType {}, Allocator }
         {
         }
 
@@ -72,17 +72,17 @@ namespace egg::Containers
         }
 
         constexpr DenseMap(const std::size_t BucketCount, const HashType& Hash, const AllocatorType& Allocator)
-            : DenseMap { BucketCount, Hash, KeyEqualType {}, Allocator, DefaultThreshold }
+            : DenseMap { BucketCount, Hash, KeyEqualType {}, Allocator }
         {
         }
 
         constexpr DenseMap(const std::size_t BucketCount, const KeyEqualType& KeyEqual, const AllocatorType& Allocator)
-            : DenseMap { BucketCount, HashType {}, KeyEqual, Allocator, DefaultThreshold }
+            : DenseMap { BucketCount, HashType {}, KeyEqual, Allocator }
         {
         }
 
         constexpr explicit DenseMap(const std::size_t BucketCount,
-                                    const HashType& Hash = HashType {}, const KeyEqualType KeyEqual = KeyEqualType {},
+                                    const HashType& Hash = HashType {}, const KeyEqualType& KeyEqual = KeyEqualType {},
                                     const AllocatorType& Allocator = AllocatorType {},
                                     const float Threshold = DefaultThreshold)
             : Sparse { Allocator, Hash },

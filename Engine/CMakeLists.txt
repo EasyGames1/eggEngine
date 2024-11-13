@@ -69,6 +69,7 @@ add_library(VulkanEngine_lib
         Sources/Events/Traits/FunctionTraits.h
         Sources/Events/Sink.h
         Sources/Events/EventLoop.h
+        Sources/Events/EventLoopInterface.h
 )
 
 target_include_directories(VulkanEngine_lib PRIVATE Sources)

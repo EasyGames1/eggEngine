@@ -10,17 +10,17 @@
 
 namespace egg::Events
 {
-    template <typename Type, Types::ValidAllocator<Delegate<Type>> = std::allocator<Delegate<Type>>>
+    template <typename Type, typename = std::allocator<Delegate<Type>>>
     class Signal;
 
 
-    template <typename ReturnType, typename... Args, Types::ValidAllocator<Delegate<ReturnType(Args...)>> AllocatorParameter>
+    template <typename ReturnType, typename... Args, typename AllocatorParameter>
     class Signal<ReturnType(Args...), AllocatorParameter>
     {
         using SlotType = Delegate<ReturnType(Args...)>;
 
         using ContainerAllocatorTraits = std::allocator_traits<AllocatorParameter>;
-        using ContainerType = std::vector<SlotType, AllocatorParameter>;
+        using ContainerType = std::vector<SlotType, typename ContainerAllocatorTraits::template rebind_alloc<SlotType>>;
 
     public:
         using AllocatorType = AllocatorParameter;

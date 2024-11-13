@@ -2,7 +2,6 @@
 #define ENGINE_SOURCES_ECS_CONTAINERS_PAGED_VECTOR_FILE_PAGED_VECTOR_H
 
 #include "../Container.h"
-#include "../../Traits/BasicEntityTraits.h"
 #include "Containers/CompressedPair/CompressedPair.h"
 #include "ECS/Traits/PageSizeTraits.h"
 #include "./Internal/PagedVectorIterator.h"
@@ -61,7 +60,7 @@ namespace egg::ECS::Containers
             }
         {
             EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || GetAllocator() == Other.GetAllocator(),
-                       "Cannot copy paged vector because it has a incompatible allocator");
+                       "Cannot move paged vector because it has an incompatible allocator");
         }
 
         constexpr ~PagedVector() noexcept
@@ -74,7 +73,7 @@ namespace egg::ECS::Containers
         constexpr PagedVector& operator=(PagedVector&& Other) noexcept(std::is_nothrow_move_assignable_v<PayloadType>)
         {
             EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || GetAllocator() == Other.GetAllocator(),
-                       "Cannot copy paged vector because it has a incompatible allocator");
+                       "Cannot move paged vector because it has an incompatible allocator");
             ReleasePages();
             Payload = std::move(Other.Payload);
             return *this;
@@ -172,24 +171,12 @@ namespace egg::ECS::Containers
 
         constexpr Reference Assure(const std::size_t Position)
         {
-            const auto Page { Position / PageSize::value };
+            return AssurePosition(Position);
+        }
 
-            if (Page >= Payload.GetFirst().size()) Payload.GetFirst().resize(Page + 1u);
-
-            if (!Payload.GetFirst()[Page])
-            {
-                Payload.GetFirst()[Page] = ContainerAllocatorTraits::allocate(Payload.GetSecond(), PageSize::value);
-                if constexpr (ValidEntity<ValueType>)
-                {
-                    std::uninitialized_fill(
-                        Payload.GetFirst()[Page],
-                        Payload.GetFirst()[Page] + PageSize::value,
-                        EntityTraits<ValueType>::Tombstone
-                    );
-                }
-            }
-
-            return Payload.GetFirst()[Page][Math::FastModulo<std::size_t>(Position, PageSize::value)];
+        constexpr Reference Assure(const std::size_t Position, const Type& DefaultValue)
+        {
+            return AssurePosition(Position, DefaultValue);
         }
 
         constexpr void Shrink(const std::size_t Size, const std::size_t AvailableElements)
@@ -210,6 +197,27 @@ namespace egg::ECS::Containers
         }
 
     private:
+        template <std::same_as<ValueType>...DefaultValueType> requires(sizeof...(DefaultValueType) <= 1u)
+        constexpr Reference AssurePosition(const std::size_t Position, const DefaultValueType&... DefaultValue)
+        {
+            const auto Page { Position / PageSize::value };
+
+            if (Page >= Payload.GetFirst().size()) Payload.GetFirst().resize(Page + 1u);
+
+            auto&& PageData { Payload.GetFirst()[Page] };
+
+            if (!PageData)
+            {
+                PageData = ContainerAllocatorTraits::allocate(Payload.GetSecond(), PageSize::value);
+                if constexpr (sizeof...(DefaultValueType) == 1u)
+                {
+                    std::uninitialized_fill(PageData, PageData + PageSize::value, DefaultValue...);
+                }
+            }
+
+            return PageData[Math::FastModulo<std::size_t>(Position, PageSize::value)];
+        }
+
         constexpr void ReleasePages()
         {
             for (auto&& Page : Payload.GetFirst())

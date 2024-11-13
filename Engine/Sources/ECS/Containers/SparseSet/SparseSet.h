@@ -52,7 +52,7 @@ namespace egg::ECS::Containers
                                                                                  Packed { std::move(Other.Packed), Allocator }
         {
             EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || Packed.get_allocator() == Other.Packed.get_allocator(),
-                       "Cannot copy sparse set because it has a incompatible allocator");
+                       "Cannot move sparse set because it has an incompatible allocator");
         }
 
         constexpr virtual ~SparseSet() noexcept = default;
@@ -62,7 +62,7 @@ namespace egg::ECS::Containers
         constexpr SparseSet& operator=(SparseSet&& Other) noexcept(std::is_nothrow_move_assignable_v<SparseContainer>)
         {
             EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || Packed.get_allocator() == Other.Packed.get_allocator(),
-                       "Cannot copy sparse set because it has a incompatible allocator");
+                       "Cannot move sparse set because it has an incompatible allocator");
             Sparse = std::move(Other.Sparse);
             Packed = std::move(Other.Packed);
             return *this;
@@ -423,7 +423,7 @@ namespace egg::ECS::Containers
 
         [[nodiscard]] constexpr Reference Assure(const EntityType Entity)
         {
-            return Sparse.Assure(TraitsType::ToEntity(Entity));
+            return Sparse.Assure(TraitsType::ToEntity(Entity), TraitsType::Tombstone);
         }
 
         [[nodiscard]] constexpr Iterator ToIterator(const EntityType Entity)
