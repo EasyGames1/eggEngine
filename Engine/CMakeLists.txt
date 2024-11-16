@@ -29,7 +29,6 @@ add_library(VulkanEngine_lib
         Sources/GUI/Window/Window.h
         Sources/Math/Math.h
         Sources/Scene/Scene.h
-        Sources/Constants/Memory.h
         Sources/Containers/DenseMap/DenseMap.h
         Sources/Containers/DenseMap/Internal/DenseMapNode.h
         Sources/Containers/CompressedPair/CompressedPair.h
@@ -41,9 +40,7 @@ add_library(VulkanEngine_lib
         Sources/Containers/IterableAdaptor.h
         Sources/Containers/PointerImitator.h
         Sources/Type/TypeInfo.h
-        Sources/Type/TypeID.h
-        Sources/Hash/Internal/Traits/Murmur2Traits.h
-        Sources/Hash/Internal/Traits/Fnv1aTraits.h
+        Sources/Hash/Hash.h
         Sources/ECS/Containers/Registry/Registry.h
         Sources/Events/Delegate.h
         Sources/Events/Traits/InvocablePointerTraits.h
@@ -63,13 +60,21 @@ add_library(VulkanEngine_lib
         Sources/Type/Traits/Capabilities.h
         Sources/Events/Signal.h
         Sources/Events/Action.h
-        Sources/Utils/Memory.h
         Sources/Math/Traits/Capabilities.h
         Sources/Events/Traits/Internal/FunctionPointerTraits.h
         Sources/Events/Traits/FunctionTraits.h
         Sources/Events/Sink.h
         Sources/Events/EventLoop.h
         Sources/Events/EventLoopInterface.h
+        Sources/Events/Dispatcher.h
+        Sources/Memory/Constants.h
+        Sources/Memory/Deleter.h
+        Sources/Containers/CompressedPair/CompressedBase.h
+        Sources/Hash/Traits/FNV1aTraits.h
+        Sources/Hash/Traits/Murmur2Traits.h
+        Sources/Hash/Literals.h
+        Sources/Type/Types.h
+        Sources/Type/Traits/Internal/HasType.h
 )
 
 target_include_directories(VulkanEngine_lib PRIVATE Sources)

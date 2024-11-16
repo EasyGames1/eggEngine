@@ -1,11 +1,11 @@
 #ifndef ENGINE_SOURCES_TYPE_INFO_FILE_TYPEID_H
 #define ENGINE_SOURCES_TYPE_INFO_FILE_TYPEID_H
 
-#include "TypeID.h"
-#include "../Hash/DataHash.h"
+#include "./Types.h"
 #include "./Internal/FunctionNameUtils.h"
 #include "./Internal/TypeIndex.h"
 #include "./Internal/TypeNameUtils.h"
+#include <Hash/Hash.h>
 
 #include <concepts>
 #include <span>
@@ -43,7 +43,7 @@ namespace egg::Types
             }
             else
             {
-                return Hash::DataHash<SizeType> { std::as_bytes(std::span { Name }) }.Murmur2();
+                return Hash::Hash<SizeType>(std::as_bytes(std::span { Name }));
             }
         }
     };
