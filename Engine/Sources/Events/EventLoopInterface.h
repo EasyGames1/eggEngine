@@ -7,10 +7,10 @@ namespace egg::Events
 {
     struct EventLoopInterface
     {
-        virtual ~EventLoopInterface() = default;
-        virtual void Publish() = 0;
-        virtual void Clear() noexcept = 0;
-        [[nodiscard]] virtual std::size_t GetSize() const noexcept = 0;
+        constexpr virtual ~EventLoopInterface() = default;
+        constexpr virtual void Publish() = 0;
+        constexpr virtual void Clear() noexcept = 0;
+        [[nodiscard]] constexpr virtual std::size_t GetSize() const noexcept = 0;
     };
 }
 

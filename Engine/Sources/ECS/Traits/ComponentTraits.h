@@ -2,12 +2,11 @@
 #define ENGINE_SOURCES_ECS_TRAITS_FILE_COMPONENT_TRAITS_H
 
 #include "./PageSizeTraits.h"
-
-#include <type_traits>
+#include "Type/Traits/Capabilities.h"
 
 namespace egg::ECS
 {
-    template <typename ComponentType> requires std::same_as<ComponentType, std::decay_t<ComponentType>>
+    template <Types::Decayed ComponentType>
     struct ComponentTraits
     {
         using Type = ComponentType;

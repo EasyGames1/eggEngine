@@ -12,8 +12,7 @@
 
 namespace egg::Events
 {
-    template <typename Type, Types::ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
-        requires std::same_as<Type, std::decay_t<Type>>
+    template <Types::Decayed Type, Types::ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
     class EventLoop final : public EventLoopInterface
     {
         using LoopAllocatorTraits = std::allocator_traits<AllocatorParameter>;
@@ -51,7 +50,7 @@ namespace egg::Events
             Clear();
         }
 
-        constexpr void Trigger(EventType Event)
+        constexpr void Trigger(EventType Event) const
         {
             Signal.Publish(Event);
         }

@@ -172,7 +172,7 @@ namespace egg::Events
         template <typename Type>
         constexpr void Disconnect(Type& ValueOrInstance)
         {
-            Type* const Pointer { &ValueOrInstance };
+            const Type* const Pointer { &ValueOrInstance };
             DisconnectIf([Pointer](const SlotType& Element) -> bool { return Element.GetInstance() == Pointer; });
         }
 

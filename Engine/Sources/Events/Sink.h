@@ -19,7 +19,7 @@ namespace egg::Events
         using WrappedSignature = typename SignalType::WrappedSignature;
 
 
-        explicit Sink(SignalType& Connections) noexcept : Connections { Connections }
+        constexpr explicit Sink(SignalType& Connections) noexcept : Connections { Connections }
         {
         }
 
@@ -92,7 +92,7 @@ namespace egg::Events
             Connections.Disconnect();
         }
 
-        [[nodiscard]] bool Empty() const noexcept
+        [[nodiscard]] constexpr bool Empty() const noexcept
         {
             return Connections.Empty();
         }

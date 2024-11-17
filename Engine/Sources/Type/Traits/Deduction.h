@@ -1,7 +1,7 @@
 #ifndef ENGINE_SOURCES_TYPE_TRAITS_FILE_DEDUCTION_H
 #define ENGINE_SOURCES_TYPE_TRAITS_FILE_DEDUCTION_H
 
-#include "./Internal/HasType.h"
+#include "./Internal/ContainedIn.h"
 
 namespace egg::Types
 {
@@ -16,7 +16,7 @@ namespace egg::Types
     };
 
     template <typename Type, typename Tuple>
-    concept ContainedIn = Internal::HasType<Type, Tuple>::value;
+    concept ContainedIn = Internal::ContainedIn<Type, Tuple>::value;
 }
 
 #endif // ENGINE_SOURCES_TYPE_TRAITS_FILE_DEDUCTION_H

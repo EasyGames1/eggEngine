@@ -74,7 +74,7 @@ add_library(VulkanEngine_lib
         Sources/Hash/Traits/Murmur2Traits.h
         Sources/Hash/Literals.h
         Sources/Type/Types.h
-        Sources/Type/Traits/Internal/HasType.h
+        Sources/Type/Traits/Internal/ContainedIn.h
 )
 
 target_include_directories(VulkanEngine_lib PRIVATE Sources)

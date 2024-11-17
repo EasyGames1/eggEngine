@@ -3,6 +3,7 @@
 
 #include "Deduction.h"
 
+#include <concepts>
 #include <memory>
 #include <type_traits>
 
@@ -22,6 +23,9 @@ namespace egg::Types
 
     template <typename Type>
     concept Character = ContainedIn<Type, std::tuple<char, signed char, unsigned char, wchar_t, char8_t, char16_t, char32_t>>;
+
+    template <typename Type>
+    concept Decayed = std::same_as<Type, std::decay_t<Type>>;
 }
 
 #endif // ENGINE_SOURCES_TYPE_TRAITS_FILE_CAPABILITIES_H
