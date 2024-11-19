@@ -38,17 +38,17 @@ add_library(VulkanEngine_lib
         Sources/Containers/Container.h
         Sources/Containers/IterableAdaptor.h
         Sources/Containers/PointerImitator.h
-        Sources/Type/TypeInfo.h
+        Sources/Types/TypeInfo.h
         Sources/Hash/Hash.h
         Sources/ECS/Containers/Registry/Registry.h
         Sources/Events/Delegate.h
         Sources/Events/Traits/InvocablePointerTraits.h
-        Sources/Type/Internal/FunctionNameUtils.h
-        Sources/Type/Internal/TypeNameUtils.h
-        Sources/Type/Internal/TypeIndex.h
-        Sources/Type/Traits/Constness.h
+        Sources/Types/Internal/FunctionNameUtils.h
+        Sources/Types/Internal/TypeNameUtils.h
+        Sources/Types/Internal/TypeIndex.h
+        Sources/Types/Traits/Constness.h
         Sources/Algorithms/Sorting/StandardSorting.h
-        Sources/Type/Traits/Deduction.h
+        Sources/Types/Traits/Deduction.h
         Sources/Events/Traits/FunctorOverloadTraits.h
         Sources/Events/Traits/Internal/FunctorOverloadTraits.h
         Sources/Containers/DenseMap/Internal/DenseMapIterator.h
@@ -56,7 +56,7 @@ add_library(VulkanEngine_lib
         Sources/ECS/Containers/SparseSet/Internal/SparseSetIterator.h
         Sources/ECS/Containers/Storage/Internal/StorageIterator.h
         Sources/ECS/Containers/PagedVector/Internal/PagedVectorIterator.h
-        Sources/Type/Traits/Capabilities.h
+        Sources/Types/Traits/Capabilities.h
         Sources/Events/Signal.h
         Sources/Events/Action.h
         Sources/Math/Traits/Capabilities.h
@@ -72,8 +72,8 @@ add_library(VulkanEngine_lib
         Sources/Hash/Traits/FNV1aTraits.h
         Sources/Hash/Traits/Murmur2Traits.h
         Sources/Hash/Literals.h
-        Sources/Type/Types.h
-        Sources/Type/Traits/Internal/ContainedIn.h
+        Sources/Types/Types.h
+        Sources/Types/Traits/Internal/ContainedIn.h
 )
 
 target_include_directories(VulkanEngine_lib PRIVATE Sources)

@@ -4,7 +4,7 @@
 #include "Config/Config.h"
 #include "Traits/InvocablePointerTraits.h"
 #include "Traits/FunctorOverloadTraits.h"
-#include "Type/Traits/Constness.h"
+#include "Types/Traits/Constness.h"
 
 #include <functional>
 #include <tuple>

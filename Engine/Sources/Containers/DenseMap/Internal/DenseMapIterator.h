@@ -2,7 +2,7 @@
 #define ENGINE_SOURCES_CONTAINERS_DENSE_MAP_INTERNAL_FILE_DENSE_MAP_ITERATOR_H
 
 #include "../../PointerImitator.h"
-#include "Type/Traits/Constness.h"
+#include "Types/Traits/Constness.h"
 
 #include <iterator>
 #include <utility>

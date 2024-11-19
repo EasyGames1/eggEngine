@@ -6,7 +6,7 @@
 #include "Algorithms/Sorting/StandardSorting.h"
 #include "ECS/Containers/PagedVector/PagedVector.h"
 #include "./Internal/SparseSetIterator.h"
-#include "Type/Traits/Capabilities.h"
+#include "Types/Traits/Capabilities.h"
 
 #include <memory>
 #include <vector>

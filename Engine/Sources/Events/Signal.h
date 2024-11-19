@@ -3,7 +3,7 @@
 
 #include "Action.h"
 #include "Delegate.h"
-#include "Type/Traits/Capabilities.h"
+#include "Types/Traits/Capabilities.h"
 
 #include <memory>
 #include <vector>

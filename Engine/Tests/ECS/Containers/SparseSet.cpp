@@ -3,7 +3,7 @@
 #include "../../Single.h"
 #include "Events/Delegate.h"
 
-#include "Type/TypeInfo.h"
+#include "Types/TypeInfo.h"
 
 #include <gtest/gtest.h>
 

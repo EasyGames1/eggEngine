@@ -2,8 +2,8 @@
 #define ENGINE_SOURCES_HASH_FILE_LITERALS_H
 
 #include "Hash.h"
-#include "Type/Types.h"
-#include "Type/Traits/Capabilities.h"
+#include "Types/Types.h"
+#include "Types/Traits/Capabilities.h"
 
 #include <span>
 

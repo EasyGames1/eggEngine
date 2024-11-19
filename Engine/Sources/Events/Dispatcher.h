@@ -6,8 +6,8 @@
 #include "Containers/CompressedPair/CompressedPair.h"
 #include "Containers/DenseMap/DenseMap.h"
 #include "Memory/Utils.h"
-#include "Type/TypeInfo.h"
-#include "Type/Types.h"
+#include "Types/TypeInfo.h"
+#include "Types/Types.h"
 
 #include <memory>
 #include <type_traits>

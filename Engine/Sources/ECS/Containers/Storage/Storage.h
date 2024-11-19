@@ -6,7 +6,7 @@
 #include "../SparseSet/SparseSet.h"
 #include "./Internal/StorageIterator.h"
 #include "ECS/Entity.h"
-#include "Type/Traits/Capabilities.h"
+#include "Types/Traits/Capabilities.h"
 
 #include <stdexcept>
 #include <type_traits>

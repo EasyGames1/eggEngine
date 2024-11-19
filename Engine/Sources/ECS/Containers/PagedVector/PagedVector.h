@@ -6,7 +6,7 @@
 #include "ECS/Traits/PageSizeTraits.h"
 #include "./Internal/PagedVectorIterator.h"
 #include "Math/Math.h"
-#include "Type/Traits/Capabilities.h"
+#include "Types/Traits/Capabilities.h"
 
 #include <memory>
 #include <vector>

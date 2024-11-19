@@ -2,7 +2,7 @@
 #define ENGINE_SOURCES_EVENTS_TRAITS_FILE_FUNCTION_POINTER_TRAITS_H
 
 #include "Internal/FunctionPointerTraits.h"
-#include "Type/Traits/Capabilities.h"
+#include "Types/Traits/Capabilities.h"
 
 namespace egg::Events
 {

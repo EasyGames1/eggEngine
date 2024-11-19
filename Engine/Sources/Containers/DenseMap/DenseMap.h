@@ -2,12 +2,12 @@
 #define ENGINE_SOURCES_CONTAINERS_DENSE_MAP_FILE_DENSE_MAP_H
 
 #include "../../Containers/Container.h"
-#include "../../Type/Traits/Capabilities.h"
 #include "../CompressedPair/CompressedPair.h"
 #include "./Internal/DenseMapIterator.h"
 #include "./Internal/DenseMapLocalIterator.h"
 #include "./Internal/DenseMapNode.h"
 #include "Math/Math.h"
+#include "Types/Traits/Capabilities.h"
 
 #include <algorithm>
 #include <cmath>

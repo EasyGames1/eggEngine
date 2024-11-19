@@ -2,7 +2,7 @@
 #define ENGINE_SOURCES_ECS_TRAITS_FILE_COMPONENT_TRAITS_H
 
 #include "./PageSizeTraits.h"
-#include "Type/Traits/Capabilities.h"
+#include "Types/Traits/Capabilities.h"
 
 namespace egg::ECS
 {
