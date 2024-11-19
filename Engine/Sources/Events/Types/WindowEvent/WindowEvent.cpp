@@ -2,11 +2,11 @@
 
 namespace egg::Events
 {
-    WindowEvent::WindowEvent(GUI::Window& Window) : Window { Window }
+    WindowEvent::WindowEvent(const std::shared_ptr<GUI::Window>& Window) : Window { Window }
     {
     }
 
-    GUI::Window& WindowEvent::GetWindow() const
+    std::shared_ptr<GUI::Window> WindowEvent::GetWindow() const
     {
         return Window;
     }

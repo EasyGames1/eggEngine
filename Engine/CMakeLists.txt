@@ -24,7 +24,6 @@ add_library(VulkanEngine_lib
         Sources/ECS/Traits/EntityTraits.h
         Sources/ECS/Traits/PageSizeTraits.h
         Sources/Engine/Engine.h
-        Sources/Events/Dispatcher_Deprecated.h
         Sources/Events/Types/WindowCreated/WindowCreated.h
         Sources/GUI/Window/Window.h
         Sources/Math/Math.h

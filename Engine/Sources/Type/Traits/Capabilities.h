@@ -1,7 +1,7 @@
 #ifndef ENGINE_SOURCES_TYPE_TRAITS_FILE_CAPABILITIES_H
 #define ENGINE_SOURCES_TYPE_TRAITS_FILE_CAPABILITIES_H
 
-#include "Deduction.h"
+#include "./Deduction.h"
 
 #include <concepts>
 #include <memory>

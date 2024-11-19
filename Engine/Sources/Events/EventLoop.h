@@ -7,6 +7,7 @@
 #include "Type/Traits/Capabilities.h"
 
 #include <concepts>
+#include <iterator>
 #include <memory>
 #include <vector>
 
@@ -43,11 +44,14 @@ namespace egg::Events
 
         constexpr void Publish() override
         {
-            for (auto& Event : Events)
+            const std::size_t EventCount { GetSize() };
+
+            for (std::size_t Position = 0u; Position < EventCount; ++Position)
             {
-                Signal.Publish(Event);
+                Signal.Publish(Events[Position]);
             }
-            Clear();
+
+            Events.erase(Events.cbegin(), std::next(Events.cbegin(), EventCount));
         }
 
         constexpr void Trigger(EventType Event) const

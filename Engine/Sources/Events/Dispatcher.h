@@ -15,17 +15,17 @@
 
 namespace egg::Events
 {
-    template <typename AllocatorParameter>
+    template <typename AllocatorParameter = std::allocator<void>>
     class Dispatcher
     {
         using KeyType = Types::TypeID;
-        using MappedType = std::unique_ptr<EventLoopInterface, Memory::Deleter<AllocatorParameter>>;
+        using MappedType = std::shared_ptr<EventLoopInterface>;
 
         using DispatcherAllocatorTraits = std::allocator_traits<AllocatorParameter>;
         using ContainerAllocator = typename DispatcherAllocatorTraits::template rebind_alloc<std::pair<const KeyType, MappedType>>;
         using ContainerType = Containers::DenseMap<KeyType, MappedType, std::identity, std::equal_to<>, ContainerAllocator>;
 
-        template <typename Type>
+        template <Types::Decayed Type>
         using EventLoopType = EventLoop<Type, typename DispatcherAllocatorTraits::template rebind_alloc<Type>>;
 
         using EventLoopsType = Containers::CompressedPair<ContainerType, AllocatorParameter>;
@@ -33,7 +33,7 @@ namespace egg::Events
     public:
         using AllocatorType = AllocatorParameter;
 
-        template <typename EventType>
+        template <Types::Decayed EventType>
         using SinkType = typename EventLoopType<EventType>::SinkType;
 
 
@@ -73,50 +73,11 @@ namespace egg::Events
         }
 
         template <typename Type>
-        [[nodiscard]] constexpr std::size_t GetSize(
-            const Types::TypeID Identifier = Types::TypeInfo<Type>::template GetID<Dispatcher>()
-        ) const noexcept
-        {
-            if (const auto* Loop { Assure<std::decay_t<Type>>(Identifier) })
-            {
-                return Loop->GetSize();
-            }
-            return 0u;
-        }
-
-        [[nodiscard]] constexpr std::size_t GetSize() const noexcept
-        {
-            std::size_t Size {};
-
-            for (auto&& Loop : EventLoops.GetFirst())
-            {
-                Size += Loop.second->GetSize();
-            }
-
-            return Size;
-        }
-
-        template <typename Type>
         [[nodiscard]] constexpr SinkType<std::decay_t<Type>> GetSink(
             const Types::TypeID Identifier = Types::TypeInfo<Type>::template GetID<Dispatcher>()
         )
         {
             return Assure<std::decay_t<Type>>(Identifier).GetSink();
-        }
-
-        template <typename Type>
-        constexpr void Trigger(Type&& Event = {}) const
-        {
-            Trigger(Types::TypeInfo<std::decay_t<Type>>::template GetID<Dispatcher>(), std::forward<Type>(Event));
-        }
-
-        template <typename Type>
-        constexpr void Trigger(const Types::TypeID Identifier, Type&& Event = {}) const
-        {
-            if (const auto* Loop { Assure<std::decay_t<Type>>(Identifier) })
-            {
-                Loop->Trigger(std::forward<Type>(Event));
-            }
         }
 
         template <typename Type, typename... Args>
@@ -144,9 +105,44 @@ namespace egg::Events
         }
 
         template <typename Type>
+        constexpr void Trigger(Type&& Event = {}) const
+        {
+            Trigger(Types::TypeInfo<std::decay_t<Type>>::template GetID<Dispatcher>(), std::forward<Type>(Event));
+        }
+
+        template <typename Type>
+        constexpr void Trigger(const Types::TypeID Identifier, Type&& Event = {}) const
+        {
+            if (const auto* Loop { Find<std::decay_t<Type>>(Identifier) })
+            {
+                Loop->Trigger(std::forward<Type>(Event));
+            }
+        }
+
+        template <typename Type>
+        constexpr void Update(const Types::TypeID Identifier = Types::TypeInfo<Type>::template GetID<Dispatcher>())
+        {
+            if (const auto* Loop { Find<std::decay_t<Type>>(Identifier) })
+            {
+                Loop->Publish();
+            }
+        }
+
+        constexpr void Update() const
+        {
+            for (auto&& Loop : EventLoops.GetFirst())
+            {
+                Loop.second->Publish();
+            }
+        }
+
+        template <typename Type>
         constexpr void Clear(const Types::TypeID Identifier = Types::TypeInfo<Type>::template GetID<Dispatcher>())
         {
-            Assure<std::decay_t<Type>>(Identifier).Clear();
+            if (const auto* Loop { Find<std::decay_t<Type>>(Identifier) })
+            {
+                Loop->Clear();
+            }
         }
 
         constexpr void Clear() noexcept
@@ -158,17 +154,27 @@ namespace egg::Events
         }
 
         template <typename Type>
-        constexpr void Update(const Types::TypeID Identifier = Types::TypeInfo<Type>::template GetID<Dispatcher>())
+        [[nodiscard]] constexpr std::size_t GetSize(
+            const Types::TypeID Identifier = Types::TypeInfo<Type>::template GetID<Dispatcher>()
+        ) const noexcept
         {
-            Assure<std::decay_t<Type>>(Identifier).Publish();
+            if (const auto* Loop { Find<std::decay_t<Type>>(Identifier) })
+            {
+                return Loop->GetSize();
+            }
+            return 0u;
         }
 
-        constexpr void Update() const
+        [[nodiscard]] constexpr std::size_t GetSize() const noexcept
         {
+            std::size_t EventCount {};
+
             for (auto&& Loop : EventLoops.GetFirst())
             {
-                Loop.second->Publish();
+                EventCount += Loop.second->GetSize();
             }
+
+            return EventCount;
         }
 
         constexpr AllocatorType GetAllocator() const noexcept
@@ -184,15 +190,15 @@ namespace egg::Events
 
             if (!Pointer)
             {
-                const AllocatorType Allocator { GetAllocator() };
-                Pointer = Memory::AllocateUnique<EventLoopType<Type>>(Allocator, Allocator);
+                const auto& Allocator { GetAllocator() };
+                Pointer = std::allocate_shared<EventLoopType<Type>>(Allocator, Allocator);
             }
 
             return static_cast<EventLoopType<Type>&>(*Pointer);
         }
 
         template <Types::Decayed Type>
-        [[nodiscard]] constexpr const EventLoopType<Type>* Assure(const Types::TypeID Identifier) const
+        [[nodiscard]] constexpr const EventLoopType<Type>* Find(const Types::TypeID Identifier) const
         {
             if (auto It = EventLoops.GetFirst().Find(Identifier); It != EventLoops.GetFirst().ConstEnd())
             {

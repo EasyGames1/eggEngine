@@ -3,17 +3,19 @@
 
 #include "../../../GUI/Window/Window.h"
 
+#include <memory>
+
 namespace egg::Events
 {
     class WindowEvent
     {
     public:
-        explicit WindowEvent(GUI::Window& Window);
+        explicit WindowEvent(const std::shared_ptr<GUI::Window>& Window);
 
-        [[nodiscard]] GUI::Window& GetWindow() const;
+        [[nodiscard]] std::shared_ptr<GUI::Window> GetWindow() const;
 
     private:
-        GUI::Window& Window;
+        std::shared_ptr<GUI::Window> Window;
     };
 }
 

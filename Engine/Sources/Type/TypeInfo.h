@@ -5,7 +5,7 @@
 #include "./Internal/FunctionNameUtils.h"
 #include "./Internal/TypeIndex.h"
 #include "./Internal/TypeNameUtils.h"
-#include <Hash/Hash.h>
+#include "Hash/Hash.h"
 
 #include <concepts>
 #include <span>

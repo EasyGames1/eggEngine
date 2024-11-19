@@ -4,6 +4,8 @@
 #include "../System.h"
 #include "../../../GUI/Window/Window.h"
 
+#include <memory>
+
 namespace egg::Systems
 {
     class Renderer final : public System
@@ -20,7 +22,7 @@ namespace egg::Systems
     private:
         void InitWindow();
 
-        GUI::Window* Window {};
+        std::shared_ptr<GUI::Window> Window {};
     };
 }
 

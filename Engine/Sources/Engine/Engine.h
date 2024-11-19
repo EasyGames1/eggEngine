@@ -3,7 +3,9 @@
 
 #include "../ECS/Systems/System.h"
 #include "../GUI/Window/Window.h"
+#include "Events/Types/WindowCreated/WindowCreated.h"
 
+#include <memory>
 #include <vector>
 
 namespace egg
@@ -26,13 +28,15 @@ namespace egg
     private:
         void Init();
 
+        void InitWindow(const Events::WindowCreated& Event);
+
         void MainLoop();
 
         void End();
 
         std::vector<Systems::System*> Systems;
 
-        GUI::Window* Window {};
+        std::shared_ptr<GUI::Window> Window {};
     };
 }
 

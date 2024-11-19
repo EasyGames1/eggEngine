@@ -9,7 +9,7 @@ namespace egg::Events
     class WindowCreated : public WindowEvent
     {
     public:
-        explicit WindowCreated(GUI::Window& Window);
+        explicit WindowCreated(const std::shared_ptr<GUI::Window>& Window);
     };
 }
 

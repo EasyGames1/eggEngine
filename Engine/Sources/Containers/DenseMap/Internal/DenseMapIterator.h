@@ -2,6 +2,7 @@
 #define ENGINE_SOURCES_CONTAINERS_DENSE_MAP_INTERNAL_FILE_DENSE_MAP_ITERATOR_H
 
 #include "../../PointerImitator.h"
+#include "Type/Traits/Constness.h"
 
 #include <iterator>
 #include <utility>
@@ -14,8 +15,12 @@ namespace egg::Containers::Internal
         template <typename>
         friend class DenseMapIterator;
 
-        using FirstType = decltype(std::as_const(std::declval<IteratorType>()->Value.first));
-        using SecondType = decltype((std::declval<IteratorType>()->Value.second));
+        using IteratorPairType = typename std::iter_value_t<IteratorType>::ValueType;
+        using FirstType = std::add_lvalue_reference_t<std::add_const_t<typename IteratorPairType::first_type>>;
+        using SecondType = std::add_lvalue_reference_t<Types::ConstnessAs<
+            std::remove_reference_t<std::iter_reference_t<IteratorType>>,
+            typename IteratorPairType::second_type
+        >>;
 
     public:
         using value_type = std::pair<FirstType, SecondType>;
@@ -25,6 +30,7 @@ namespace egg::Containers::Internal
         using iterator_category = std::input_iterator_tag;
         using iterator_concept = std::random_access_iterator_tag;
 
+
         constexpr DenseMapIterator() noexcept : Iterator {}
         {
         }
@@ -33,8 +39,8 @@ namespace egg::Containers::Internal
         {
         }
 
-        template <std::convertible_to<IteratorType> OtherType> requires (!std::same_as<IteratorType, OtherType>)
-        constexpr explicit DenseMapIterator(const DenseMapIterator<OtherType>& Other) noexcept : Iterator { Other.Iterator }
+        template <std::convertible_to<IteratorType> OtherIteratorType> requires (!std::same_as<OtherIteratorType, IteratorType>)
+        constexpr explicit DenseMapIterator(const DenseMapIterator<OtherIteratorType>& Other) noexcept : Iterator { Other.Iterator }
         {
         }
 
@@ -100,43 +106,43 @@ namespace egg::Containers::Internal
             return operator[](0);
         }
 
-        template <typename OtherIteratorType>
+        template <std::convertible_to<IteratorType> OtherIteratorType>
         [[nodiscard]] constexpr difference_type operator-(const DenseMapIterator<OtherIteratorType>& Other) const noexcept
         {
             return Iterator - Other.Iterator;
         }
 
-        template <typename OtherIteratorType>
+        template <std::convertible_to<IteratorType> OtherIteratorType>
         [[nodiscard]] constexpr bool operator==(const DenseMapIterator<OtherIteratorType>& Other) const noexcept
         {
             return Iterator == Other.Iterator;
         }
 
-        template <typename OtherIteratorType>
+        template <std::convertible_to<IteratorType> OtherIteratorType>
         [[nodiscard]] constexpr bool operator!=(const DenseMapIterator<OtherIteratorType>& Other) const noexcept
         {
             return !(*this == Other);
         }
 
-        template <typename OtherIteratorType>
+        template <std::convertible_to<IteratorType> OtherIteratorType>
         [[nodiscard]] constexpr bool operator<(const DenseMapIterator<OtherIteratorType>& Other) const noexcept
         {
             return Iterator < Other.Iterator;
         }
 
-        template <typename OtherIteratorType>
+        template <std::convertible_to<IteratorType> OtherIteratorType>
         [[nodiscard]] constexpr bool operator>(const DenseMapIterator<OtherIteratorType>& Other) const noexcept
         {
             return Other < *this;
         }
 
-        template <typename OtherIteratorType>
+        template <std::convertible_to<IteratorType> OtherIteratorType>
         [[nodiscard]] constexpr bool operator<=(const DenseMapIterator<OtherIteratorType>& Other) const noexcept
         {
             return !(*this > Other);
         }
 
-        template <typename OtherIteratorType>
+        template <std::convertible_to<IteratorType> OtherIteratorType>
         [[nodiscard]] constexpr bool operator>=(const DenseMapIterator<OtherIteratorType>& Other) const noexcept
         {
             return !(*this < Other);

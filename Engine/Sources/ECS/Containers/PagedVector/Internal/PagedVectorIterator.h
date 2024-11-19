@@ -20,7 +20,8 @@ namespace egg::ECS::Containers::Internal
             typename ContainerAllocatorTraits::template rebind_traits<typename std::pointer_traits<typename
                 ContainerType::value_type>::element_type>::const_pointer,
             typename ContainerAllocatorTraits::template rebind_traits<typename std::pointer_traits<typename
-                ContainerType::value_type>::element_type>::pointer>>;
+                ContainerType::value_type>::element_type>::pointer
+        >>;
 
     public:
         using value_type = typename ContainerIteratorTraits::value_type;

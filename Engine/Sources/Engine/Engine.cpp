@@ -27,17 +27,17 @@ namespace egg
 
     void Engine::Init()
     {
-        Scene::GetDispatcher().Subscribe<Events::WindowCreated>(
-            [this](const Events::WindowCreated& Event)
-            {
-                Window = &Event.GetWindow();
-            }
-        );
+        Scene::GetDispatcher().GetSink<Events::WindowCreated>().Connect<&Engine::InitWindow>(*this);
 
         for (auto* System : Systems)
         {
             System->Initialize();
         }
+    }
+
+    void Engine::InitWindow(const Events::WindowCreated& Event)
+    {
+        Window = Event.GetWindow();
     }
 
     void Engine::MainLoop()

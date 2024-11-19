@@ -4,7 +4,6 @@
 #include "./Constants.h"
 #include "./Deleter.h"
 #include "Config/Config.h"
-#include "Type/Traits/Capabilities.h"
 
 #include <concepts>
 #include <ranges>
@@ -53,20 +52,32 @@ namespace egg::Memory
         return Value ^ Value >> ShiftBits;
     }
 
-    template <typename Type, Types::ValidAllocator<Type> AllocatorType, typename... Args>
-    [[nodiscard]] constexpr std::unique_ptr<Type, Deleter<AllocatorType>>
-    AllocateUnique(const AllocatorType& Allocator, Args&&... Arguments)
+    template <typename Type, typename AllocatorParameter, typename... Args> requires (!std::is_array_v<Type>)
+    [[nodiscard]] constexpr std::unique_ptr<
+        Type,
+        AllocationDeleter<typename std::allocator_traits<AllocatorParameter>::template rebind_alloc<Type>>
+    > AllocateUnique(const AllocatorParameter& Allocator, Args&&... Arguments)
     {
-        using Traits = std::allocator_traits<AllocatorType>;
-        using Pointer = typename Traits::pointer;
+        using UniqueAllocatorTraits = typename std::allocator_traits<AllocatorParameter>::template rebind_traits<Type>;
+        using AllocatorType = typename UniqueAllocatorTraits::allocator_type;
+        using PointerType = typename UniqueAllocatorTraits::pointer;
 
         AllocatorType AllocatorCopy { Allocator };
-        Pointer Allocated { Traits::allocate(AllocatorCopy, 1u) };
-        Traits::construct(AllocatorCopy, Allocated, std::forward<Args>(Arguments)...);
+        PointerType Pointer { UniqueAllocatorTraits::allocate(AllocatorCopy, 1u) };
 
-        return std::unique_ptr<Type, Deleter<AllocatorType>> {
-            Allocated,
-            Deleter<AllocatorType> { Allocator }
+        try
+        {
+            UniqueAllocatorTraits::construct(AllocatorCopy, std::to_address(Pointer), std::forward<Args>(Arguments)...);
+        }
+        catch (...)
+        {
+            UniqueAllocatorTraits::deallocate(AllocatorCopy, Pointer, 1u);
+            throw;
+        }
+
+        return std::unique_ptr<Type, AllocationDeleter<AllocatorType>> {
+            Pointer,
+            AllocationDeleter<AllocatorType> { AllocatorCopy }
         };
     }
 }

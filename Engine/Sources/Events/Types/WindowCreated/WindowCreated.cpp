@@ -2,7 +2,7 @@
 
 namespace egg::Events
 {
-    WindowCreated::WindowCreated(GUI::Window& Window) : WindowEvent { Window }
+    WindowCreated::WindowCreated(const std::shared_ptr<GUI::Window>& Window) : WindowEvent { Window }
     {
     }
 }

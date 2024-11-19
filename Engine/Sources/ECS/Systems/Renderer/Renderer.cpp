@@ -24,7 +24,6 @@ namespace egg
 
     Systems::Renderer::~Renderer()
     {
-        delete Window;
         glfwTerminate();
     }
 
@@ -32,13 +31,13 @@ namespace egg
     {
         if (!glfwInit()) throw std::runtime_error("Failed to initialize glfw");
 
-        Window = new GUI::Window(
+        Window = std::make_shared<GUI::Window>(
             Constants::Window::Name.data(),
             Constants::Window::InitialWidth,
             Constants::Window::InitialHeight,
             GUI::Window::ClientAPI::None
         );
 
-        Scene::GetDispatcher().Notify(Events::WindowCreated { *Window });
+        Scene::GetDispatcher().Trigger(Events::WindowCreated { Window });
     }
 }
