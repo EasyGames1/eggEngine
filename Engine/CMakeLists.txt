@@ -40,7 +40,6 @@ add_library(VulkanEngine_lib
         Sources/Containers/PointerImitator.h
         Sources/Types/TypeInfo.h
         Sources/Hash/Hash.h
-        Sources/ECS/Containers/Registry/Registry.h
         Sources/Events/Delegate.h
         Sources/Events/Traits/InvocablePointerTraits.h
         Sources/Types/Internal/FunctionNameUtils.h
@@ -73,7 +72,9 @@ add_library(VulkanEngine_lib
         Sources/Hash/Traits/Murmur2Traits.h
         Sources/Hash/Literals.h
         Sources/Types/Types.h
-        Sources/Types/Traits/Internal/ContainedIn.h
+        Sources/ECS/Registry.h
+        Sources/ECS/Containers/LifecycleContainer.h
+        Sources/Types/Traits/Internal/IsInstanceOf.h
 )
 
 target_include_directories(VulkanEngine_lib PRIVATE Sources)

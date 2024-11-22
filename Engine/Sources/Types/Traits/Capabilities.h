@@ -1,7 +1,7 @@
 #ifndef ENGINE_SOURCES_TYPE_TRAITS_FILE_CAPABILITIES_H
 #define ENGINE_SOURCES_TYPE_TRAITS_FILE_CAPABILITIES_H
 
-#include "./Deduction.h"
+#include "./Internal/IsInstanceOf.h"
 
 #include <concepts>
 #include <memory>
@@ -22,10 +22,10 @@ namespace egg::Types
     concept ValidAllocator = std::same_as<Type, typename std::allocator_traits<AllocatorType>::value_type>;
 
     template <typename Type>
-    concept Character = ContainedIn<Type, std::tuple<char, signed char, unsigned char, wchar_t, char8_t, char16_t, char32_t>>;
-
-    template <typename Type>
     concept Decayed = std::same_as<Type, std::decay_t<Type>>;
+
+    template <typename Type, template<typename...> typename Template>
+    concept InstanceOf = Internal::IsInstanceOf<Type, Template>::value;
 }
 
 #endif // ENGINE_SOURCES_TYPE_TRAITS_FILE_CAPABILITIES_H

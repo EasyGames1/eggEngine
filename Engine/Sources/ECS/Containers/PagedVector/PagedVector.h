@@ -103,7 +103,7 @@ namespace egg::ECS::Containers
                        : nullptr;
         }
 
-        [[nodiscard]] constexpr Reference GetReference(const std::size_t Position) const
+        [[nodiscard]] constexpr ValueType& GetReference(const std::size_t Position) const
         {
             EGG_ASSERT(GetPointer(Position), "Payload not contain position");
             return Payload.GetFirst()[Position / PageSize::value][Math::FastModulo<std::size_t>(Position, PageSize::value)];
@@ -169,12 +169,12 @@ namespace egg::ECS::Containers
             return ReverseEnd(AvailableElements);
         }
 
-        constexpr Reference Assure(const std::size_t Position)
+        constexpr ValueType& Assure(const std::size_t Position)
         {
             return AssurePosition(Position);
         }
 
-        constexpr Reference Assure(const std::size_t Position, const Type& DefaultValue)
+        constexpr ValueType& Assure(const std::size_t Position, const ValueType& DefaultValue)
         {
             return AssurePosition(Position, DefaultValue);
         }
@@ -198,7 +198,7 @@ namespace egg::ECS::Containers
 
     private:
         template <std::same_as<ValueType>...DefaultValueType> requires(sizeof...(DefaultValueType) <= 1u)
-        constexpr Reference AssurePosition(const std::size_t Position, const DefaultValueType&... DefaultValue)
+        constexpr ValueType& AssurePosition(const std::size_t Position, const DefaultValueType&... DefaultValue)
         {
             const auto Page { Position / PageSize::value };
 

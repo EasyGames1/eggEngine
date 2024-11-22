@@ -3,7 +3,6 @@
 
 #include "Hash.h"
 #include "Types/Types.h"
-#include "Types/Traits/Capabilities.h"
 
 #include <span>
 
@@ -11,7 +10,7 @@ namespace egg::Hash::Literals
 {
     namespace Internal
     {
-        template <Types::Character Char>
+        template <typename Char>
         [[nodiscard]] constexpr Types::HashType HashString(const Char* String, const std::size_t Size) noexcept
         {
             return Hash::Hash<Types::HashType>(std::as_bytes(std::span { String, Size }));

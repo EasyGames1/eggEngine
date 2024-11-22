@@ -1,7 +1,9 @@
 #ifndef ENGINE_SOURCES_ECS_FILE_ENTITY_H
 #define ENGINE_SOURCES_ECS_FILE_ENTITY_H
 
+#include <concepts>
 #include <cstdint>
+#include <type_traits>
 
 namespace egg::ECS
 {
