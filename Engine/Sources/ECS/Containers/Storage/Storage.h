@@ -373,6 +373,8 @@ namespace egg::ECS::Containers
         {
         }
 
+        Storage(const Storage&) = delete;
+
         constexpr Storage(Storage&& Other) noexcept(std::is_nothrow_move_constructible_v<BaseType>) = default;
 
         constexpr Storage(Storage&& Other, const AllocatorType& Allocator) : BaseType { std::move(Other), Allocator }

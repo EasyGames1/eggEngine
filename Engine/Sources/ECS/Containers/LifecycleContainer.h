@@ -25,15 +25,13 @@ namespace egg::ECS::Containers
         (Types::InstanceOf<ContainerType, Storage> &&
             OptimizableElement<typename ContainerType::ElementType, typename ContainerType::EntityType>)
     class LifecycleContainer<ContainerType> final
-        : public SparseSet<typename ContainerType::EntityType,
-                           typename std::allocator_traits<typename ContainerType::AllocatorType>::template
-                           rebind_alloc<typename ContainerType::EntityType>>
+        : public ContainerType
     {
         using EntityParameter = typename ContainerType::EntityType;
         using AllocatorParameter = typename ContainerType::AllocatorType;
         using EntityAllocatorType = typename std::allocator_traits<AllocatorParameter>::template rebind_alloc<EntityParameter>;
 
-        using BaseType = SparseSet<EntityParameter, EntityAllocatorType>;
+        using BaseType = ContainerType;
         using OwnerType = Registry<EntityParameter, EntityAllocatorType>;
 
         using SignalType = Events::Signal<void(OwnerType&, EntityParameter), AllocatorParameter>;
