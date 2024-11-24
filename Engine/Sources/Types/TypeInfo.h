@@ -1,11 +1,12 @@
 #ifndef ENGINE_SOURCES_TYPE_INFO_FILE_TYPEID_H
 #define ENGINE_SOURCES_TYPE_INFO_FILE_TYPEID_H
 
-#include "./Types.h"
 #include "./Internal/FunctionNameUtils.h"
 #include "./Internal/TypeIndex.h"
 #include "./Internal/TypeNameUtils.h"
-#include "Hash/Hash.h"
+
+#include <Hash/Hash.h>
+#include <Types/Types.h>
 
 #include <concepts>
 #include <span>

@@ -1,11 +1,11 @@
 #ifndef ENGINE_SOURCES_ECS_CONTAINERS_FILE_LIFECYCLE_CONTAINER_H
 #define ENGINE_SOURCES_ECS_CONTAINERS_FILE_LIFECYCLE_CONTAINER_H
 
-#include "Events/Signal.h"
-#include "Events/Sink.h"
-#include "SparseSet/SparseSet.h"
-#include "Storage/Storage.h"
-#include "Types/Traits/Capabilities.h"
+#include <ECS/Containers/SparseSet/SparseSet.h>
+#include <ECS/Containers/Storage/Storage.h>
+#include <Events/Signal.h>
+#include <Events/Sink.h>
+#include <Types/Traits/Capabilities.h>
 
 namespace egg::ECS
 {

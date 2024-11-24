@@ -1,12 +1,14 @@
 #ifndef ENGINE_SOURCES_ECS_CONTAINERS_STORAGE_FILE_STORAGE_H
 #define ENGINE_SOURCES_ECS_CONTAINERS_STORAGE_FILE_STORAGE_H
 
-#include "../Container.h"
-#include "../../../Containers/IterableAdaptor.h"
-#include "../SparseSet/SparseSet.h"
 #include "./Internal/StorageIterator.h"
-#include "ECS/Entity.h"
-#include "Types/Traits/Capabilities.h"
+
+#include <Containers/IterableAdaptor.h>
+#include <ECS/Entity.h>
+#include <ECS/Containers/Container.h>
+#include <ECS/Containers/SparseSet/SparseSet.h>
+#include <ECS/Traits/PageSizeTraits.h>
+#include <Types/Traits/Capabilities.h>
 
 #include <stdexcept>
 #include <type_traits>

@@ -1,9 +1,9 @@
 #ifndef ENGINE_SOURCES_ENGINE_FILE_ENGINE_H
 #define ENGINE_SOURCES_ENGINE_FILE_ENGINE_H
 
-#include "../ECS/Systems/System.h"
-#include "../GUI/Window/Window.h"
-#include "Events/Types/WindowCreated/WindowCreated.h"
+#include <ECS/Systems/System.h>
+#include <Events/Types/WindowCreated/WindowCreated.h>
+#include <GUI/Window/Window.h>
 
 #include <memory>
 #include <vector>

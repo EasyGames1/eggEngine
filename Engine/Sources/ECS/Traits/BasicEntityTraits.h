@@ -1,7 +1,7 @@
 #ifndef ENGINE_SOURCES_ECS_TRAITS_FILE_BASIC_ENTITY_TRAITS_H
 #define ENGINE_SOURCES_ECS_TRAITS_FILE_BASIC_ENTITY_TRAITS_H
 
-#include "../Entity.h"
+#include <ECS/Entity.h>
 
 #include <cstdint>
 #include <type_traits>

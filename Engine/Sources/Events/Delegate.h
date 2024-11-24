@@ -1,10 +1,10 @@
 #ifndef ENGINE_SOURCES_EVENTS_FILE_DELEGATE_H
 #define ENGINE_SOURCES_EVENTS_FILE_DELEGATE_H
 
-#include "Config/Config.h"
-#include "Traits/InvocablePointerTraits.h"
-#include "Traits/FunctorOverloadTraits.h"
-#include "Types/Traits/Constness.h"
+#include <Config/Config.h>
+#include <Events/Traits/FunctorOverloadTraits.h>
+#include <Events/Traits/InvocablePointerTraits.h>
+#include <Types/Traits/Constness.h>
 
 #include <functional>
 #include <tuple>

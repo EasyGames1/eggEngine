@@ -1,7 +1,7 @@
 #ifndef ENGINE_SOURCES_EVENTS_TYPES_WINDOW_EVENT_FILE_WINDOW_EVENT_H
 #define ENGINE_SOURCES_EVENTS_TYPES_WINDOW_EVENT_FILE_WINDOW_EVENT_H
 
-#include "../../../GUI/Window/Window.h"
+#include <GUI/Window/Window.h>
 
 #include <memory>
 

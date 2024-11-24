@@ -1,8 +1,8 @@
 #ifndef ENGINE_SOURCES_ECS_TRAITS_FILE_PAGE_SIZE_TRAITS_H
 #define ENGINE_SOURCES_ECS_TRAITS_FILE_PAGE_SIZE_TRAITS_H
 
-#include "BasicEntityTraits.h"
-#include "Memory/Constants.h"
+#include <ECS/Traits/BasicEntityTraits.h>
+#include <Memory/Constants.h>
 
 #include <type_traits>
 

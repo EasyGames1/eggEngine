@@ -1,7 +1,7 @@
 #ifndef ENGINE_SOURCES_HASH_TRAITS_FILE_MURMUR2_TRAITS_H
 #define ENGINE_SOURCES_HASH_TRAITS_FILE_MURMUR2_TRAITS_H
 
-#include "Memory/Constants.h"
+#include <Memory/Constants.h>
 
 #include <concepts>
 #include <cstdint>

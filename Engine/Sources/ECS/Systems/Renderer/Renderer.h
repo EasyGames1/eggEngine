@@ -1,8 +1,8 @@
 #ifndef ENGINE_SOURCES_ECS_SYSTEMS_RENDERER_FILE_RENDERER_H
 #define ENGINE_SOURCES_ECS_SYSTEMS_RENDERER_FILE_RENDERER_H
 
-#include "../System.h"
-#include "../../../GUI/Window/Window.h"
+#include <ECS/Systems/System.h>
+#include <GUI/Window/Window.h>
 
 #include <memory>
 

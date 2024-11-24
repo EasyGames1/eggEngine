@@ -1,7 +1,7 @@
 #ifndef ENGINE_SOURCES_GUI_WINDOW_FILE_WINDOW_H
 #define ENGINE_SOURCES_GUI_WINDOW_FILE_WINDOW_H
 
-#include "../../Constants/Window.h"
+#include <Constants/Window.h>
 
 #include <array>
 #include <string_view>

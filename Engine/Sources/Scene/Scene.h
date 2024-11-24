@@ -1,7 +1,7 @@
 #ifndef ENGINE_SOURCES_SCENE_FILE_SCENE_H
 #define ENGINE_SOURCES_SCENE_FILE_SCENE_H
 
-#include "Events/Dispatcher.h"
+#include <Events/Dispatcher.h>
 
 namespace egg
 {

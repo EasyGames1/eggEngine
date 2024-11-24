@@ -1,9 +1,9 @@
 #ifndef ENGINE_SOURCES_EVENTS_FILE_CONNECTION_H
 #define ENGINE_SOURCES_EVENTS_FILE_CONNECTION_H
 
-#include "Delegate.h"
-#include "Config/Config.h"
-#include "Containers/CompressedPair/CompressedPair.h"
+#include <Config/Config.h>
+#include <Containers/CompressedPair/CompressedPair.h>
+#include <Events/Delegate.h>
 
 #include <tuple>
 

@@ -1,9 +1,9 @@
 #include "./Renderer.h"
 
-#include "../../../Constants/Window.h"
-#include "../../../Events/Types/WindowCreated/WindowCreated.h"
-#include "../../../GUI/Window/Window.h"
-#include "../../../Scene/Scene.h"
+#include <Constants/Window.h>
+#include <Events/Types/WindowCreated/WindowCreated.h>
+#include <GUI/Window/Window.h>
+#include <Scene/Scene.h>
 
 #include <stdexcept>
 

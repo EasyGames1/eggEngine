@@ -1,9 +1,7 @@
 #ifndef ENGINE_SOURCES_EVENTS_TRAITS_INTERNAL_FILE_FUNCTION_POINTER_TRAITS_H
 #define ENGINE_SOURCES_EVENTS_TRAITS_INTERNAL_FILE_FUNCTION_POINTER_TRAITS_H
 
-#include "../FunctionTraits.h"
-
-#include <tuple>
+#include <Events/Traits/FunctionTraits.h>
 
 namespace egg::Events::Internal
 {

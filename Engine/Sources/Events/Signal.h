@@ -1,9 +1,8 @@
 #ifndef ENGINE_SOURCES_EVENTS_FILE_SIGNAL_H
 #define ENGINE_SOURCES_EVENTS_FILE_SIGNAL_H
 
-#include "Action.h"
-#include "Delegate.h"
-#include "Types/Traits/Capabilities.h"
+#include <Events/Action.h>
+#include <Events/Delegate.h>
 
 #include <memory>
 #include <vector>

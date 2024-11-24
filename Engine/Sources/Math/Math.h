@@ -1,7 +1,7 @@
 #ifndef ENGINE_SOURCES_MATH_FILE_MATH_H
 #define ENGINE_SOURCES_MATH_FILE_MATH_H
 
-#include "../Config/Config.h"
+#include <Config/Config.h>
 
 #include <bit>
 #include <concepts>

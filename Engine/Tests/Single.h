@@ -1,8 +1,8 @@
 #ifndef ENGINE_TESTS_FILE_SINGLE_H
 #define ENGINE_TESTS_FILE_SINGLE_H
 
-#include "../Sources/ECS/Entity.h"
-#include "../Sources/ECS/Traits/EntityTraits.h"
+#include <ECS/Entity.h>
+#include <ECS/Traits/EntityTraits.h>
 
 using EntityType = egg::ECS::Entity;
 

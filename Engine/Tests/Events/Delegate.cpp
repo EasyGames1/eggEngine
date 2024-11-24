@@ -1,7 +1,6 @@
-#include "Events/Delegate.h"
-
 #include "../CommonFunctions.h"
 
+#include <Events/Delegate.h>
 #include <gtest/gtest.h>
 
 

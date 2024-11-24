@@ -1,9 +1,9 @@
 #ifndef ENGINE_SOURCES_MEMORY_FILE_UTILS_H
 #define ENGINE_SOURCES_MEMORY_FILE_UTILS_H
 
-#include "./Constants.h"
-#include "./Deleter.h"
-#include "Config/Config.h"
+#include <Config/Config.h>
+#include <Memory/Constants.h>
+#include <Memory/Deleter.h>
 
 #include <concepts>
 #include <ranges>

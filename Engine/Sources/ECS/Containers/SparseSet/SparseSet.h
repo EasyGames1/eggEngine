@@ -1,12 +1,14 @@
 #ifndef ENGINE_SOURCES_ECS_CONTAINERS_SPARSE_SET_FILE_SPARSE_SET_H
 #define ENGINE_SOURCES_ECS_CONTAINERS_SPARSE_SET_FILE_SPARSE_SET_H
 
-#include "../Container.h"
-#include "../../Traits/EntityTraits.h"
-#include "../PagedVector/PagedVector.h"
-#include "Algorithms/Sorting/StandardSorting.h"
 #include "./Internal/SparseSetIterator.h"
-#include "Types/Traits/Capabilities.h"
+
+#include <Algorithms/Sorting/StandardSorting.h>
+#include <ECS/Entity.h>
+#include <ECS/Containers/Container.h>
+#include <ECS/Containers/PagedVector/PagedVector.h>
+#include <ECS/Traits/EntityTraits.h>
+#include <Types/Traits/Capabilities.h>
 
 #include <memory>
 #include <vector>

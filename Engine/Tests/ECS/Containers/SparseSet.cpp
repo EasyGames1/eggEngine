@@ -1,11 +1,9 @@
-#include "ECS/Containers/SparseSet/SparseSet.h"
-
 #include "../../Single.h"
-#include "Events/Delegate.h"
 
-#include "Types/TypeInfo.h"
-
+#include <ECS/Containers/SparseSet/SparseSet.h>
+#include <Events/Delegate.h>
 #include <gtest/gtest.h>
+#include <Types/TypeInfo.h>
 
 class SparseSetTest : public testing::Test
 {

@@ -1,9 +1,9 @@
 #ifndef ENGINE_SOURCES_HASH_FILE_ALGORITHMS_H
 #define ENGINE_SOURCES_HASH_FILE_ALGORITHMS_H
 
-#include "./Traits/FNV1aTraits.h"
-#include "./Traits/Murmur2Traits.h"
-#include "Memory/Utils.h"
+#include <Hash/Traits/FNV1aTraits.h>
+#include <Hash/Traits/Murmur2Traits.h>
+#include <Memory/Utils.h>
 
 #include <concepts>
 #include <cstddef>

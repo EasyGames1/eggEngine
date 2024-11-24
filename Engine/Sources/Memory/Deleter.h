@@ -1,7 +1,7 @@
 #ifndef ENGINE_SOURCES_MEMORY_FILE_DELETER_H
 #define ENGINE_SOURCES_MEMORY_FILE_DELETER_H
 
-#include "Containers/CompressedPair/CompressedBase.h"
+#include <Containers/CompressedPair/CompressedBase.h>
 
 namespace egg::Memory
 {

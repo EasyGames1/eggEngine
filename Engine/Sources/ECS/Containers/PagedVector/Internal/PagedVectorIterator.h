@@ -1,9 +1,8 @@
 #ifndef ENGINE_SOURCES_ECS_CONTAINERS_PAGED_VECTOR_INTERNAL_FILE_PAGED_VECTOR_ITERATOR_H
 #define ENGINE_SOURCES_ECS_CONTAINERS_PAGED_VECTOR_INTERNAL_FILE_PAGED_VECTOR_ITERATOR_H
 
-#include "../../Container.h"
-#include "ECS/Traits/PageSizeTraits.h"
-#include "Math/Math.h"
+#include <ECS/Traits/PageSizeTraits.h>
+#include <Math/Math.h>
 
 #include <memory>
 #include <type_traits>
@@ -14,8 +13,8 @@ namespace egg::ECS::Containers::Internal
     class PagedVectorIterator final
     {
         using ContainerType = std::remove_const_t<Container>;
-        using ContainerAllocatorTraits = AllocatorTraits<typename ContainerType::allocator_type>;
-        using ContainerIteratorTraits = IteratorTraits<std::conditional_t<
+        using ContainerAllocatorTraits = std::allocator_traits<typename ContainerType::allocator_type>;
+        using ContainerIteratorTraits = std::iterator_traits<std::conditional_t<
             std::is_const_v<Container>,
             typename ContainerAllocatorTraits::template rebind_traits<typename std::pointer_traits<typename
                 ContainerType::value_type>::element_type>::const_pointer,

@@ -1,7 +1,7 @@
-#include "ECS/Containers/Storage/Storage.h"
 #include "../../Single.h"
-#include "ECS/Traits/ComponentTraits.h"
 
+#include <ECS/Containers/Storage/Storage.h>
+#include <ECS/Traits/ComponentTraits.h>
 #include <gtest/gtest.h>
 
 #include <cmath>

@@ -1,8 +1,8 @@
 #ifndef ENGINE_SOURCES_EVENTS_TYPES_WINDOW_CREATED_FILE_WINDOW_CREATED_H
 #define ENGINE_SOURCES_EVENTS_TYPES_WINDOW_CREATED_FILE_WINDOW_CREATED_H
 
-#include "../../../GUI/Window/Window.h"
-#include "../WindowEvent/WindowEvent.h"
+#include <Events/Types/WindowEvent/WindowEvent.h>
+#include <GUI/Window/Window.h>
 
 namespace egg::Events
 {

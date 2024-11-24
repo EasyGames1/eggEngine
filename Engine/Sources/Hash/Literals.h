@@ -1,8 +1,8 @@
 #ifndef ENGINE_SOURCES_HASH_FILE_LITERALS_H
 #define ENGINE_SOURCES_HASH_FILE_LITERALS_H
 
-#include "Hash.h"
-#include "Types/Types.h"
+#include <Hash/Hash.h>
+#include <Types/Types.h>
 
 #include <span>
 
