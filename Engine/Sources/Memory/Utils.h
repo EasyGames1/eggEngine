@@ -22,26 +22,26 @@ namespace egg::Memory
         return Bits >> ByteShift;
     }
 
-    template <std::unsigned_integral Type>
-    [[nodiscard]] constexpr Type UnalignedLoad(const std::byte* Bytes) noexcept
+    template <std::unsigned_integral Type, Types::Byte ByteType>
+    [[nodiscard]] constexpr Type UnalignedLoad(const ByteType* Bytes) noexcept
     {
         Type Result {};
         for (Type i = 0u; i < sizeof(Result); ++i)
         {
-            Result |= std::to_integer<Type>(Bytes[i]) << ToBits(i);
+            Result |= static_cast<Type>(Bytes[i]) << ToBits(i);
         }
         return Result;
     }
 
-    template <std::unsigned_integral Type>
-    [[nodiscard]] constexpr Type LoadBytes(const std::span<const std::byte> Bytes) noexcept
+    template <std::unsigned_integral Type, Types::Byte ByteType>
+    [[nodiscard]] constexpr Type LoadBytes(const std::span<const ByteType> Bytes) noexcept
     {
         EGG_ASSERT(Bytes.size() <= sizeof(Type), "The Type cannot accommodate so many Bytes");
         Type Result {};
         for (const auto Byte : Bytes | std::views::reverse)
         {
             Result <<= Memory::BitsIn<static_cast<Type>(1u)>;
-            Result |= std::to_integer<Type>(Byte);
+            Result |= static_cast<Type>(Byte);
         }
         return Result;
     }

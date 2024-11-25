@@ -44,7 +44,7 @@ namespace egg::Types
             }
             else
             {
-                return Hash::Hash<SizeType>(std::as_bytes(std::span { Name }));
+                return Hash::Hash<SizeType>(std::span { Name });
             }
         }
     };

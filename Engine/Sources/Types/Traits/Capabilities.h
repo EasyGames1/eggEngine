@@ -1,6 +1,7 @@
 #ifndef ENGINE_SOURCES_TYPE_TRAITS_FILE_CAPABILITIES_H
 #define ENGINE_SOURCES_TYPE_TRAITS_FILE_CAPABILITIES_H
 
+#include "./Internal/IsAnyOf.h"
 #include "./Internal/IsInstanceOf.h"
 
 #include <concepts>
@@ -26,6 +27,12 @@ namespace egg::Types
 
     template <typename Type, template<typename...> typename Template>
     concept InstanceOf = Internal::IsInstanceOf<Type, Template>::value;
+
+    template <typename Type, typename... Other>
+    concept AnyOf = Internal::IsAnyOf<Type, Other...>::value;
+
+    template <typename Type>
+    concept Byte = AnyOf<std::remove_cv_t<Type>, std::byte, unsigned char, signed char, char>;
 }
 
 #endif // ENGINE_SOURCES_TYPE_TRAITS_FILE_CAPABILITIES_H

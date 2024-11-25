@@ -75,6 +75,7 @@ add_library(VulkanEngine_lib
         Sources/ECS/Registry.h
         Sources/ECS/Containers/LifecycleContainer.h
         Sources/Types/Traits/Internal/IsInstanceOf.h
+        Sources/Types/Traits/Internal/IsAnyOf.h
 )
 
 target_include_directories(VulkanEngine_lib PRIVATE Sources)
