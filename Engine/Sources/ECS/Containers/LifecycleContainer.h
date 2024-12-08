@@ -5,7 +5,11 @@
 #include <ECS/Containers/Storage/Storage.h>
 #include <Events/Signal.h>
 #include <Events/Sink.h>
-#include <Types/Traits/Capabilities.h>
+#include <Types/Capabilities/Capabilities.h>
+
+#include <iterator>
+#include <memory>
+#include <type_traits>
 
 namespace egg::ECS
 {
@@ -17,71 +21,71 @@ namespace egg::ECS
 namespace egg::ECS::Containers
 {
     template <typename>
-    class LifecycleContainer;
+    class Lifecycle;
 
 
-    template <typename ContainerType> requires
-        Types::InstanceOf<ContainerType, SparseSet> ||
-        (Types::InstanceOf<ContainerType, Storage> &&
-            OptimizableElement<typename ContainerType::ElementType, typename ContainerType::EntityType>)
-    class LifecycleContainer<ContainerType> final
-        : public ContainerType
+    template <typename ContainerParameter> requires
+        Types::InstanceOf<ContainerParameter, SparseSet> ||
+        (Types::InstanceOf<ContainerParameter, Storage> &&
+            OptimizableElement<typename ContainerParameter::ElementType, typename ContainerParameter::EntityType>)
+    class Lifecycle<ContainerParameter> final
+        : public ContainerParameter
     {
-        using EntityParameter = typename ContainerType::EntityType;
-        using AllocatorParameter = typename ContainerType::AllocatorType;
-        using EntityAllocatorType = typename std::allocator_traits<AllocatorParameter>::template rebind_alloc<EntityParameter>;
+        using UnderlyingType = ContainerParameter;
+        using EntityParameter = typename UnderlyingType::EntityType;
+        using AllocatorParameter = typename UnderlyingType::AllocatorType;
 
-        using BaseType = ContainerType;
-        using OwnerType = Registry<EntityParameter, EntityAllocatorType>;
-
+        using OwnerType = Registry<EntityParameter,
+                                   typename std::allocator_traits<AllocatorParameter>::template rebind_alloc<EntityParameter>>;
         using SignalType = Events::Signal<void(OwnerType&, EntityParameter), AllocatorParameter>;
 
     public:
-        using AllocatorType = typename BaseType::AllocatorType;
+        using ContainerType = UnderlyingType;
+        using AllocatorType = typename ContainerType::AllocatorType;
 
-        using EntityType = typename BaseType::EntityType;
-        using Iterator = typename BaseType::Iterator;
+        using EntityType = typename ContainerType::EntityType;
+        using Iterator = typename ContainerType::Iterator;
 
         using RegistryType = OwnerType;
         using SinkType = Events::Sink<SignalType>;
 
 
-        constexpr explicit LifecycleContainer(RegistryType& Owner, const AllocatorType& Allocator = {})
+        constexpr explicit Lifecycle(RegistryType& Owner, const AllocatorType& Allocator = {})
             noexcept(
-                std::is_nothrow_constructible_v<BaseType, const AllocatorType&> &&
+                std::is_nothrow_constructible_v<ContainerType, const AllocatorType&> &&
                 std::is_nothrow_constructible_v<SignalType, const AllocatorType&>)
-            : BaseType { Allocator },
+            : ContainerType { Allocator },
               Owner { Owner },
               Construction { Allocator },
               Destruction { Allocator }
         {
         }
 
-        LifecycleContainer(const LifecycleContainer&) = delete;
+        Lifecycle(const Lifecycle&) = delete;
 
-        constexpr LifecycleContainer(LifecycleContainer&& Other)
-            noexcept(std::is_nothrow_move_constructible_v<BaseType> && std::is_nothrow_move_constructible_v<SignalType>) = default;
+        constexpr Lifecycle(Lifecycle&& Other)
+            noexcept(std::is_nothrow_move_constructible_v<ContainerType> && std::is_nothrow_move_constructible_v<SignalType>) = default;
 
-        constexpr LifecycleContainer(LifecycleContainer&& Other, const AllocatorType& Allocator)
-            : BaseType { std::move(Other), Allocator },
+        constexpr Lifecycle(Lifecycle&& Other, const AllocatorType& Allocator)
+            : ContainerType { std::move(Other), Allocator },
               Owner { Other.Owner },
               Construction { std::move(Other.Construction), Allocator },
               Destruction { std::move(Other.Destruction), Allocator }
         {
         }
 
-        constexpr ~LifecycleContainer() noexcept override = default;
+        constexpr ~Lifecycle() noexcept override = default;
 
-        LifecycleContainer& operator=(const LifecycleContainer&) = delete;
+        Lifecycle& operator=(const Lifecycle&) = delete;
 
-        constexpr LifecycleContainer& operator=(LifecycleContainer&& Other)
-            noexcept(std::is_nothrow_move_assignable_v<BaseType> && std::is_nothrow_move_assignable_v<SignalType>) = default;
+        constexpr Lifecycle& operator=(Lifecycle&& Other)
+            noexcept(std::is_nothrow_move_assignable_v<ContainerType> && std::is_nothrow_move_assignable_v<SignalType>) = default;
 
-        constexpr friend void swap(LifecycleContainer& Left, LifecycleContainer& Right)
-            noexcept(std::is_nothrow_swappable_v<BaseType> && std::is_nothrow_swappable_v<SignalType>)
+        constexpr friend void swap(Lifecycle& Left, Lifecycle& Right)
+            noexcept(std::is_nothrow_swappable_v<ContainerType> && std::is_nothrow_swappable_v<SignalType>)
         {
             using std::swap;
-            swap(static_cast<BaseType&>(Left), static_cast<BaseType&>(Right));
+            swap(static_cast<ContainerType&>(Left), static_cast<ContainerType&>(Right));
             swap(Left.Owner, Right.Owner);
             swap(Left.Construction, Right.Construction);
             swap(Left.Destruction, Right.Destruction);
@@ -101,19 +105,19 @@ namespace egg::ECS::Containers
         {
             if (!Destruction.Empty())
             {
-                for (std::size_t Position = 0u, Last = BaseType::GetSize(); Position < Last; ++Position)
+                for (std::size_t Position = 0u, Last = ContainerType::GetSize(); Position < Last; ++Position)
                 {
-                    Destruction.Publish(Owner, BaseType::operator[](Position));
+                    Destruction.Publish(Owner, ContainerType::operator[](Position));
                 }
             }
 
-            BaseType::Clear();
+            ContainerType::Clear();
         }
 
     protected:
         constexpr Iterator TryEmplace(const EntityType Entity) override
         {
-            const Iterator Constructed { BaseType::TryEmplace(Entity) };
+            const Iterator Constructed { ContainerType::TryEmplace(Entity) };
             Construction.Publish(Owner, *Constructed);
             return Constructed;
         }
@@ -128,7 +132,7 @@ namespace egg::ECS::Containers
                 }
             }
 
-            BaseType::Pop(First, Last);
+            ContainerType::Pop(First, Last);
         }
 
     private:
@@ -137,43 +141,41 @@ namespace egg::ECS::Containers
         SignalType Destruction;
     };
 
-    template <Types::InstanceOf<Storage> ContainerType>
-        requires (!OptimizableElement<typename ContainerType::ElementType, typename ContainerType::EntityType>)
-    class LifecycleContainer<ContainerType> final
-        : public Storage<typename ContainerType::ElementType, typename ContainerType::EntityType, typename ContainerType::AllocatorType>
+    template <Types::InstanceOf<Storage> ContainerParameter>
+        requires (!OptimizableElement<typename ContainerParameter::ElementType, typename ContainerParameter::EntityType>)
+    class Lifecycle<ContainerParameter> final
+        : public ContainerParameter
     {
-        using ElementParameter = typename ContainerType::ElementType;
-        using EntityParameter = typename ContainerType::EntityType;
-        using AllocatorParameter = typename ContainerType::AllocatorType;
+        using UnderlyingType = ContainerParameter;
+        using EntityParameter = typename UnderlyingType::EntityType;
 
-
-        using UnderlyingType = Storage<ElementParameter, EntityParameter, AllocatorParameter>;
         using SparseSetType = typename UnderlyingType::BaseType;
         using SparseSetIterator = typename SparseSetType::Iterator;
 
         using OwnerType = Registry<EntityParameter, typename SparseSetType::AllocatorType>;
-        using SignalType = Events::Signal<void(OwnerType&, EntityParameter), AllocatorParameter>;
+        using SignalType = Events::Signal<void(OwnerType&, EntityParameter), typename UnderlyingType::AllocatorType>;
 
     public:
-        using AllocatorType = typename UnderlyingType::AllocatorType;
+        using ContainerType = UnderlyingType;
+        using AllocatorType = typename ContainerType::AllocatorType;
 
-        using EntityType = typename UnderlyingType::EntityType;
-        using ElementType = typename UnderlyingType::ElementType;
+        using EntityType = typename ContainerType::EntityType;
+        using ElementType = typename ContainerType::ElementType;
 
-        using ConstReference = typename UnderlyingType::ConstReference;
-        using Reference = typename UnderlyingType::Reference;
+        using ConstReference = typename ContainerType::ConstReference;
+        using Reference = typename ContainerType::Reference;
 
-        using Iterator = typename UnderlyingType::Iterator;
+        using Iterator = typename ContainerType::Iterator;
 
         using RegistryType = OwnerType;
         using SinkType = Events::Sink<SignalType>;
 
 
-        constexpr explicit LifecycleContainer(RegistryType& Owner, const AllocatorType& Allocator = {})
+        constexpr explicit Lifecycle(RegistryType& Owner, const AllocatorType& Allocator = {})
             noexcept(
-                std::is_nothrow_constructible_v<UnderlyingType, const AllocatorType&> &&
+                std::is_nothrow_constructible_v<ContainerType, const AllocatorType&> &&
                 std::is_nothrow_constructible_v<SignalType, const AllocatorType&>)
-            : UnderlyingType { Allocator },
+            : ContainerType { Allocator },
               Owner { Owner },
               Construction { Allocator },
               Update { Allocator },
@@ -181,13 +183,13 @@ namespace egg::ECS::Containers
         {
         }
 
-        LifecycleContainer(const LifecycleContainer&) = delete;
+        Lifecycle(const Lifecycle&) = delete;
 
-        constexpr LifecycleContainer(LifecycleContainer&& Other)
-            noexcept(std::is_nothrow_move_constructible_v<UnderlyingType> && std::is_nothrow_move_constructible_v<SignalType>) = default;
+        constexpr Lifecycle(Lifecycle&& Other)
+            noexcept(std::is_nothrow_move_constructible_v<ContainerType> && std::is_nothrow_move_constructible_v<SignalType>) = default;
 
-        constexpr LifecycleContainer(LifecycleContainer&& Other, const AllocatorType& Allocator)
-            : UnderlyingType { std::move(Other), Allocator },
+        constexpr Lifecycle(Lifecycle&& Other, const AllocatorType& Allocator)
+            : ContainerType { std::move(Other), Allocator },
               Owner { Other.Owner },
               Construction { std::move(Other.Construction), Allocator },
               Update { std::move(Other.Update), Allocator },
@@ -195,18 +197,18 @@ namespace egg::ECS::Containers
         {
         }
 
-        constexpr ~LifecycleContainer() noexcept override = default;
+        constexpr ~Lifecycle() noexcept override = default;
 
-        LifecycleContainer& operator=(const LifecycleContainer&) = delete;
+        Lifecycle& operator=(const Lifecycle&) = delete;
 
-        constexpr LifecycleContainer& operator=(LifecycleContainer&& Other)
-            noexcept(std::is_nothrow_move_assignable_v<UnderlyingType> && std::is_nothrow_move_assignable_v<SignalType>) = default;
+        constexpr Lifecycle& operator=(Lifecycle&& Other)
+            noexcept(std::is_nothrow_move_assignable_v<ContainerType> && std::is_nothrow_move_assignable_v<SignalType>) = default;
 
-        constexpr friend void swap(LifecycleContainer& Left, LifecycleContainer& Right)
-            noexcept(std::is_nothrow_swappable_v<UnderlyingType> && std::is_nothrow_swappable_v<SignalType>)
+        constexpr friend void swap(Lifecycle& Left, Lifecycle& Right)
+            noexcept(std::is_nothrow_swappable_v<ContainerType> && std::is_nothrow_swappable_v<SignalType>)
         {
             using std::swap;
-            swap(static_cast<UnderlyingType&>(Left), static_cast<UnderlyingType&>(Right));
+            swap(static_cast<ContainerType&>(Left), static_cast<ContainerType&>(Right));
             swap(Left.Owner, Right.Owner);
             swap(Left.Construction, Right.Construction);
             swap(Left.Update, Right.Update);
@@ -231,32 +233,32 @@ namespace egg::ECS::Containers
         template <typename... Args>
         constexpr ElementType& Emplace(const EntityType Entity, Args&&... Arguments)
         {
-            ElementType& Constructed { UnderlyingType::Emplace(Entity, std::forward<Args>(Arguments)...) };
+            ElementType& Constructed { ContainerType::Emplace(Entity, std::forward<Args>(Arguments)...) };
             Construction.Publish(Owner, Entity);
             return Constructed;
         }
 
-        template <typename IteratorType, typename... Args>
-        constexpr Iterator Insert(IteratorType First, IteratorType Last, Args&&... Arguments)
+        template <typename IteratorType, std::sentinel_for<IteratorType> SentinelType, typename... Args>
+        constexpr Iterator Insert(IteratorType First, SentinelType Last, Args&&... Arguments)
         {
-            std::size_t From { UnderlyingType::GetSize() };
-            const Iterator Constructed { UnderlyingType::Insert(First, Last, std::forward<Args>(Arguments)...) };
+            std::size_t From { ContainerType::GetSize() };
+            const Iterator Constructed { ContainerType::Insert(First, Last, std::forward<Args>(Arguments)...) };
 
             if (!Construction.Empty())
             {
-                for (const std::size_t To { UnderlyingType::GetSize() }; From < To; ++From)
+                for (const std::size_t To { ContainerType::GetSize() }; From < To; ++From)
                 {
-                    Construction.Publish(Owner, UnderlyingType::operator[](From));
+                    Construction.Publish(Owner, ContainerType::operator[](From));
                 }
             }
 
             return Constructed;
         }
 
-        template <typename... Func>
-        constexpr ElementType& Patch(const EntityType Entity, Func&&... Functions)
+        template <typename... CallableTypes>
+        constexpr ElementType& Patch(const EntityType Entity, CallableTypes&&... Callables)
         {
-            ElementType& Updated { UnderlyingType::Patch(Entity, std::forward<Func>(Functions)...) };
+            ElementType& Updated { ContainerType::Patch(Entity, std::forward<CallableTypes>(Callables)...) };
             Update.Publish(Owner, Entity);
             return Updated;
         }
@@ -265,21 +267,21 @@ namespace egg::ECS::Containers
         {
             if (!Destruction.Empty())
             {
-                for (std::size_t Position = 0u, Last = UnderlyingType::GetSize(); Position < Last; ++Position)
+                for (std::size_t Position = 0u, Last = ContainerType::GetSize(); Position < Last; ++Position)
                 {
-                    Destruction.Publish(Owner, UnderlyingType::operator[](Position));
+                    Destruction.Publish(Owner, ContainerType::operator[](Position));
                 }
             }
 
-            UnderlyingType::Clear();
+            ContainerType::Clear();
         }
 
     protected:
         constexpr SparseSetIterator TryEmplace(const EntityType Entity) override
         {
-            const SparseSetIterator Constructed { UnderlyingType::TryEmplace(Entity) };
+            const SparseSetIterator Constructed { ContainerType::TryEmplace(Entity) };
 
-            if constexpr (std::default_initializable<typename UnderlyingType::ElementType>)
+            if constexpr (std::default_initializable<typename ContainerType::ElementType>)
             {
                 Construction.Publish(Owner, *Constructed);
             }
@@ -297,7 +299,7 @@ namespace egg::ECS::Containers
                 }
             }
 
-            UnderlyingType::Pop(First, Last);
+            ContainerType::Pop(First, Last);
         }
 
     private:

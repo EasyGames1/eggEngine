@@ -5,12 +5,12 @@
 
 namespace egg::Types::Internal
 {
-    template <typename, template<typename...>typename>
+    template <typename, template<typename...> typename>
     struct IsInstanceOf : std::false_type
     {
     };
 
-    template <template<typename...>typename Template, typename... Args>
+    template <template<typename...> typename Template, typename... Args>
     struct IsInstanceOf<Template<Args...>, Template> : std::true_type
     {
     };

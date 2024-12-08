@@ -3,13 +3,15 @@
 
 #include "./Internal/SparseSetIterator.h"
 
-#include <Algorithms/Sorting/StandardSorting.h>
+#include <Containers/PagedVector/PagedVector.h>
 #include <ECS/Entity.h>
 #include <ECS/Containers/Container.h>
-#include <ECS/Containers/PagedVector/PagedVector.h>
 #include <ECS/Traits/EntityTraits.h>
-#include <Types/Traits/Capabilities.h>
+#include <Types/Capabilities/Capabilities.h>
 
+#include <algorithm>
+#include <functional>
+#include <iterator>
 #include <memory>
 #include <vector>
 
@@ -35,7 +37,7 @@ namespace egg::ECS::Containers
         using VersionType = typename TraitsType::VersionType;
 
         using Iterator = Internal::SparseSetIterator<PackedContainer>;
-        using ConstIterator = Internal::SparseSetIterator<const PackedContainer>;
+        using ConstIterator = Iterator;
         using ReverseIterator = std::reverse_iterator<Iterator>;
         using ConstReverseIterator = std::reverse_iterator<ConstIterator>;
 
@@ -83,8 +85,8 @@ namespace egg::ECS::Containers
             return TryEmplace(Entity);
         }
 
-        template <typename IteratorType>
-        constexpr Iterator Push(IteratorType First, IteratorType Last)
+        template <typename IteratorType, std::sentinel_for<IteratorType> SentinelType>
+        constexpr Iterator Push(IteratorType First, SentinelType Last)
         {
             auto Current { End() };
 
@@ -174,7 +176,20 @@ namespace egg::ECS::Containers
 
         constexpr void SwapElements(const EntityType Left, const EntityType Right)
         {
-            SwapAt(GetIndex(Left), GetIndex(Right));
+            SwapElementsAt(GetIndex(Left), GetIndex(Right));
+        }
+
+        constexpr virtual void SwapElementsAt(const std::size_t Left, const std::size_t Right)
+        {
+            EGG_ASSERT(Left < Packed.size() && Right < Packed.size(), "Index out of bounds");
+            auto& From { Packed[Left] };
+            auto& To { Packed[Right] };
+
+            GetReference(From) = TraitsType::Combine(static_cast<typename TraitsType::EntityType>(Right), TraitsType::ToIntegral(From));
+            GetReference(To) = TraitsType::Combine(static_cast<typename TraitsType::EntityType>(Left), TraitsType::ToIntegral(To));
+
+            using std::swap;
+            swap(Packed[Left], Packed[Right]);
         }
 
         constexpr virtual void Reserve(const std::size_t Capacity)
@@ -205,28 +220,29 @@ namespace egg::ECS::Containers
             return Element ? TraitsType::ToVersion(*Element) : TraitsType::ToVersion(TraitsType::Tombstone);
         }
 
-        [[nodiscard]] constexpr ConstIterator Find(const EntityType Entity) const noexcept
-        {
-            return Contains(Entity) ? ToIterator(Entity) : End();
-        }
-
         [[nodiscard]] constexpr Iterator Find(const EntityType Entity) noexcept
         {
             return Contains(Entity) ? ToIterator(Entity) : End();
         }
 
-        template <typename CompareType, typename SortType = Algorithms::Sorting::StandardSorting, typename... Args>
-        constexpr void Sort(CompareType Compare, SortType Sort = SortType {}, Args&&... Arguments)
+        [[nodiscard]] constexpr ConstIterator Find(const EntityType Entity) const noexcept
         {
-            SortCount(GetSize(), std::move(Compare), std::move(Sort), std::forward<Args>(Arguments)...);
+            return Contains(Entity) ? ToIterator(Entity) : End();
         }
 
-        template <typename CompareType, typename SortType = Algorithms::Sorting::StandardSorting, typename... Args>
-        constexpr void SortCount(const std::size_t Count, CompareType Compare, SortType Sort = SortType {}, Args&&... Arguments)
+        template <typename CompareType, typename SortType = decltype(std::ranges::sort), typename ProjectionType = std::identity>
+        constexpr void Sort(CompareType Compare, SortType Sort = SortType {}, ProjectionType Projection = ProjectionType {})
+        {
+            SortCount(GetSize(), std::move(Compare), std::move(Sort), std::move(Projection));
+        }
+
+        template <typename CompareType, typename SortType = decltype(std::ranges::sort), typename ProjectionType = std::identity>
+        constexpr void SortCount(const std::size_t Count,
+                                 CompareType Compare, SortType Sort = SortType {}, ProjectionType Projection = ProjectionType {})
         {
             EGG_ASSERT(Count <= GetSize(), "Count of elements to sort exceeds the number of elements");
 
-            Sort(Packed.rend() - Count, Packed.rend(), std::move(Compare), std::forward<Args>(Arguments)...);
+            Sort(Packed.rend() - Count, Packed.rend(), std::move(Compare), std::move(Projection));
 
             for (std::size_t Position = 0u; Position < Count; ++Position)
             {
@@ -242,18 +258,43 @@ namespace egg::ECS::Containers
             }
         }
 
-        template <typename IteratorType>
-        constexpr Iterator SortAs(IteratorType First, IteratorType Last)
+        template <typename IteratorType, std::sentinel_for<IteratorType> SentinelType>
+        constexpr Iterator SortAs(IteratorType First, SentinelType Last)
         {
-            auto It { Begin() };
+            Iterator It { Begin() };
 
-            for (const auto CurrentLast { End() };
+            for (const Iterator CurrentLast { End() };
                  It != CurrentLast && First != Last;
                  ++First)
             {
-                if (const auto Other { *First }; Contains(Other))
+                if (const EntityType Other { *First }; Contains(Other))
                 {
-                    if (const auto Current { *It }; Current != Other)
+                    if (const EntityType Current { *It }; Current != Other)
+                    {
+                        SwapElements(Current, Other);
+                    }
+
+                    ++It;
+                }
+            }
+
+            return It;
+        }
+
+        template <typename IteratorType, std::sentinel_for<IteratorType> SentinelType>
+        constexpr ReverseIterator SortCountAs(const std::size_t Count, IteratorType First, SentinelType Last)
+        {
+            EGG_ASSERT(Count <= GetSize(), "Count of elements to sort exceeds the number of elements");
+
+            ReverseIterator It { ReverseBegin() };
+
+            for (const ReverseIterator CurrentLast { It + Count };
+                 It != CurrentLast && First != Last;
+                 ++First)
+            {
+                if (const EntityType Other { *First }; Contains(Other) && GetIndex(Other) < Count)
+                {
+                    if (const EntityType Current { *It }; Current != Other)
                     {
                         SwapElements(Current, Other);
                     }
@@ -398,18 +439,6 @@ namespace egg::ECS::Containers
 
             Index = TraitsType::Tombstone;
             Packed.pop_back();
-        }
-
-        constexpr virtual void SwapAt(const std::size_t Left, const std::size_t Right)
-        {
-            auto& From { Packed[Left] };
-            auto& To { Packed[Right] };
-
-            GetReference(From) = TraitsType::Combine(static_cast<typename TraitsType::EntityType>(Right), TraitsType::ToIntegral(From));
-            GetReference(To) = TraitsType::Combine(static_cast<typename TraitsType::EntityType>(Left), TraitsType::ToIntegral(To));
-
-            using std::swap;
-            swap(Packed[Left], Packed[Right]);
         }
 
     private:

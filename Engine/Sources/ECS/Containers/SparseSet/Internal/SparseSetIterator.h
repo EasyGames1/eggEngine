@@ -77,9 +77,7 @@ namespace egg::ECS::Containers::Internal
 
         [[nodiscard]] constexpr reference operator[](const difference_type Value) const noexcept
         {
-            const std::size_t Index { GetIndex() + Value };
-            EGG_ASSERT(Index < Packed->size(), "Index out of bounds");
-            return (*Packed)[Index];
+            return (*Packed)[GetIndex() - Value];
         }
 
         [[nodiscard]] constexpr pointer operator->() const noexcept
@@ -90,11 +88,6 @@ namespace egg::ECS::Containers::Internal
         [[nodiscard]] constexpr reference operator*() const noexcept
         {
             return operator[](0);
-        }
-
-        [[nodiscard]] constexpr pointer GetData() const noexcept
-        {
-            return Packed ? Packed->data() : nullptr;
         }
 
         [[nodiscard]] constexpr std::size_t GetIndex() const noexcept

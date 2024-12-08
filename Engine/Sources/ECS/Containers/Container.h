@@ -23,6 +23,9 @@ namespace egg::ECS::Containers
 
     template <typename Type>
     using IteratorTraits = egg::Containers::IteratorTraits<Type>;
+
+    template <typename... Types>
+    using CommonTypeOf = egg::Containers::CommonTypeOf<Types...>;
 }
 
 

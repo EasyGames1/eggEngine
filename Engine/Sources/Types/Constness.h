@@ -1,5 +1,5 @@
-#ifndef ENGINE_SOURCES_TYPE_TRAITS_FILE_CONSTNESS_H
-#define ENGINE_SOURCES_TYPE_TRAITS_FILE_CONSTNESS_H
+#ifndef ENGINE_SOURCES_TYPES_FILE_CONSTNESS_H
+#define ENGINE_SOURCES_TYPES_FILE_CONSTNESS_H
 
 #include <type_traits>
 
@@ -15,4 +15,4 @@ namespace egg::Types
     using PointeeConstnessAsOther = std::add_pointer_t<ConstnessAsPointee<From, To>>;
 }
 
-#endif // ENGINE_SOURCES_TYPE_TRAITS_FILE_CONSTNESS_H
+#endif // ENGINE_SOURCES_TYPES_FILE_CONSTNESS_H

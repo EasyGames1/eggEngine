@@ -2,6 +2,7 @@
 #define ENGINE_SOURCES_EVENTS_FILE_SIGNAL_H
 
 #include <Events/Action.h>
+#include <Events/ConnectionArgument.h>
 #include <Events/Delegate.h>
 
 #include <memory>

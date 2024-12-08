@@ -88,7 +88,7 @@ namespace egg::Containers
 
     //Anything that isn't a free function that returns an iterator is a stub for #include unused warning
 
-    //So other Container.h files is used to properly handle ADL. They're also redeclare some concepts to stub #include unused warning
+    //So other Container.h files is used to properly handle ADL. They're also redeclare some usings to stub #include unused warning
 
     //If the new container doesn't use anything declared in Container.h as stubs,
     //then you should extract anything like Traits, concept etc. into Container.h to prevent #include unused warnings
@@ -98,6 +98,9 @@ namespace egg::Containers
 
     template <typename Type>
     using IteratorTraits = std::iterator_traits<Type>;
+
+    template <typename... Types>
+    using CommonTypeOf = std::common_type_t<Types...>;
 }
 
 #endif // ENGINE_SOURCES_CONTAINERS_FILE_CONTAINER_H

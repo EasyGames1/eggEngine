@@ -8,60 +8,60 @@
 
 struct Velocity
 {
-    bool operator==(const Velocity& Other) const
+    constexpr bool operator==(const Velocity& Other) const
     {
         return X == Other.X && Y == Other.Y;
     }
 
-    bool operator!=(const Velocity& Other) const
+    constexpr bool operator!=(const Velocity& Other) const
     {
         return !(*this == Other);
     }
 
-    Velocity& operator+=(const float Value)
+    constexpr Velocity& operator+=(const float Value)
     {
         X += Value;
         Y += Value;
         return *this;
     }
 
-    Velocity& operator-=(const float Value)
+    constexpr Velocity& operator-=(const float Value)
     {
         X -= Value;
         Y -= Value;
         return *this;
     }
 
-    Velocity& operator*=(const float Value)
+    constexpr Velocity& operator*=(const float Value)
     {
         X *= Value;
         Y *= Value;
         return *this;
     }
 
-    Velocity& operator/=(const float Value)
+    constexpr Velocity& operator/=(const float Value)
     {
         X /= Value;
         Y /= Value;
         return *this;
     }
 
-    Velocity operator+(const float Value) const
+    constexpr Velocity operator+(const float Value) const
     {
         return Velocity { *this } += Value;
     }
 
-    Velocity operator-(const float Value) const
+    constexpr Velocity operator-(const float Value) const
     {
         return *this + -Value;
     }
 
-    Velocity operator*(const float Value) const
+    constexpr Velocity operator*(const float Value) const
     {
         return Velocity { *this } *= Value;
     }
 
-    Velocity operator/(const float Value) const
+    constexpr Velocity operator/(const float Value) const
     {
         return *this * (1.f / Value);
     }
@@ -183,7 +183,7 @@ TEST_F(StorageTest, Patch)
         ComponentType PatchedComponent { Storage.Get(Current) + IterationsCount };
         EXPECT_EQ(Storage.Patch(
                       Current,
-                      [](ComponentType& Component){ Component += IterationsCount; }),
+                      [](ComponentType& Component) constexpr { Component += IterationsCount; }),
                   PatchedComponent);
     }
 
@@ -192,8 +192,8 @@ TEST_F(StorageTest, Patch)
         ComponentType PatchedComponent { (Storage.Get(Current) + IterationsCount) * 2u };
         EXPECT_EQ(Storage.Patch(
                       Current,
-                      [](ComponentType& Component){ Component += IterationsCount; },
-                      [](ComponentType& Component){ Component *= 2u; }),
+                      [](ComponentType& Component) constexpr { Component += IterationsCount; },
+                      [](ComponentType& Component) constexpr { Component *= 2u; }),
                   PatchedComponent);
     }
 }
@@ -259,7 +259,7 @@ TEST_F(StorageTest, Clear)
 
 TEST_F(StorageTest, Data)
 {
-    for (std::size_t i = 0u; const auto& Current : Storage.Element())
+    for (std::size_t i = 0u; const auto& Current : Storage.Elements())
     {
         EXPECT_EQ(Current, GetComponentAtReversed(i));
         ++i;
@@ -281,15 +281,6 @@ TEST_F(StorageTest, Get)
     for (std::size_t i = 0u; const auto& Current : Storage)
     {
         EXPECT_EQ(Storage.Get(Current), GetComponentAtReversed(i));
-        ++i;
-    }
-}
-
-TEST_F(StorageTest, GetAsTuple)
-{
-    for (std::size_t i = 0u; const auto& Current : Storage)
-    {
-        EXPECT_EQ(Storage.GetAsTuple(Current), std::forward_as_tuple(GetComponentAtReversed(i)));
         ++i;
     }
 }

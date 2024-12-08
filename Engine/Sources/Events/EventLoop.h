@@ -4,7 +4,7 @@
 #include <Events/EventLoopInterface.h>
 #include <Events/Signal.h>
 #include <Events/Sink.h>
-#include <Types/Traits/Capabilities.h>
+#include <Types/Capabilities/Capabilities.h>
 
 #include <concepts>
 #include <iterator>

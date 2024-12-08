@@ -3,9 +3,11 @@
 
 #include <Containers/Container.h>
 
+#include <iterator>
+
 namespace egg::Containers
 {
-    template <typename IteratorType, typename SentinelType = IteratorType>
+    template <typename IteratorType, std::sentinel_for<IteratorType> SentinelType = IteratorType>
     class IterableAdaptor final
     {
     public:
@@ -37,16 +39,6 @@ namespace egg::Containers
         [[nodiscard]] constexpr Sentinel End() const noexcept
         {
             return Last;
-        }
-
-        [[nodiscard]] constexpr ReverseIterator ReverseBegin() const noexcept
-        {
-            return std::make_reverse_iterator(First);
-        }
-
-        [[nodiscard]] constexpr ReverseSentinel ReverseEnd() const noexcept
-        {
-            return std::make_reverse_iterator(Last);
         }
 
     private:

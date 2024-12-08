@@ -3,11 +3,11 @@
 
 #include <Hash/Traits/FNV1aTraits.h>
 #include <Hash/Traits/Murmur2Traits.h>
+#include <Memory/Constants.h>
 #include <Memory/Utils.h>
 
 #include <concepts>
 #include <cstdint>
-#include <ranges>
 
 namespace egg::Hash
 {
@@ -29,7 +29,7 @@ namespace egg::Hash
             Hash ^= Memory::ShiftMix(Chunk, TraitsType::ShiftBits) * TraitsType::Multiplier;
         }
 
-        if (auto Remainder = static_cast<SizeType>(std::distance(First, End)))
+        if (auto Remainder { static_cast<SizeType>(std::distance(First, End)) })
         {
             while (Remainder--)
             {
@@ -51,22 +51,20 @@ namespace egg::Hash
     {
         using TraitsType = Internal::Murmur2Traits<SizeType>;
 
-        constexpr SizeType AlignMask { 0x7ull };
-
         SizeType Hash { Seed ^ Data.size() * TraitsType::Multiplier };
 
-        const ByteType* const End { Data.data() + (Data.size() & ~AlignMask) };
+        const ByteType* const End { Data.data() + (Data.size() & ~TraitsType::AlignMask) };
 
-        for (const ByteType* First = Data.data(); First != End; First += 8)
+        for (const ByteType* First = Data.data(); First != End; First += Memory::BitsIn<1u>)
         {
             const SizeType Chunk { Memory::UnalignedLoad<SizeType>(First) * TraitsType::Multiplier };
             Hash ^= Memory::ShiftMix(Chunk, TraitsType::ShiftBits) * TraitsType::Multiplier;
             Hash *= TraitsType::Multiplier;
         }
 
-        if (Data.size() & AlignMask)
+        if (Data.size() & TraitsType::AlignMask)
         {
-            Hash ^= Memory::LoadBytes<SizeType>({ End, Data.size() & AlignMask });
+            Hash ^= Memory::LoadBytes<SizeType>({ End, Data.size() & TraitsType::AlignMask });
             Hash *= TraitsType::Multiplier;
         }
 

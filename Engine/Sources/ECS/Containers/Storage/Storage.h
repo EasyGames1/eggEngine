@@ -4,12 +4,14 @@
 #include "./Internal/StorageIterator.h"
 
 #include <Containers/IterableAdaptor.h>
+#include <Containers/PagedVector/PagedVector.h>
 #include <ECS/Entity.h>
 #include <ECS/Containers/Container.h>
 #include <ECS/Containers/SparseSet/SparseSet.h>
 #include <ECS/Traits/PageSizeTraits.h>
-#include <Types/Traits/Capabilities.h>
+#include <Types/Capabilities/Capabilities.h>
 
+#include <iterator>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
@@ -18,7 +20,6 @@ namespace egg::ECS::Containers
 {
     template <typename Element, typename Entity>
     concept OptimizableElement = ValidEntity<Entity> && (std::same_as<Element, Entity> || !PageSizeTraits<Element>::value);
-
 
     template <typename Type, ValidEntity EntityParameter, Types::ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
     class Storage : public SparseSet<EntityParameter,
@@ -31,8 +32,8 @@ namespace egg::ECS::Containers
         using BaseType = SparseSet<EntityParameter, typename ContainerAllocatorTraits::template rebind_alloc<EntityParameter>>;
         using AllocatorType = AllocatorParameter;
 
-        using ElementType = Type;
-        using EntityType = EntityParameter;
+        using ElementType = typename ContainerType::ValueType;
+        using EntityType = typename BaseType::EntityType;
 
         using Pointer = typename ContainerType::ConstPointer;
         using ConstPointer = typename ContainerType::ConstPointer;
@@ -46,19 +47,19 @@ namespace egg::ECS::Containers
         using ConstReverseIterator = typename ContainerType::ConstReverseIterator;
 
         using EachIterator = Internal::StorageIterator<typename BaseType::Iterator, Iterator>;
-        using ConstEachIterator = Internal::StorageIterator<typename BaseType::ConstIterator, ConstIterator>;
-        using ReverseEachIterator = Internal::StorageIterator<typename BaseType::ReverseIterator, ReverseIterator>;
-        using ConstReverseEachIterator = Internal::StorageIterator<typename BaseType::ConstReverseIterator, ConstReverseIterator>;
+        using EachConstIterator = Internal::StorageIterator<typename BaseType::ConstIterator, ConstIterator>;
+        using EachReverseIterator = Internal::StorageIterator<typename BaseType::ReverseIterator, ReverseIterator>;
+        using EachConstReverseIterator = Internal::StorageIterator<typename BaseType::ConstReverseIterator, ConstReverseIterator>;
 
-        using ElementIterable = egg::Containers::IterableAdaptor<Iterator>;
-        using ConstElementIterable = egg::Containers::IterableAdaptor<ConstIterator>;
-        using ReverseElementIterable = egg::Containers::IterableAdaptor<ReverseIterator>;
-        using ConstReverseElementIterable = egg::Containers::IterableAdaptor<ConstReverseIterator>;
+        using ElementsIterable = egg::Containers::IterableAdaptor<Iterator>;
+        using ElementsConstIterable = egg::Containers::IterableAdaptor<ConstIterator>;
+        using ElementsReverseIterable = egg::Containers::IterableAdaptor<ReverseIterator>;
+        using ElementsConstReverseIterable = egg::Containers::IterableAdaptor<ConstReverseIterator>;
 
         using EachIterable = egg::Containers::IterableAdaptor<EachIterator>;
-        using ConstEachIterable = egg::Containers::IterableAdaptor<ConstEachIterator>;
-        using ReverseEachIterable = egg::Containers::IterableAdaptor<ReverseEachIterator>;
-        using ConstReverseEachIterable = egg::Containers::IterableAdaptor<ConstReverseEachIterator>;
+        using EachConstIterable = egg::Containers::IterableAdaptor<EachConstIterator>;
+        using EachReverseIterable = egg::Containers::IterableAdaptor<EachReverseIterator>;
+        using EachConstReverseIterable = egg::Containers::IterableAdaptor<EachConstReverseIterator>;
 
 
         constexpr Storage() : Storage { AllocatorType {} }
@@ -126,15 +127,15 @@ namespace egg::ECS::Containers
             }
         }
 
-        template <typename IteratorType>
-        constexpr Iterator Insert(IteratorType First, IteratorType Last, const ElementType& Value = {})
+        template <typename IteratorType, std::sentinel_for<IteratorType> SentinelType>
+        constexpr Iterator Insert(IteratorType First, SentinelType Last, const ElementType& Value = {})
         {
             for (; First != Last; ++First)
             {
                 EmplaceElement(*First, Value);
             }
 
-            return Payload.Begin(BaseType::GetSize());
+            return ElementsBegin();
         }
 
         template <typename EntityIteratorType, typename ContainerIteratorType>
@@ -146,14 +147,14 @@ namespace egg::ECS::Containers
                 EmplaceElement(*First, *From);
             }
 
-            return Payload.Begin(BaseType::GetSize());
+            return ElementsBegin();
         }
 
-        template <typename... Func>
-        constexpr ElementType& Patch(const EntityType Entity, Func&&... Functions)
+        template <typename... CallableTypes>
+        constexpr ElementType& Patch(const EntityType Entity, CallableTypes&&... Callables)
         {
             auto& Element { Payload.GetReference(BaseType::GetIndex(Entity)) };
-            (std::forward<Func>(Functions)(Element), ...);
+            (std::forward<CallableTypes>(Callables)(Element), ...);
             return Element;
         }
 
@@ -166,6 +167,12 @@ namespace egg::ECS::Containers
                 BaseType::Erase(First);
                 ContainerAllocatorTraits::destroy(Allocator, std::addressof(Payload.GetReference(First.GetIndex())));
             }
+        }
+
+        constexpr void SwapElementsAt(const std::size_t Left, const std::size_t Right) override
+        {
+            BaseType::SwapElementsAt(Left, Right);
+            SwapPayloadAt(Left, Right);
         }
 
         constexpr void Reserve(const std::size_t Capacity) override
@@ -181,76 +188,184 @@ namespace egg::ECS::Containers
             ShrinkToSize(BaseType::GetSize());
         }
 
-        [[nodiscard]] constexpr ElementIterable Element() noexcept
+        [[nodiscard]] constexpr Iterator ElementsBegin() noexcept
         {
-            return { Payload.Begin(BaseType::GetSize()), Payload.End() };
+            return Payload.Begin(BaseType::GetSize());
         }
 
-        [[nodiscard]] constexpr ConstElementIterable Element() const noexcept
+        [[nodiscard]] constexpr ConstIterator ElementsBegin() const noexcept
         {
-            return { Payload.Begin(BaseType::GetSize()), Payload.End() };
+            return Payload.Begin(BaseType::GetSize());
         }
 
-        [[nodiscard]] constexpr ConstElementIterable ConstElement() const noexcept
+        [[nodiscard]] constexpr ConstIterator ElementsConstBegin() const noexcept
         {
-            return Element();
+            return ElementsBegin();
         }
 
-        [[nodiscard]] constexpr ReverseElementIterable ReverseElement() noexcept
+        [[nodiscard]] constexpr Iterator ElementsEnd() noexcept
         {
-            return { Payload.ReverseBegin(), Payload.ReverseEnd(BaseType::GetSize()) };
+            return Payload.End();
         }
 
-        [[nodiscard]] constexpr ConstReverseElementIterable ReverseElement() const noexcept
+        [[nodiscard]] constexpr ConstIterator ElementsEnd() const noexcept
         {
-            return { Payload.ReverseBegin(), Payload.ReverseEnd(BaseType::GetSize()) };
+            return Payload.End();
         }
 
-        [[nodiscard]] constexpr ConstReverseElementIterable ConstReverseElement() const noexcept
+        [[nodiscard]] constexpr ConstIterator ElementsConstEnd() const noexcept
         {
-            return ReverseElement();
+            return ElementsEnd();
+        }
+
+        [[nodiscard]] constexpr ReverseIterator ElementsReverseBegin() noexcept
+        {
+            return Payload.ReverseBegin();
+        }
+
+        [[nodiscard]] constexpr ConstReverseIterator ElementsReverseBegin() const noexcept
+        {
+            return Payload.ReverseBegin();
+        }
+
+        [[nodiscard]] constexpr ConstReverseIterator ElementsConstReverseBegin() const noexcept
+        {
+            return ElementsReverseBegin();
+        }
+
+        [[nodiscard]] constexpr ReverseIterator ElementsReverseEnd() noexcept
+        {
+            return Payload.ReverseEnd(BaseType::GetSize());
+        }
+
+        [[nodiscard]] constexpr ConstReverseIterator ElementsReverseEnd() const noexcept
+        {
+            return Payload.ReverseEnd(BaseType::GetSize());
+        }
+
+        [[nodiscard]] constexpr ConstReverseIterator ElementsConstReverseEnd() const noexcept
+        {
+            return ElementsReverseEnd();
+        }
+
+        [[nodiscard]] constexpr ElementsIterable Elements() noexcept
+        {
+            return ElementsIterable { ElementsBegin(), ElementsEnd() };
+        }
+
+        [[nodiscard]] constexpr ElementsConstIterable Elements() const noexcept
+        {
+            return ElementsConstIterable { ElementsBegin(), ElementsEnd() };
+        }
+
+        [[nodiscard]] constexpr ElementsConstIterable ElementsConst() const noexcept
+        {
+            return Elements();
+        }
+
+        [[nodiscard]] constexpr ElementsReverseIterable ElementsReverse() noexcept
+        {
+            return ElementsReverseIterable { ElementsReverseBegin(), ElementsReverseEnd() };
+        }
+
+        [[nodiscard]] constexpr ElementsConstReverseIterable ElementsReverse() const noexcept
+        {
+            return ElementsConstReverseIterable { ElementsReverseBegin(), ElementsReverseEnd() };
+        }
+
+        [[nodiscard]] constexpr ElementsConstReverseIterable ElementsConstReverse() const noexcept
+        {
+            return ElementsReverse();
+        }
+
+        [[nodiscard]] constexpr EachIterator EachBegin() noexcept
+        {
+            return EachIterator { BaseType::Begin(), ElementsBegin() };
+        }
+
+        [[nodiscard]] constexpr EachConstIterator EachBegin() const noexcept
+        {
+            return EachConstIterator { BaseType::Begin(), ElementsBegin() };
+        }
+
+        [[nodiscard]] constexpr EachConstIterator EachConstBegin() const noexcept
+        {
+            return EachBegin();
+        }
+
+        [[nodiscard]] constexpr EachIterator EachEnd() noexcept
+        {
+            return EachIterator { BaseType::End(), ElementsEnd() };
+        }
+
+        [[nodiscard]] constexpr EachConstIterator EachEnd() const noexcept
+        {
+            return EachConstIterator { BaseType::End(), ElementsEnd() };
+        }
+
+        [[nodiscard]] constexpr EachConstIterator EachConstEnd() const noexcept
+        {
+            return EachEnd();
+        }
+
+        [[nodiscard]] constexpr EachReverseIterator EachReverseBegin() noexcept
+        {
+            return EachReverseIterator { BaseType::ReverseBegin(), ElementsReverseBegin() };
+        }
+
+        [[nodiscard]] constexpr EachConstReverseIterator EachReverseBegin() const noexcept
+        {
+            return EachConstReverseIterator { BaseType::ReverseBegin(), ElementsReverseBegin() };
+        }
+
+        [[nodiscard]] constexpr EachConstReverseIterator EachConstReverseBegin() const noexcept
+        {
+            return EachReverseBegin();
+        }
+
+        [[nodiscard]] constexpr EachReverseIterator EachReverseEnd() noexcept
+        {
+            return EachReverseIterator { BaseType::ReverseEnd(), ElementsReverseEnd() };
+        }
+
+        [[nodiscard]] constexpr EachConstReverseIterator EachReverseEnd() const noexcept
+        {
+            return EachConstReverseIterator { BaseType::ReverseEnd(), ElementsReverseEnd() };
+        }
+
+        [[nodiscard]] constexpr EachConstReverseIterator EachConstReverseEnd() const noexcept
+        {
+            return EachReverseEnd();
         }
 
         [[nodiscard]] constexpr EachIterable Each() noexcept
         {
-            return {
-                EachIterator { BaseType::Begin(), Payload.Begin(BaseType::GetSize()) },
-                EachIterator { BaseType::End(), Payload.End() }
-            };
+            return EachIterable { EachBegin(), EachEnd() };
         }
 
-        [[nodiscard]] constexpr ConstEachIterable Each() const noexcept
+        [[nodiscard]] constexpr EachConstIterable Each() const noexcept
         {
-            return {
-                ConstEachIterator { BaseType::Begin(), Payload.Begin(BaseType::GetSize()) },
-                ConstEachIterator { BaseType::End(), Payload.End() }
-            };
+            return EachConstIterable { EachBegin(), EachEnd() };
         }
 
-        [[nodiscard]] constexpr ConstEachIterable ConstEach() const noexcept
+        [[nodiscard]] constexpr EachConstIterable EachConst() const noexcept
         {
             return Each();
         }
 
-        [[nodiscard]] constexpr ReverseEachIterable ReverseEach() noexcept
+        [[nodiscard]] constexpr EachReverseIterable EachReverse() noexcept
         {
-            return {
-                ReverseEachIterator { BaseType::ReverseBegin(), Payload.ReverseBegin() },
-                ReverseEachIterator { BaseType::ReverseEnd(), Payload.ReverseEnd(BaseType::GetSize()) }
-            };
+            return EachReverseIterable { EachReverseBegin(), EachReverseEnd() };
         }
 
-        [[nodiscard]] constexpr ConstReverseEachIterable ReverseEach() const noexcept
+        [[nodiscard]] constexpr EachConstReverseIterable EachReverse() const noexcept
         {
-            return {
-                ConstReverseEachIterator { BaseType::ReverseBegin(), Payload.ReverseBegin() },
-                ConstReverseEachIterator { BaseType::ReverseEnd(), Payload.ReverseEnd(BaseType::GetSize()) }
-            };
+            return EachConstReverseIterable { EachReverseBegin(), EachReverseEnd() };
         }
 
-        [[nodiscard]] constexpr ConstReverseEachIterable ConstReverseEach() const noexcept
+        [[nodiscard]] constexpr EachConstReverseIterable EachConstReverse() const noexcept
         {
-            return ReverseEach();
+            return EachReverse();
         }
 
         [[nodiscard]] constexpr ElementType& Get(const EntityType Entity) noexcept
@@ -261,16 +376,6 @@ namespace egg::ECS::Containers
         [[nodiscard]] constexpr const ElementType& Get(const EntityType Entity) const noexcept
         {
             return Payload.GetReference(BaseType::GetIndex(Entity));
-        }
-
-        [[nodiscard]] constexpr std::tuple<ElementType&> GetAsTuple(const EntityType Entity) noexcept
-        {
-            return std::forward_as_tuple(Get(Entity));
-        }
-
-        [[nodiscard]] constexpr std::tuple<const ElementType&> GetAsTuple(const EntityType Entity) const noexcept
-        {
-            return std::forward_as_tuple(Get(Entity));
         }
 
         [[nodiscard]] constexpr std::size_t GetCapacity() const noexcept override
@@ -327,12 +432,6 @@ namespace egg::ECS::Containers
         {
             BaseType::UpdateToPacked(Index, LeftIndex, RightIndex);
             SwapPayloadAt(LeftIndex, RightIndex);
-        }
-
-        constexpr void SwapAt(const std::size_t Left, const std::size_t Right) override
-        {
-            BaseType::SwapAt(Left, Right);
-            SwapPayloadAt(Left, Right);
         }
 
         constexpr void SwapPayloadAt(const std::size_t Left, const std::size_t Right)

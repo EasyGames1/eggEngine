@@ -8,10 +8,11 @@
 #include <Containers/Container.h>
 #include <Containers/CompressedPair/CompressedPair.h>
 #include <Math/Math.h>
-#include <Types/Traits/Capabilities.h>
+#include <Types/Capabilities/Capabilities.h>
 
 #include <algorithm>
 #include <cmath>
+#include <iterator>
 #include <limits>
 #include <utility>
 #include <vector>
@@ -161,8 +162,8 @@ namespace egg::Containers
             return InsertOrDoNothing(std::forward<Arg>(Value).first, std::forward<Arg>(Value).second);
         }
 
-        template <typename IteratorType>
-        constexpr void Insert(IteratorType First, IteratorType Last)
+        template <typename IteratorType, std::sentinel_for<IteratorType> SentinelType>
+        constexpr void Insert(IteratorType First, SentinelType Last)
         {
             for (; First != Last; ++First)
             {
@@ -202,7 +203,7 @@ namespace egg::Containers
                 auto& Node { Packed.GetFirst().emplace_back(GetSize(), std::forward<Args>(Arguments)...) };
                 const auto Index { GetBucketIndex(Node.Value.first) };
 
-                if (auto It = FindInBucket(Node.Value.first, Index); It != End())
+                if (auto It { FindInBucket(Node.Value.first, Index) }; It != End())
                 {
                     Packed.GetFirst().pop_back();
                     return std::make_pair(It, false);
@@ -275,7 +276,7 @@ namespace egg::Containers
                 )
             };
 
-            if (const auto Size = std::bit_ceil(Value); Size != GetBucketCount())
+            if (const auto Size { std::bit_ceil(Value) }; Size != GetBucketCount())
             {
                 Sparse.GetFirst().resize(Size);
 
@@ -512,7 +513,7 @@ namespace egg::Containers
         {
             const auto Index { GetBucketIndex(Key) };
 
-            if (auto It = FindInBucket(Key, Index); It != End())
+            if (auto It { FindInBucket(Key, Index) }; It != End())
             {
                 return std::make_pair(It, false);
             }
@@ -534,7 +535,7 @@ namespace egg::Containers
         {
             const auto Index { GetBucketIndex(Key) };
 
-            if (auto It = FindInBucket(Key, Index); It != End())
+            if (auto It { FindInBucket(Key, Index) }; It != End())
             {
                 It->second = std::forward<Arg>(Value);
                 return std::make_pair(It, false);
@@ -580,7 +581,7 @@ namespace egg::Containers
 
         constexpr void MoveAndPop(const std::size_t Position)
         {
-            if (const auto Last = GetSize() - 1u; Position != Last)
+            if (const auto Last { GetSize() - 1u }; Position != Last)
             {
                 std::size_t* Current { &Sparse.GetFirst()[GetBucketIndex(Packed.GetFirst().back().Value.first)] };
                 Packed.GetFirst()[Position] = std::move(Packed.GetFirst().back());

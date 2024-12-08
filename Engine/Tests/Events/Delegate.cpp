@@ -1,5 +1,6 @@
 #include "../CommonFunctions.h"
 
+#include <Events/ConnectionArgument.h>
 #include <Events/Delegate.h>
 #include <gtest/gtest.h>
 

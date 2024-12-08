@@ -34,11 +34,11 @@ namespace egg::Events
         }
 
         template <std::convertible_to<Args>...Other>
-        constexpr explicit Action(DelegateType Invocable, Other&&... Arguments)
+        constexpr explicit Action(DelegateType Callable, Other&&... Arguments)
             noexcept (std::is_nothrow_constructible_v<ArgumentsTuple, Other&&...>)
             : Callable {
                 std::piecewise_construct,
-                std::forward_as_tuple(Invocable),
+                std::forward_as_tuple(Callable),
                 std::forward_as_tuple(std::forward<Other>(Arguments)...)
             }
         {
@@ -46,16 +46,16 @@ namespace egg::Events
 
         constexpr ResultType operator()() const noexcept(std::is_nothrow_invocable_r_v<ResultType, DelegateType, Args...>)
         {
-            EGG_ASSERT(static_cast<bool>(Callable.GetFirst()), "Uninitialized Invocable");
+            EGG_ASSERT(static_cast<bool>(Callable.GetFirst()), "Uninitialized Callable");
             return std::apply(Callable.GetFirst(), Callable.GetSecond());
         }
 
-        [[nodiscard]] constexpr DelegateType& GetInvocable() noexcept
+        [[nodiscard]] constexpr DelegateType& GetCallable() noexcept
         {
             return Callable.GetFirst();
         }
 
-        [[nodiscard]] constexpr const DelegateType& GetInvocable() const noexcept
+        [[nodiscard]] constexpr const DelegateType& GetCallable() const noexcept
         {
             return Callable.GetFirst();
         }

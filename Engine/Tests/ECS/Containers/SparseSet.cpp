@@ -3,7 +3,7 @@
 #include <ECS/Containers/SparseSet/SparseSet.h>
 #include <Events/Delegate.h>
 #include <gtest/gtest.h>
-#include <Types/TypeInfo.h>
+#include <Types/TypeInfo/TypeInfo.h>
 
 class SparseSetTest : public testing::Test
 {
@@ -314,7 +314,7 @@ TEST_F(SparseSetTest, Sort)
             {
                 if (auto Second { Sparse.Find(Entities[j]) }; Second != Sparse.End())
                 {
-                    EXPECT_FALSE(Compare{}(First.GetIndex(), Second.GetIndex()));
+                    EXPECT_TRUE(Compare{}(First, Second));
                 }
             }
         }
@@ -444,7 +444,7 @@ TEST_F(SparseSetIteratorTest, Subscript)
 {
     for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
-        EXPECT_EQ(End[i + 1u], Sparse[i]);
+        EXPECT_EQ(Begin[i], Sparse[GetReversedIndex(i)]);
     }
 }
 

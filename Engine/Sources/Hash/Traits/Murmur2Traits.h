@@ -33,7 +33,8 @@ namespace egg::Hash::Internal
         static constexpr SizeType Multiplier {
             (0xc6a4a793ull << Memory::BitsIn<4ull>) + static_cast<SizeType>(BasicMurmur2Traits<std::uint32_t>::Multiplier)
         };
-        static constexpr SizeType ShiftBits { 47u };
+        static constexpr SizeType ShiftBits { 47ull };
+        static constexpr SizeType AlignMask { 7ull };
     };
 
 

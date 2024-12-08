@@ -104,7 +104,7 @@ namespace CommonFunctions
         template <bool IsNoExcept>
         [[nodiscard]] consteval static auto VoidNoArgs() noexcept(IsNoExcept)
         {
-            return []() -> void
+            return []() constexpr noexcept -> void
             {
             };
         }
@@ -112,7 +112,7 @@ namespace CommonFunctions
         template <bool IsNoExcept>
         [[nodiscard]] consteval static auto VoidInt() noexcept(IsNoExcept)
         {
-            return [](int) -> void
+            return [](int) constexpr noexcept -> void
             {
             };
         }
@@ -120,7 +120,7 @@ namespace CommonFunctions
         template <bool IsNoExcept>
         [[nodiscard]] consteval static auto VoidObject() noexcept(IsNoExcept)
         {
-            return [](Helper&) -> void
+            return [](Helper&) constexpr noexcept -> void
             {
             };
         }
@@ -128,7 +128,7 @@ namespace CommonFunctions
         template <bool IsNoExcept>
         [[nodiscard]] consteval static auto VoidObjectInt() noexcept(IsNoExcept)
         {
-            return [](Helper&, int) -> void
+            return [](Helper&, int) constexpr noexcept -> void
             {
             };
         }

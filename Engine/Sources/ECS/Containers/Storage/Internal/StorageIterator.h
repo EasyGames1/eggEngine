@@ -3,41 +3,45 @@
 
 #include <Containers/PointerImitator.h>
 
+#include <iterator>
 #include <tuple>
 
 namespace egg::ECS::Containers::Internal
 {
-    template <typename IteratorParameter, typename... OtherTypes>
+    template <typename EntityIteratorParameter, typename ElementIteratorParameter>
     class StorageIterator final
     {
     public:
-        using IteratorType = IteratorParameter;
-        using value_type = decltype(std::tuple_cat(std::make_tuple(*std::declval<IteratorType>()),
-                                                   std::forward_as_tuple(*std::declval<OtherTypes>()...)));
+        using EntityIteratorType = EntityIteratorParameter;
+        using ElementIteratorType = ElementIteratorParameter;
+        using value_type = std::tuple<std::iter_value_t<EntityIteratorType>,
+                                      std::add_rvalue_reference_t<std::iter_reference_t<ElementIteratorType>>>;
         using pointer = egg::Containers::PointerImitator<value_type>;
         using reference = value_type;
         using difference_type = std::ptrdiff_t;
         using iterator_category = std::input_iterator_tag;
-        using iterator_concept = std::random_access_iterator_tag;
+        using iterator_concept = std::forward_iterator_tag;
 
 
-        constexpr StorageIterator() : Iterators {}
+        constexpr StorageIterator() : EntityIterator {}, ElementIterator {}
         {
         }
 
-        constexpr explicit StorageIterator(IteratorType Base, OtherTypes... Other) : Iterators { Base, Other... }
+        constexpr explicit StorageIterator(EntityIteratorType EntityIterator, ElementIteratorType ElementIterator)
+            : EntityIterator { EntityIterator }, ElementIterator { ElementIterator }
         {
         }
 
-        template <std::convertible_to<OtherTypes>... Args> requires (!std::same_as<Args, OtherTypes> && ...)
-        constexpr explicit StorageIterator(const StorageIterator<IteratorType, Args...>& Other) : Iterators { Other.Iterators }
+        template <std::convertible_to<ElementIteratorType> OtherIterator> requires (!std::same_as<OtherIterator, ElementIteratorType>)
+        constexpr explicit StorageIterator(const StorageIterator<EntityIteratorType, OtherIterator>& Other)
+            : EntityIterator { Other.EntityIterator }, ElementIterator { Other.ElementIterator }
         {
         }
 
         constexpr StorageIterator& operator++() noexcept
         {
-            ++std::get<IteratorType>(Iterators);
-            (++std::get<OtherTypes>(Iterators), ...);
+            ++EntityIterator;
+            ++ElementIterator;
             return *this;
         }
 
@@ -48,47 +52,6 @@ namespace egg::ECS::Containers::Internal
             return Original;
         }
 
-        constexpr StorageIterator& operator--() noexcept
-        {
-            --std::get<IteratorType>(Iterators);
-            (--std::get<OtherTypes>(Iterators), ...);
-            return *this;
-        }
-
-        constexpr StorageIterator operator--(int) noexcept
-        {
-            StorageIterator Original { *this };
-            --*this;
-            return Original;
-        }
-
-        constexpr StorageIterator& operator+=(const difference_type Value) noexcept
-        {
-            std::get<IteratorType>(Iterators) += Value;
-            ((std::get<OtherTypes>(Iterators) += Value), ...);
-            return *this;
-        }
-
-        constexpr StorageIterator operator+(const difference_type Value) const noexcept
-        {
-            return StorageIterator { *this } += Value;
-        }
-
-        constexpr StorageIterator& operator-=(const difference_type Value) noexcept
-        {
-            return *this += -Value;
-        }
-
-        constexpr StorageIterator operator-(const difference_type Value) const noexcept
-        {
-            return *this + -Value;
-        }
-
-        [[nodiscard]] constexpr reference operator[](const difference_type Value) const noexcept
-        {
-            return { std::get<IteratorType>(Iterators)[Value], std::get<OtherTypes>(Iterators)[Value]... };
-        }
-
         [[nodiscard]] constexpr pointer operator->() const noexcept
         {
             return pointer { operator*() };
@@ -96,58 +59,24 @@ namespace egg::ECS::Containers::Internal
 
         [[nodiscard]] constexpr reference operator*() const noexcept
         {
-            return { *std::get<IteratorType>(Iterators), *std::get<OtherTypes>(Iterators)... };
+            return { *EntityIterator, *ElementIterator };
         }
 
-        [[nodiscard]] constexpr IteratorType Base() const noexcept
+        template <std::convertible_to<ElementIteratorType> OtherIterator>
+        [[nodiscard]] constexpr bool operator==(const StorageIterator<EntityIteratorType, OtherIterator>& Other) const noexcept
         {
-            return std::get<IteratorType>(Iterators);
+            return EntityIterator == Other.EntityIterator;
         }
 
-        template <typename... Arguments>
-        [[nodiscard]] constexpr difference_type operator-(const StorageIterator<Arguments...>& Other) const noexcept
-        {
-            return std::get<0u>(Iterators) - std::get<0u>(Other.Iterators);
-        }
-
-        template <typename... Arguments>
-        [[nodiscard]] constexpr bool operator==(const StorageIterator<Arguments...>& Other) const noexcept
-        {
-            return std::get<0u>(Iterators) == std::get<0u>(Other.Iterators);
-        }
-
-        template <typename... Arguments>
-        [[nodiscard]] constexpr bool operator!=(const StorageIterator<Arguments...>& Other) const noexcept
+        template <std::convertible_to<ElementIteratorType> OtherIterator>
+        [[nodiscard]] constexpr bool operator!=(const StorageIterator<EntityIteratorType, OtherIterator>& Other) const noexcept
         {
             return !(*this == Other);
         }
 
-        template <typename... Arguments>
-        [[nodiscard]] constexpr bool operator<(const StorageIterator<Arguments...>& Other) const noexcept
-        {
-            return std::get<0u>(Iterators) < std::get<0u>(Other.Iterators);
-        }
-
-        template <typename... Arguments>
-        [[nodiscard]] constexpr bool operator>(const StorageIterator<Arguments...>& Other) const noexcept
-        {
-            return Other < *this;
-        }
-
-        template <typename... Arguments>
-        [[nodiscard]] constexpr bool operator<=(const StorageIterator<Arguments...>& Other) const noexcept
-        {
-            return !(*this > Other);
-        }
-
-        template <typename... Arguments>
-        [[nodiscard]] constexpr bool operator>=(const StorageIterator<Arguments...>& Other) const noexcept
-        {
-            return !(*this < Other);
-        }
-
     private:
-        std::tuple<IteratorType, OtherTypes...> Iterators;
+        EntityIteratorType EntityIterator;
+        ElementIteratorType ElementIterator;
     };
 }
 

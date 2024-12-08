@@ -1,7 +1,7 @@
 #ifndef ENGINE_SOURCES_CONTAINERS_COMPRESSED_PAIR_FILE_COMPRESSED_PAIR_ELEMENT_H
 #define ENGINE_SOURCES_CONTAINERS_COMPRESSED_PAIR_FILE_COMPRESSED_PAIR_ELEMENT_H
 
-#include <Types/Traits/Capabilities.h>
+#include <Types/Capabilities/Capabilities.h>
 
 #include <cstddef>
 #include <tuple>

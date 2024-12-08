@@ -6,7 +6,7 @@
 #include <Events/EventLoop.h>
 #include <Events/EventLoopInterface.h>
 #include <Memory/Utils.h>
-#include <Types/TypeInfo.h>
+#include <Types/TypeInfo/TypeInfo.h>
 #include <Types/Types.h>
 
 #include <memory>
@@ -200,7 +200,7 @@ namespace egg::Events
         template <Types::Decayed Type>
         [[nodiscard]] constexpr const EventLoopType<Type>* Find(const Types::TypeID Identifier) const
         {
-            if (auto It = EventLoops.GetFirst().Find(Identifier); It != EventLoops.GetFirst().ConstEnd())
+            if (auto It { EventLoops.GetFirst().Find(Identifier) }; It != EventLoops.GetFirst().ConstEnd())
             {
                 return static_cast<const EventLoopType<Type>*>(It->second.get());
             }

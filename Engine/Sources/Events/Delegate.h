@@ -2,9 +2,11 @@
 #define ENGINE_SOURCES_EVENTS_FILE_DELEGATE_H
 
 #include <Config/Config.h>
+#include <Events/ConnectionArgument.h>
+#include <Events/Traits/FunctionPointerTraits.h>
 #include <Events/Traits/FunctorOverloadTraits.h>
-#include <Events/Traits/InvocablePointerTraits.h>
-#include <Types/Traits/Constness.h>
+#include <Types/Constness.h>
+
 
 #include <functional>
 #include <tuple>
@@ -12,16 +14,6 @@
 
 namespace egg::Events
 {
-    template <auto>
-    struct ConnectionArgumentType
-    {
-        constexpr explicit ConnectionArgumentType() = default;
-    };
-
-    template <auto Candidate>
-    inline constexpr ConnectionArgumentType<Candidate> ConnectionArgument {};
-
-
     template <typename>
     class Delegate;
 
@@ -54,62 +46,62 @@ namespace egg::Events
             Connect<Candidate>(ValueOrInstance);
         }
 
-        constexpr explicit Delegate(WrappedSignature* WrappedInvocable) noexcept
+        constexpr explicit Delegate(WrappedSignature* WrappedCallable) noexcept
         {
-            Connect(WrappedInvocable);
+            Connect(WrappedCallable);
         }
 
         template <typename Type>
-        constexpr Delegate(WrappedSignature* WrappedInvocable, Type& Payload) noexcept
+        constexpr Delegate(WrappedSignature* WrappedCallable, Type& Payload) noexcept
         {
-            Connect(WrappedInvocable, Payload);
+            Connect(WrappedCallable, Payload);
         }
 
         template <auto Candidate>
         constexpr void Connect() noexcept
         {
             Instance = nullptr;
-            Function = GetWrapped<Candidate>();
+            Callable = GetWrapped<Candidate>();
         }
 
         template <auto Candidate, typename Type> requires ValidValueOrInstance<Type&, decltype(Candidate)>
         constexpr void Connect(Type& ValueOrInstance) noexcept
         {
             Instance = &ValueOrInstance;
-            Function = GetWrapped<Candidate, Type&>();
+            Callable = GetWrapped<Candidate, Type&>();
         }
 
         template <auto Candidate, typename Type> requires ValidValueOrInstance<Type*, decltype(Candidate)>
         constexpr void Connect(Type* ValueOrInstance) noexcept
         {
             Instance = ValueOrInstance;
-            Function = GetWrapped<Candidate, Type*>();
+            Callable = GetWrapped<Candidate, Type*>();
         }
 
-        constexpr void Connect(WrappedSignature* WrappedInvocable) noexcept
+        constexpr void Connect(WrappedSignature* WrappedCallable) noexcept
         {
-            EGG_ASSERT(WrappedInvocable, "Uninitialized function pointer");
+            EGG_ASSERT(WrappedCallable, "Uninitialized function pointer");
             Instance = nullptr;
-            Function = WrappedInvocable;
+            Callable = WrappedCallable;
         }
 
         template <typename Type>
-        constexpr void Connect(WrappedSignature* WrappedInvocable, Type& Payload) noexcept
+        constexpr void Connect(WrappedSignature* WrappedCallable, Type& Payload) noexcept
         {
-            EGG_ASSERT(WrappedInvocable, "Uninitialized function pointer");
+            EGG_ASSERT(WrappedCallable, "Uninitialized function pointer");
             Instance = &Payload;
-            Function = WrappedInvocable;
+            Callable = WrappedCallable;
         }
 
         constexpr void Reset() noexcept
         {
             Instance = nullptr;
-            Function = nullptr;
+            Callable = nullptr;
         }
 
         [[nodiscard]] constexpr WrappedSignature* GetFunction() const noexcept
         {
-            return Function;
+            return Callable;
         }
 
         [[nodiscard]] constexpr const void* GetInstance() const noexcept
@@ -121,17 +113,17 @@ namespace egg::Events
             noexcept(std::is_nothrow_invocable_r_v<ResultType, WrappedSignature, const void*, Args...>)
         {
             EGG_ASSERT(static_cast<bool>(*this), "Uninitialized delegate");
-            return std::invoke_r<ResultType>(Function, Instance, std::forward<Args>(Arguments)...);
+            return std::invoke_r<ResultType>(Callable, Instance, std::forward<Args>(Arguments)...);
         }
 
         [[nodiscard]] constexpr explicit operator bool() const noexcept
         {
-            return Function;
+            return Callable;
         }
 
         [[nodiscard]] constexpr bool operator==(const Delegate& Other) const noexcept
         {
-            return Function == Other.Function && Instance == Other.Instance;
+            return Callable == Other.Callable && Instance == Other.Instance;
         }
 
         [[nodiscard]] constexpr bool operator!=(const Delegate& Other) const noexcept
@@ -155,7 +147,7 @@ namespace egg::Events
         template <auto Candidate, std::size_t... Indices>
         [[nodiscard]] static constexpr auto Wrap(std::index_sequence<Indices...>) noexcept
         {
-            return [](const void*, Args... Arguments) -> ResultType
+            return [](const void*, Args... Arguments) constexpr -> ResultType
             {
                 constexpr std::size_t Offset {
                     !std::is_invocable_r_v<ResultType, decltype(Candidate), std::tuple_element_t<Indices, std::tuple<Args...>>...>
@@ -181,7 +173,7 @@ namespace egg::Events
         template <auto Candidate, ValidValueOrInstance<decltype(Candidate)> Type, std::size_t... Indices>
         [[nodiscard]] static constexpr auto Wrap(std::index_sequence<Indices...>) noexcept
         {
-            return [](const void* Payload, Args... Arguments) -> ResultType
+            return [](const void* Payload, Args... Arguments) constexpr -> ResultType
             {
                 constexpr std::size_t Offset {
                     !std::is_invocable_r_v<ResultType, decltype(Candidate), Type, std::tuple_element_t<Indices, std::tuple<Args...>>...>
@@ -230,7 +222,7 @@ namespace egg::Events
                 constexpr bool MemberFunctor { ValidMemberFunctorOverload<decltype(Candidate), ResultType, Args...> };
                 std::is_invocable_r_v<ResultType, decltype(Candidate), Args...> && !MemberFunctor)
             {
-                return [](const void*, Args... Arguments) -> ResultType
+                return [](const void*, Args... Arguments) constexpr -> ResultType
                 {
                     return std::invoke_r<ResultType>(Candidate, std::forward<Args>(Arguments)...);
                 };
@@ -249,7 +241,7 @@ namespace egg::Events
                 if constexpr (MemberFunctor)
                 {
                     return Wrap<Candidate>(
-                        typename InvocablePointerTraits<
+                        typename FunctionPointerTraits<
                             MemberFunctorOverload<decltype(Candidate), ReturnType, Args...>
                         >::template IndexSequenceFor<InstanceType> {}
                     );
@@ -257,14 +249,14 @@ namespace egg::Events
                 else
                 {
                     return Wrap<Candidate>(
-                        typename InvocablePointerTraits<decltype(Candidate)>::template IndexSequenceFor<InstanceType> {}
+                        typename FunctionPointerTraits<decltype(Candidate)>::template IndexSequenceFor<InstanceType> {}
                     );
                 }
             }
             else
             {
                 return Wrap<Candidate>(
-                    typename InvocablePointerTraits<decltype(Candidate)>::template IndexSequenceFor<> {}
+                    typename FunctionPointerTraits<decltype(Candidate)>::template IndexSequenceFor<> {}
                 );
             }
         }
@@ -275,7 +267,7 @@ namespace egg::Events
             if constexpr (ValidMemberFunctorOverload<decltype(Candidate), ResultType, Type, Args...>)
             {
                 return Wrap<Candidate, Type>(
-                    typename InvocablePointerTraits<
+                    typename FunctionPointerTraits<
                         MemberFunctorOverload<decltype(Candidate), ResultType, Type, Args...>
                     >::template IndexSequenceFor<> {}
                 );
@@ -287,7 +279,7 @@ namespace egg::Events
             else
             {
                 return Wrap<Candidate, Type>(
-                    typename InvocablePointerTraits<
+                    typename FunctionPointerTraits<
                         decltype(Candidate),
                         Type
                     >::template IndexSequenceFor<> {}
@@ -296,18 +288,18 @@ namespace egg::Events
         }
 
         const void* Instance {};
-        WrappedSignature* Function {};
+        WrappedSignature* Callable {};
     };
 
 
     template <auto Candidate>
-    Delegate(ConnectionArgumentType<Candidate>) -> Delegate<typename InvocablePointerTraits<decltype(Candidate)>::Type>;
+    Delegate(ConnectionArgumentType<Candidate>) -> Delegate<typename FunctionPointerTraits<decltype(Candidate)>::Type>;
 
     template <auto Candidate, typename Type> requires ValidValueOrInstance<Type&, decltype(Candidate)>
-    Delegate(ConnectionArgumentType<Candidate>, Type&) -> Delegate<typename InvocablePointerTraits<decltype(Candidate), Type&>::Type>;
+    Delegate(ConnectionArgumentType<Candidate>, Type&) -> Delegate<typename FunctionPointerTraits<decltype(Candidate), Type&>::Type>;
 
     template <auto Candidate, typename Type> requires ValidValueOrInstance<Type*, decltype(Candidate)>
-    Delegate(ConnectionArgumentType<Candidate>, Type*) -> Delegate<typename InvocablePointerTraits<decltype(Candidate), Type*>::Type>;
+    Delegate(ConnectionArgumentType<Candidate>, Type*) -> Delegate<typename FunctionPointerTraits<decltype(Candidate), Type*>::Type>;
 
     template <typename ReturnType, typename... Args>
     Delegate(ReturnType (*)(const void*, Args...)) -> Delegate<ReturnType(Args...)>;

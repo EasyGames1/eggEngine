@@ -14,7 +14,7 @@ add_library(VulkanEngine_lib
         Sources/GUI/Window/Window.cpp
         Sources/Math/Math.cpp
         Sources/Config/Config.h
-        Sources/ECS/Containers/PagedVector/PagedVector.h
+        Sources/Containers/PagedVector/PagedVector.h
         Sources/ECS/Containers/SparseSet/SparseSet.h
         Sources/ECS/Containers/Storage/Storage.h
         Sources/ECS/Systems/Renderer/Renderer.h
@@ -38,24 +38,20 @@ add_library(VulkanEngine_lib
         Sources/Containers/Container.h
         Sources/Containers/IterableAdaptor.h
         Sources/Containers/PointerImitator.h
-        Sources/Types/TypeInfo.h
+        Sources/Types/TypeInfo/TypeInfo.h
         Sources/Hash/Hash.h
         Sources/Events/Delegate.h
-        Sources/Events/Traits/InvocablePointerTraits.h
-        Sources/Types/Internal/FunctionNameUtils.h
-        Sources/Types/Internal/TypeNameUtils.h
-        Sources/Types/Internal/TypeIndex.h
-        Sources/Types/Traits/Constness.h
-        Sources/Algorithms/Sorting/StandardSorting.h
-        Sources/Types/Traits/Deduction.h
+        Sources/Events/Traits/FunctionPointerTraits.h
+        Sources/Types/TypeInfo/Internal/FunctionNameUtils.h
+        Sources/Types/TypeInfo/Internal/TypeNameUtils.h
+        Sources/Types/TypeInfo/Internal/TypeIndex.h
         Sources/Events/Traits/FunctorOverloadTraits.h
         Sources/Events/Traits/Internal/FunctorOverloadTraits.h
         Sources/Containers/DenseMap/Internal/DenseMapIterator.h
         Sources/Containers/DenseMap/Internal/DenseMapLocalIterator.h
         Sources/ECS/Containers/SparseSet/Internal/SparseSetIterator.h
         Sources/ECS/Containers/Storage/Internal/StorageIterator.h
-        Sources/ECS/Containers/PagedVector/Internal/PagedVectorIterator.h
-        Sources/Types/Traits/Capabilities.h
+        Sources/Containers/PagedVector/Internal/PagedVectorIterator.h
         Sources/Events/Signal.h
         Sources/Events/Action.h
         Sources/Math/Traits/Capabilities.h
@@ -74,8 +70,27 @@ add_library(VulkanEngine_lib
         Sources/Types/Types.h
         Sources/ECS/Registry.h
         Sources/ECS/Containers/LifecycleContainer.h
-        Sources/Types/Traits/Internal/IsInstanceOf.h
-        Sources/Types/Traits/Internal/IsAnyOf.h
+        Sources/Types/Capabilities/Internal/IsInstanceOf.h
+        Sources/Types/Capabilities/Internal/IsAnyOf.h
+        Sources/ECS/Containers/Group/Group.h
+        Sources/ECS/Ownership.h
+        Sources/Types/Capabilities/Internal/IsAllSame.h
+        Sources/ECS/Containers/Group/Internal/GroupIterator.h
+        Sources/Types/Capabilities/Capabilities.h
+        Sources/Types/Constness.h
+        Sources/Types/Deduction/Deduction.h
+        Sources/Types/Capabilities/Internal/IsUniqueIn.h
+        Sources/Types/Capabilities/Internal/IsAllUnique.h
+        Sources/Types/Capabilities/Internal/IsContainedIn.h
+        Sources/Types/Capabilities/Internal/IsApplicable.h
+        Sources/Types/Deduction/Internal/RemoveTupleType.h
+        Sources/Types/Deduction/Internal/RemoveTupleIndex.h
+        Sources/Types/Deduction/Internal/FilterTuple.h
+        Sources/Types/Deduction/Internal/CombineTuples.h
+        Sources/Types/Deduction/Internal/MemberObjectPointerTraits.h
+        Sources/ECS/Containers/Group/Internal/GroupViewer.h
+        Sources/Types/Deduction/Internal/TypeIndexIn.h
+        Sources/Events/ConnectionArgument.h
 )
 
 target_include_directories(VulkanEngine_lib PRIVATE Sources)
