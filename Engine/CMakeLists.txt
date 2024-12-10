@@ -91,6 +91,7 @@ add_library(VulkanEngine_lib
         Sources/ECS/Containers/Group/Internal/GroupViewer.h
         Sources/Types/Deduction/Internal/TypeIndexIn.h
         Sources/Events/ConnectionArgument.h
+        Sources/Types/Deduction/Internal/InstantiateTuple.h
 )
 
 target_include_directories(VulkanEngine_lib PRIVATE Sources)

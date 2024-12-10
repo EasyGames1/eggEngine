@@ -3,6 +3,7 @@
 
 #include "./Internal/CombineTuples.h"
 #include "./Internal/FilterTuple.h"
+#include "./Internal/InstantiateTuple.h"
 #include "./Internal/MemberObjectPointerTraits.h"
 #include "./Internal/RemoveTupleIndex.h"
 #include "./Internal/RemoveTupleType.h"
@@ -22,8 +23,11 @@ namespace egg::Types
     template <template<typename...> typename Tuple, typename... Tuples>
     using CombineTuples = typename Internal::CombineTuples<Tuple, Tuples...>::type;
 
-    template <template<typename...> typename PredicateType, typename Tuple>
+    template <template<typename> typename PredicateType, typename Tuple>
     using FilterTuple = typename Internal::FilterTuple<PredicateType, Tuple>::type;
+
+    template <template<typename> typename Template, typename Tuple>
+    using InstantiateTuple = typename Internal::InstantiateTuple<Template, Tuple>::type;
 
     template <typename Type, typename Tuple>
     inline constexpr std::size_t TypeIndexIn = Internal::TypeIndexIn<Type, Tuple>::value;

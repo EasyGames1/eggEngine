@@ -115,7 +115,7 @@ namespace egg::ECS::Containers::Internal
             Types::Applicable<CallableType, Types::RemoveTupleType<EntityType, std::iter_reference_t<Iterator>>>
         constexpr void Each(const CommonIterator Begin, const CommonIterator End, CallableType Callable) const
         {
-            for (auto First = GetIterator(Begin), Last = GetIterator(End); First != Last; ++First)
+            for (Iterator First = GetIterator(Begin), Last = GetIterator(End); First != Last; ++First)
             {
                 if constexpr (Types::Applicable<CallableType, std::iter_reference_t<Iterator>>)
                 {

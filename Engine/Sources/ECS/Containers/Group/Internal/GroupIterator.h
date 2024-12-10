@@ -45,13 +45,21 @@ namespace egg::ECS::Containers::Internal
             return std::make_tuple();
         }
 
+        template <typename ElementType>
+        using StorablePredicate = std::bool_constant<!OptimizableElement<ElementType, std::iter_value_t<IteratorParameter>>>;
+
     public:
         using IteratorType = IteratorParameter;
         using value_type = Types::CombineTuples<
             std::tuple,
             std::tuple<std::iter_value_t<IteratorType>>,
-            decltype(GetElementAsTuple(std::declval<OwnParameters&>()))...,
-            decltype(GetElementAsTuple(std::declval<ViewParameters&>()))...
+            Types::InstantiateTuple<
+                std::add_lvalue_reference_t,
+                Types::FilterTuple<
+                    StorablePredicate,
+                    std::tuple<typename OwnParameters::ElementType..., typename ViewParameters::ElementType...>
+                >
+            >
         >;
         using pointer = egg::Containers::PointerImitator<value_type>;
         using reference = value_type;

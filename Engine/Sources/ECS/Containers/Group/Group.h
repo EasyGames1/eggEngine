@@ -458,18 +458,14 @@ namespace egg::ECS::Containers
     > requires
         (Types::InstanceOf<typename OwnParameters::ContainerType, Storage> && ...) &&
         (Types::InstanceOf<typename ViewParameters::ContainerType, Storage> && ...) &&
-        (sizeof...(OwnParameters) + sizeof...(ViewParameters) == 1u)
+        (sizeof...(OwnParameters) + sizeof...(ViewParameters) == 1u) &&
+        (!OptimizableElement<
+            CommonTypeOf<typename OwnParameters::ElementType..., typename ViewParameters::ElementType...>,
+            CommonTypeOf<typename OwnParameters::EntityType..., typename ViewParameters::EntityType...>>)
     class Group<OwnType<OwnParameters...>, ViewType<ViewParameters...>, ExcludeType<>>
     {
     public:
-        using PoolType = std::tuple_element_t<
-            0u,
-            std::conditional_t<
-                sizeof...(OwnParameters),
-                std::tuple<OwnParameters...>,
-                std::tuple<ViewParameters...>
-            >
-        >;
+        using PoolType = std::tuple_element_t<0u, std::tuple<OwnParameters..., ViewParameters...>>;
         using CommonType = typename PoolType::BaseType;
         using CommonAllocator = typename CommonType::AllocatorType;
 
@@ -486,7 +482,7 @@ namespace egg::ECS::Containers
         using ReverseIterator = typename PoolType::EachReverseIterator;
 
 
-        explicit constexpr Group(PoolType& Pool) : Pool { Pool }
+        constexpr explicit Group(PoolType& Pool) : Pool { Pool }
         {
         }
 
@@ -543,31 +539,23 @@ namespace egg::ECS::Containers
                 }
                 else
                 {
-                    std::apply([&Callable]<typename... ElementTypes>(EntityType, ElementTypes&&... Elements) constexpr
+                    std::apply([&Callable]<typename ElementParameter>(EntityType, ElementParameter&& Element) constexpr
                     {
-                        Callable(std::forward<ElementTypes>(Elements)...);
+                        Callable(std::forward<ElementParameter>(Element));
                     }, Arguments);
                 }
             }
         }
 
-        [[nodiscard]] constexpr ElementType& Get(const EntityType Entity) const requires (!OptimizableElement<ElementType, EntityType>)
+        [[nodiscard]] constexpr ElementType& Get(const EntityType Entity) const
         {
             return Pool.Get(Entity);
         }
 
-        [[nodiscard]] constexpr auto operator[](const std::size_t Position) const
+        [[nodiscard]] constexpr std::tuple<EntityType, ElementType&> operator[](const std::size_t Position) const
         {
             const EntityType Entity { EntitiesBegin()[Position] };
-
-            if constexpr (!OptimizableElement<ElementType, EntityType>)
-            {
-                return std::tuple<EntityType, ElementType&> { Entity, Get(Entity) };
-            }
-            else
-            {
-                return Entity;
-            }
+            return std::tuple<EntityType, ElementType&> { Entity, Get(Entity) };
         }
 
         [[nodiscard]] constexpr Iterator Find(const EntityType Entity) const noexcept
@@ -636,6 +624,123 @@ namespace egg::ECS::Containers
             return Iterator { EntitiesIterator, Pool.ElementsEnd() - (EntitiesIterator.GetIndex() + 1u) };
         }
 
+        PoolType& Pool;
+    };
+
+
+    template <
+        Types::InstanceOf<Lifecycle>... OwnParameters,
+        Types::InstanceOf<Lifecycle>... ViewParameters
+    > requires
+        (Types::InstanceOf<typename OwnParameters::ContainerType, Storage> && ...) &&
+        (Types::InstanceOf<typename ViewParameters::ContainerType, Storage> && ...) &&
+        (sizeof...(OwnParameters) + sizeof...(ViewParameters) == 1u) &&
+        OptimizableElement<
+            CommonTypeOf<typename OwnParameters::ElementType..., typename ViewParameters::ElementType...>,
+            CommonTypeOf<typename OwnParameters::EntityType..., typename ViewParameters::EntityType...>>
+    class Group<OwnType<OwnParameters...>, ViewType<ViewParameters...>, ExcludeType<>>
+    {
+    public:
+        using PoolType = std::tuple_element_t<0u, std::tuple<OwnParameters..., ViewParameters...>>;
+        using CommonType = typename PoolType::BaseType;
+        using CommonAllocator = typename CommonType::AllocatorType;
+
+        using CommonIterator = typename CommonType::Iterator;
+        using CommonReverseIterator = typename CommonType::ReverseIterator;
+
+        using EntityType = typename CommonType::EntityType;
+        using ElementType = typename PoolType::ElementType;
+
+
+        constexpr explicit Group(PoolType& Pool) : Pool { Pool }
+        {
+        }
+
+        [[nodiscard]] constexpr CommonIterator Begin() const noexcept
+        {
+            return Pool.Begin();
+        }
+
+        [[nodiscard]] constexpr CommonIterator End() const noexcept
+        {
+            return Pool.End();
+        }
+
+        [[nodiscard]] constexpr CommonReverseIterator ReverseBegin() const noexcept
+        {
+            return Pool.ReverseBegin();
+        }
+
+        [[nodiscard]] constexpr CommonReverseIterator ReverseEnd() const noexcept
+        {
+            return Pool.ReverseEnd();
+        }
+
+        template <typename CallableType> requires std::invocable<CallableType, EntityType> || std::invocable<CallableType>
+        constexpr void Each(CallableType Callable) const
+        {
+            for (const EntityType Entity : *this)
+            {
+                if constexpr (std::invocable<CallableType, EntityType>)
+                {
+                    std::invoke(Callable, Entity);
+                }
+                else
+                {
+                    std::invoke(Callable);
+                }
+            }
+        }
+
+        [[nodiscard]] constexpr EntityType operator[](const std::size_t Position) const
+        {
+            return Begin()[Position];
+        }
+
+        [[nodiscard]] constexpr CommonIterator Find(const EntityType Entity) const noexcept
+        {
+            return Pool.Find(Entity);
+        }
+
+        [[nodiscard]] constexpr bool Contains(const EntityType Entity) const noexcept
+        {
+            return Pool.Contains(Entity);
+        }
+
+        [[nodiscard]] constexpr std::size_t GetSize() const noexcept
+        {
+            return Pool.GetSize();
+        }
+
+        [[nodiscard]] constexpr bool Empty() const noexcept
+        {
+            return Pool.Empty();
+        }
+
+        [[nodiscard]] constexpr std::size_t GetCapacity() const noexcept requires (sizeof...(OwnParameters) == 1u)
+        {
+            return Pool.GetCapacity();
+        }
+
+        template <typename CompareType, typename SortType = decltype(std::ranges::sort), typename ProjectionType = std::identity>
+        constexpr void Sort(CompareType Compare, SortType Sort = SortType {}, ProjectionType Projection = ProjectionType {}) const
+            requires (sizeof...(OwnParameters) == 1u)
+        {
+            Pool.Sort(std::move(Compare), std::move(Sort), std::move(Projection));
+        }
+
+        template <typename IteratorType, std::sentinel_for<IteratorType> SentinelType>
+        constexpr CommonIterator SortAs(IteratorType First, SentinelType Last) const requires (sizeof...(OwnParameters) == 1u)
+        {
+            return Pool.SortAs(std::move(First), std::move(Last));
+        }
+
+        constexpr void ShrinkToFit() requires (sizeof...(OwnParameters) == 1u)
+        {
+            Pool.ShrinkToFit();
+        }
+
+    private:
         PoolType& Pool;
     };
 }
