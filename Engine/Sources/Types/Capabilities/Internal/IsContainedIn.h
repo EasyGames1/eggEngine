@@ -22,6 +22,15 @@ namespace egg::Types::Internal
     struct IsContainedIn<Type, Type, Types...> : std::true_type
     {
     };
+
+
+    template <typename, typename>
+    struct IsContainedInTuple;
+
+    template <typename Type, template<typename...> typename Tuple, typename... Types>
+    struct IsContainedInTuple<Type, Tuple<Types...>> : IsContainedIn<Type, Types...>
+    {
+    };
 }
 
 #endif // ENGINE_SOURCES_TYPES_CAPABILITIES_INTERNAL_FILE_IS_CONTAINED_IN_H

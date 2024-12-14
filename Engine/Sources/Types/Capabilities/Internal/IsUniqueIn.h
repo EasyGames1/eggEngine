@@ -22,6 +22,15 @@ namespace egg::Types::Internal
     struct IsUniqueIn<Type> : std::true_type
     {
     };
+
+
+    template <typename, typename>
+    struct IsUniqueInTuple;
+
+    template <typename Type, template<typename...> typename Tuple, typename... Types>
+    struct IsUniqueInTuple<Type, Tuple<Types...>> : IsUniqueIn<Type, Types...>
+    {
+    };
 }
 
 #endif // ENGINE_SOURCES_TYPES_CAPABILITIES_INTERNAL_FILE_IS_UNIQUE_IN_H

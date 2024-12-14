@@ -27,12 +27,14 @@ namespace egg::ECS::Containers::Internal
     class GroupIterator<IteratorParameter, OwnType<OwnParameters...>, ViewType<ViewParameters...>>
     {
         template <Types::ContainedIn<OwnParameters...> PoolType>
+            requires (!OptimizableElement<typename PoolType::ElementType, typename PoolType::EntityType>)
         [[nodiscard]] constexpr std::tuple<typename PoolType::ElementType&> GetElementAsTuple(PoolType& Pool) const noexcept
         {
             return std::forward_as_tuple(Pool.ElementsReverseBegin()[Iterator.GetIndex()]);
         }
 
         template <Types::ContainedIn<ViewParameters...> PoolType>
+            requires (!OptimizableElement<typename PoolType::ElementType, typename PoolType::EntityType>)
         [[nodiscard]] constexpr std::tuple<typename PoolType::ElementType&> GetElementAsTuple(PoolType& Pool) const noexcept
         {
             return std::forward_as_tuple(Pool.Get(*Iterator));

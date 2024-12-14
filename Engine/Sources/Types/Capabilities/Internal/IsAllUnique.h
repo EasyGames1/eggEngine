@@ -22,6 +22,15 @@ namespace egg::Types::Internal
     struct IsAllUnique<> : std::true_type
     {
     };
+
+
+    template <typename>
+    struct IsAllTupleUnique;
+
+    template <template<typename...> typename Tuple, typename... Types>
+    struct IsAllTupleUnique<Tuple<Types...>> : IsAllUnique<Types...>
+    {
+    };
 }
 
 #endif // ENGINE_SOURCES_TYPES_CAPABILITIES_INTERNAL_FILE_IS_ALL_UNIQUE_H

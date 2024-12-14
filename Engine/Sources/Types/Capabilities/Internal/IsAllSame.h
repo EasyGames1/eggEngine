@@ -22,6 +22,15 @@ namespace egg::Types::Internal
     struct IsAllSame<Types...> : std::true_type
     {
     };
+
+
+    template <typename>
+    struct IsAllTupleSame;
+
+    template <template<typename...> typename Tuple, typename... Types>
+    struct IsAllTupleSame<Tuple<Types...>> : IsAllSame<Types...>
+    {
+    };
 }
 
 #endif // ENGINE_SOURCES_TYPES_TRAITS_INTERNAL_FILE_IS_ALL_SAME_H

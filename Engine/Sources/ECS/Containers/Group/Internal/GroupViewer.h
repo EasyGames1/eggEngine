@@ -25,6 +25,7 @@ namespace egg::ECS::Containers::Internal
         Types::InstanceOf<Lifecycle>... ViewParameters,
         Types::InstanceOf<Lifecycle>... ExcludeParameters
     > requires
+        Types::NoneOf<std::is_const, OwnParameters..., ViewParameters..., ExcludeParameters...> &&
         (Types::InstanceOf<typename OwnParameters::ContainerType, Storage> && ...) &&
         (Types::InstanceOf<typename ViewParameters::ContainerType, Storage> && ...) &&
         (Types::InstanceOf<typename ExcludeParameters::ContainerType, Storage> && ...) &&
@@ -104,10 +105,11 @@ namespace egg::ECS::Containers::Internal
                 }, Filters);
         }
 
-        template <Types::ContainedIn<OwnParameters..., ViewParameters...> PoolType>
+        template <typename PoolType> requires
+            Types::ContainedIn<std::remove_const_t<PoolType>, OwnParameters..., ViewParameters...>
         [[nodiscard]] constexpr PoolType& GetPool() const noexcept
         {
-            return *std::get<PoolType*>(Pools);
+            return *std::get<std::remove_const_t<PoolType>*>(Pools);
         }
 
         template <typename CallableType> requires
@@ -141,8 +143,12 @@ namespace egg::ECS::Containers::Internal
             return ReverseIterator { EntitiesIterator, Pools };
         }
 
-        template <Types::ContainedIn<typename OwnParameters::ElementType..., typename ViewParameters::ElementType...>... ElementTypes>
-            requires Types::AllUnique<ElementTypes...> &&
+        template <typename... ElementTypes> requires
+            (Types::ContainedIn<
+                std::remove_const_t<ElementTypes>,
+                typename OwnParameters::ElementType..., typename ViewParameters::ElementType...
+            > && ...) &&
+            Types::AllUnique<std::remove_const_t<ElementTypes>...> &&
             (sizeof...(ElementTypes)
                  ? (!OptimizableElement<ElementTypes, EntityType> || ...)
                  : (!OptimizableElement<typename OwnParameters::ElementType, EntityType> || ...) ||
@@ -158,17 +164,21 @@ namespace egg::ECS::Containers::Internal
             }
             else if constexpr (sizeof...(ElementTypes) == 1u)
             {
-                return (GetElement<ElementTypes>(), ...);
+                return (GetElement<ElementTypes>(Entity), ...);
             }
             else
             {
-                return std::tuple_cat(GetElementAsTuple<ElementTypes>()...);
+                return std::tuple_cat(GetElementAsTuple<ElementTypes>(Entity)...);
             }
         }
 
-        template <Types::ContainedIn<typename OwnParameters::ElementType..., typename ViewParameters::ElementType...>... ElementTypes,
-            typename ProjectionType> requires
-            Types::AllUnique<ElementTypes...> && (!sizeof...(ElementTypes) || (!OptimizableElement<ElementTypes, EntityType> || ...))
+        template <typename... ElementTypes, typename ProjectionType> requires
+            (Types::ContainedIn<
+                std::remove_const_t<ElementTypes>,
+                typename OwnParameters::ElementType..., typename ViewParameters::ElementType...
+            > && ...) &&
+            Types::AllUnique<std::remove_const_t<ElementTypes>...> &&
+            (!sizeof...(ElementTypes) || (!OptimizableElement<ElementTypes, EntityType> || ...))
         [[nodiscard]] constexpr auto GetProjection(ProjectionType Projection) const noexcept
         {
             if constexpr (!sizeof...(ElementTypes))
@@ -197,28 +207,41 @@ namespace egg::ECS::Containers::Internal
         }
 
     private:
-        template <Types::ContainedIn<typename OwnParameters::ElementType..., typename ViewParameters::ElementType...> ElementType>
-            requires (!OptimizableElement<ElementType, EntityType>)
+        template <typename ElementType> requires
+            Types::ContainedIn<
+                std::remove_const_t<ElementType>,
+                typename OwnParameters::ElementType..., typename ViewParameters::ElementType...> &&
+            (!OptimizableElement<ElementType, EntityType>)
         [[nodiscard]] constexpr ElementType& GetElement(const EntityType Entity) const noexcept
         {
-            return GetPool<std::remove_pointer_t<std::tuple_element_t<
-                Types::TypeIndexIn<
-                    ElementType,
-                    std::tuple<typename OwnParameters::ElementType..., typename ViewParameters::ElementType...>
-                >,
-                PoolsType
-            >>>().Get(Entity);
+            return GetPool<Types::ConstnessAs<
+                ElementType,
+                std::remove_pointer_t<std::tuple_element_t<
+                    Types::TypeIndexIn<
+                        std::remove_const_t<ElementType>,
+                        std::tuple<typename OwnParameters::ElementType..., typename ViewParameters::ElementType...>
+                    >,
+                    PoolsType
+                >>
+            >>().Get(Entity);
         }
 
-        template <Types::ContainedIn<typename OwnParameters::ElementType..., typename ViewParameters::ElementType...> ElementType>
+        template <typename ElementType> requires
+            Types::ContainedIn<
+                std::remove_const_t<ElementType>,
+                typename OwnParameters::ElementType..., typename ViewParameters::ElementType...> &&
+            (!OptimizableElement<ElementType, EntityType>)
         [[nodiscard]] constexpr std::tuple<ElementType&>
         GetElementAsTuple(const EntityType Entity) const noexcept
         {
             return std::forward_as_tuple(GetElement<ElementType>(Entity));
         }
 
-        template <Types::ContainedIn<OwnParameters..., ViewParameters...> PoolType>
-            requires OptimizableElement<typename PoolType::ElementType, EntityType>
+        template <typename ElementType> requires
+            Types::ContainedIn<
+                std::remove_const_t<ElementType>,
+                typename OwnParameters::ElementType..., typename ViewParameters::ElementType...> &&
+            OptimizableElement<ElementType, EntityType>
         [[nodiscard]] static constexpr std::tuple<> GetElementAsTuple(EntityType) noexcept
         {
             return std::make_tuple();

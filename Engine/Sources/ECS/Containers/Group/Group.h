@@ -27,6 +27,7 @@ namespace egg::ECS::Containers
         Types::InstanceOf<Lifecycle>... ViewParameters,
         Types::InstanceOf<Lifecycle>... ExcludeParameters
     > requires
+        Types::NoneOf<std::is_const, OwnParameters..., ViewParameters..., ExcludeParameters...> &&
         (Types::InstanceOf<typename OwnParameters::ContainerType, Storage> && ...) &&
         (Types::InstanceOf<typename ViewParameters::ContainerType, Storage> && ...) &&
         (Types::InstanceOf<typename ExcludeParameters::ContainerType, Storage> && ...) &&
@@ -123,15 +124,19 @@ namespace egg::ECS::Containers
             Viewer.Each(EntitiesBegin(), EntitiesEnd(), std::move(Callable));
         }
 
-        template <Types::ContainedIn<typename OwnParameters::ElementType..., typename ViewParameters::ElementType...>... ElementTypes>
-            requires Types::AllUnique<ElementTypes...> &&
+        template <typename... ElementTypes> requires
+            (Types::ContainedIn<
+                std::remove_const_t<ElementTypes>,
+                typename OwnParameters::ElementType..., typename ViewParameters::ElementType...
+            > && ...) &&
+            Types::AllUnique<std::remove_const_t<ElementTypes>...> &&
             (sizeof...(ElementTypes)
                  ? (!OptimizableElement<ElementTypes, EntityType> || ...)
                  : (!OptimizableElement<typename OwnParameters::ElementType, EntityType> || ...) ||
                  (!OptimizableElement<typename ViewParameters::ElementType, EntityType> || ...))
         [[nodiscard]] constexpr decltype(auto) Get(const EntityType Entity) const
         {
-            return Viewer.Get(Entity);
+            return Viewer.template Get<ElementTypes...>(Entity);
         }
 
         [[nodiscard]] constexpr auto operator[](const std::size_t Position) const
@@ -175,11 +180,16 @@ namespace egg::ECS::Containers
             return !Size;
         }
 
-        template <Types::ContainedIn<typename OwnParameters::ElementType..., typename ViewParameters::ElementType...>... ElementTypes,
-            typename CompareType,
-            typename SortType = decltype(std::ranges::sort),
-            typename ProjectionType = std::identity> requires
-            Types::AllUnique<ElementTypes...> && (!sizeof...(ElementTypes) || (!OptimizableElement<ElementTypes, EntityType> || ...))
+        template <typename... ElementTypes,
+                  typename CompareType,
+                  typename SortType = decltype(std::ranges::sort),
+                  typename ProjectionType = std::identity> requires
+            (Types::ContainedIn<
+                std::remove_const_t<ElementTypes>,
+                typename OwnParameters::ElementType..., typename ViewParameters::ElementType...
+            > && ...) &&
+            Types::AllUnique<std::remove_const_t<ElementTypes>...> &&
+            (!sizeof...(ElementTypes) || (!OptimizableElement<ElementTypes, EntityType> || ...))
         constexpr void Sort(CompareType Compare, SortType Sort = SortType {}, ProjectionType Projection = ProjectionType {}) const
         {
             GetLeading().SortCount(
@@ -265,6 +275,7 @@ namespace egg::ECS::Containers
 
 
     template <Types::InstanceOf<Lifecycle>... ViewParameters, Types::InstanceOf<Lifecycle>... ExcludeParameters> requires
+        Types::NoneOf<std::is_const, ViewParameters..., ExcludeParameters...> &&
         (Types::InstanceOf<typename ViewParameters::ContainerType, Storage> && ...) &&
         (Types::InstanceOf<typename ExcludeParameters::ContainerType, Storage> && ...) &&
         Types::AllUnique<typename ViewParameters::ElementType..., typename ExcludeParameters::ElementType...> &&
@@ -355,14 +366,15 @@ namespace egg::ECS::Containers
             Viewer.Each(EntitiesBegin(), EntitiesEnd(), std::move(Callable));
         }
 
-        template <Types::ContainedIn<typename ViewParameters::ElementType...>... ElementTypes>
-            requires Types::AllUnique<ElementTypes...> &&
+        template <typename... ElementTypes> requires
+            (Types::ContainedIn<std::remove_const_t<ElementTypes>, typename ViewParameters::ElementType...> && ...) &&
+            Types::AllUnique<std::remove_const_t<ElementTypes>...> &&
             (sizeof...(ElementTypes)
                  ? (!OptimizableElement<ElementTypes, EntityType> || ...)
                  : (!OptimizableElement<typename ViewParameters::ElementType, EntityType> || ...))
         [[nodiscard]] constexpr decltype(auto) Get(const EntityType Entity) const
         {
-            return Viewer.Get(Entity);
+            return Viewer.template Get<ElementTypes...>(Entity);
         }
 
         [[nodiscard]] constexpr auto operator[](const std::size_t Position) const
@@ -404,11 +416,13 @@ namespace egg::ECS::Containers
             return Container.GetCapacity();
         }
 
-        template <Types::ContainedIn<typename ViewParameters::ElementType...>... ElementTypes,
-            typename CompareType,
-            typename SortType = decltype(std::ranges::sort),
-            typename ProjectionType = std::identity> requires
-            Types::AllUnique<ElementTypes...> && (!sizeof...(ElementTypes) || (!OptimizableElement<ElementTypes, EntityType> || ...))
+        template <typename... ElementTypes,
+                  typename CompareType,
+                  typename SortType = decltype(std::ranges::sort),
+                  typename ProjectionType = std::identity> requires
+            (Types::ContainedIn<std::remove_const_t<ElementTypes>, typename ViewParameters::ElementType...> && ...) &&
+            Types::AllUnique<std::remove_const_t<ElementTypes>...> &&
+            (!sizeof...(ElementTypes) || (!OptimizableElement<ElementTypes, EntityType> || ...))
         constexpr void Sort(CompareType Compare, SortType Sort = SortType {}, ProjectionType Projection = ProjectionType {}) const
         {
             Container.Sort(std::move(Compare), std::move(Sort), Viewer.template GetProjection<ElementTypes...>(std::move(Projection)));
@@ -456,6 +470,7 @@ namespace egg::ECS::Containers
         Types::InstanceOf<Lifecycle>... OwnParameters,
         Types::InstanceOf<Lifecycle>... ViewParameters
     > requires
+        Types::NoneOf<std::is_const, OwnParameters..., ViewParameters...> &&
         (Types::InstanceOf<typename OwnParameters::ContainerType, Storage> && ...) &&
         (Types::InstanceOf<typename ViewParameters::ContainerType, Storage> && ...) &&
         (sizeof...(OwnParameters) + sizeof...(ViewParameters) == 1u) &&
@@ -547,7 +562,9 @@ namespace egg::ECS::Containers
             }
         }
 
-        [[nodiscard]] constexpr ElementType& Get(const EntityType Entity) const
+        template <typename RequestedElementType = ElementType> requires
+            std::same_as<std::remove_const_t<RequestedElementType>, ElementType>
+        [[nodiscard]] constexpr RequestedElementType& Get(const EntityType Entity) const
         {
             return Pool.Get(Entity);
         }
@@ -583,10 +600,11 @@ namespace egg::ECS::Containers
             return Pool.GetCapacity();
         }
 
-        template <std::same_as<ElementType>... ElementTypes,
-            typename CompareType,
-            typename SortType = decltype(std::ranges::sort),
-            typename ProjectionType = std::identity> requires (sizeof...(ElementTypes) <= 1u)
+        template <typename... ElementTypes,
+                  typename CompareType,
+                  typename SortType = decltype(std::ranges::sort),
+                  typename ProjectionType = std::identity> requires
+            (sizeof...(ElementTypes) <= 1u) && (std::same_as<std::remove_const_t<ElementTypes>, ElementType> && ...)
         constexpr void Sort(CompareType Compare, SortType Sort = SortType {}, ProjectionType Projection = ProjectionType {}) const
             requires (sizeof...(OwnParameters) == 1u)
         {
@@ -601,7 +619,7 @@ namespace egg::ECS::Containers
                     std::move(Sort),
                     [this, &Projection](const EntityType Entity) constexpr
                     {
-                        return std::invoke(Projection, Get(Entity));
+                        return std::invoke(Projection, Get<ElementTypes...>(Entity));
                     }
                 );
             }
@@ -632,6 +650,7 @@ namespace egg::ECS::Containers
         Types::InstanceOf<Lifecycle>... OwnParameters,
         Types::InstanceOf<Lifecycle>... ViewParameters
     > requires
+        Types::NoneOf<std::is_const, OwnParameters..., ViewParameters...> &&
         (Types::InstanceOf<typename OwnParameters::ContainerType, Storage> && ...) &&
         (Types::InstanceOf<typename ViewParameters::ContainerType, Storage> && ...) &&
         (sizeof...(OwnParameters) + sizeof...(ViewParameters) == 1u) &&

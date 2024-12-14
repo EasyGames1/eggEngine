@@ -92,6 +92,9 @@ add_library(VulkanEngine_lib
         Sources/Types/Deduction/Internal/TypeIndexIn.h
         Sources/Events/ConnectionArgument.h
         Sources/Types/Deduction/Internal/InstantiateTuple.h
+        Sources/Types/Capabilities/Internal/IsPredicateTrait.h
+        Sources/Types/Capabilities/Internal/IsAllOf.h
+        Sources/Types/Capabilities/Internal/IsNoneOf.h
 )
 
 target_include_directories(VulkanEngine_lib PRIVATE Sources)

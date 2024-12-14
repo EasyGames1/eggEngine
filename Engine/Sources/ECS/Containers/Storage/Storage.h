@@ -19,9 +19,10 @@
 namespace egg::ECS::Containers
 {
     template <typename Element, typename Entity>
-    concept OptimizableElement = ValidEntity<Entity> && (std::same_as<Element, Entity> || !PageSizeTraits<Element>::value);
+    concept OptimizableElement =
+        ValidEntity<Entity> && (std::same_as<std::remove_const_t<Element>, Entity> || !PageSizeTraits<Element>::value);
 
-    template <typename Type, ValidEntity EntityParameter, Types::ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
+    template <Types::Decayed Type, ValidEntity EntityParameter, Types::ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
     class Storage : public SparseSet<EntityParameter,
                                      typename AllocatorTraits<AllocatorParameter>::template rebind_alloc<EntityParameter>>
     {
@@ -450,7 +451,7 @@ namespace egg::ECS::Containers
     };
 
 
-    template <typename Type, ValidEntity EntityParameter, Types::ValidAllocator<Type> AllocatorParameter>
+    template <Types::Decayed Type, ValidEntity EntityParameter, Types::ValidAllocator<Type> AllocatorParameter>
         requires OptimizableElement<Type, EntityParameter>
     class Storage<Type, EntityParameter, AllocatorParameter>
         : public SparseSet<EntityParameter, typename AllocatorTraits<AllocatorParameter>::template rebind_alloc<EntityParameter>>
