@@ -1,0 +1,7 @@
+eggEngine is a general-purpose software engine. Its primary goals are to ensure maximum runtime performance, provide users with flexibility and abstractions through complex templates, and maintain strict typing based on constraints. Currently, the engine is in the early stages of development, and therefore, it is highly discouraged to use it for production purposes. At this stage, there are no guarantees of backward compatibility.
+
+The engine is built on an Entity-Component-System (ECS) architecture, utilizing concepts from the EnTT library (thanks to the author for the ideas). The differences between the engine’s ECS module and EnTT lie in the use of concepts and constraints for virtually everything, as well as some reworked architectural elements to better align with best practices. For example, this implementation completely avoids empty methods marked as virtual, and classes do exactly what you expect, avoiding name hiding.
+
+Additionally, the engine aims to minimize cognitive load on the programmer by using constraints, as they often fully describe the required type. The engine’s code strives to be self-documenting by using clear names for various entities, so formal documentation will not be available soon.
+
+At this stage, the engine will move towards providing abstractions where necessary, but the cost of such abstractions must be minimal; otherwise, they will not be provided. Nonetheless, the idea of modular architecture will be promoted, and entities will be separated where possible and needed.
