@@ -181,7 +181,7 @@ namespace egg::ECS::Containers
 
         constexpr virtual void SwapElementsAt(const std::size_t Left, const std::size_t Right)
         {
-            EGG_ASSERT(Left < Packed.size() && Right < Packed.size(), "Index out of bounds");
+            EGG_ASSERT(Left < GetSize() && Right < GetSize(), "Index out of bounds");
             auto& From { Packed[Left] };
             auto& To { Packed[Right] };
 
@@ -282,13 +282,13 @@ namespace egg::ECS::Containers
         }
 
         template <typename IteratorType, std::sentinel_for<IteratorType> SentinelType>
-        constexpr ReverseIterator SortCountAs(const std::size_t Count, IteratorType First, SentinelType Last)
+        constexpr Iterator SortCountAs(const std::size_t Count, IteratorType First, SentinelType Last)
         {
             EGG_ASSERT(Count <= GetSize(), "Count of elements to sort exceeds the number of elements");
 
-            ReverseIterator It { ReverseBegin() };
+            Iterator It { End() - Count };
 
-            for (const ReverseIterator CurrentLast { It + Count };
+            for (const Iterator CurrentLast { End() };
                  It != CurrentLast && First != Last;
                  ++First)
             {
@@ -328,7 +328,7 @@ namespace egg::ECS::Containers
 
         [[nodiscard]] constexpr EntityType operator[](const std::size_t Position) const noexcept
         {
-            EGG_ASSERT(Position < Packed.size(), "Index out of bounds");
+            EGG_ASSERT(Position < GetSize(), "Index out of bounds");
             return Packed[Position];
         }
 
@@ -339,12 +339,12 @@ namespace egg::ECS::Containers
 
         [[nodiscard]] constexpr Iterator Begin() noexcept
         {
-            return { Packed, Packed.size() };
+            return { Packed, GetSize() };
         }
 
         [[nodiscard]] constexpr ConstIterator Begin() const noexcept
         {
-            return { Packed, Packed.size() };
+            return { Packed, GetSize() };
         }
 
         [[nodiscard]] constexpr ConstIterator ConstBegin() const noexcept

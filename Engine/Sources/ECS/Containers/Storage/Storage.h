@@ -47,10 +47,15 @@ namespace egg::ECS::Containers
         using ReverseIterator = typename ContainerType::ReverseIterator;
         using ConstReverseIterator = typename ContainerType::ConstReverseIterator;
 
-        using EachIterator = Internal::StorageIterator<typename BaseType::Iterator, Iterator>;
-        using EachConstIterator = Internal::StorageIterator<typename BaseType::ConstIterator, ConstIterator>;
-        using EachReverseIterator = Internal::StorageIterator<typename BaseType::ReverseIterator, ReverseIterator>;
-        using EachConstReverseIterator = Internal::StorageIterator<typename BaseType::ConstReverseIterator, ConstReverseIterator>;
+        using EntitiesIterator = typename BaseType::Iterator;
+        using EntitiesConstIterator = typename BaseType::ConstIterator;
+        using EntitiesReverseIterator = typename BaseType::ReverseIterator;
+        using EntitiesConstReverseIterator = typename BaseType::ConstReverseIterator;
+
+        using EachIterator = Internal::StorageIterator<EntitiesIterator, Iterator>;
+        using EachConstIterator = Internal::StorageIterator<EntitiesConstIterator, ConstIterator>;
+        using EachReverseIterator = Internal::StorageIterator<EntitiesReverseIterator, ReverseIterator>;
+        using EachConstReverseIterator = Internal::StorageIterator<EntitiesConstReverseIterator, ConstReverseIterator>;
 
         using ElementsIterable = egg::Containers::IterableAdaptor<Iterator>;
         using ElementsConstIterable = egg::Containers::IterableAdaptor<ConstIterator>;

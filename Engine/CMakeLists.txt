@@ -69,10 +69,10 @@ add_library(VulkanEngine_lib
         Sources/Hash/Literals.h
         Sources/Types/Types.h
         Sources/ECS/Registry.h
-        Sources/ECS/Containers/LifecycleContainer.h
+        Sources/ECS/Containers/Lifecycle.h
         Sources/Types/Capabilities/Internal/IsInstanceOf.h
         Sources/Types/Capabilities/Internal/IsAnyOf.h
-        Sources/ECS/Containers/Group/Group.h
+        Sources/ECS/Containers/Group/PoolGroup.h
         Sources/ECS/Ownership.h
         Sources/Types/Capabilities/Internal/IsAllSame.h
         Sources/ECS/Containers/Group/Internal/GroupIterator.h
@@ -88,13 +88,17 @@ add_library(VulkanEngine_lib
         Sources/Types/Deduction/Internal/FilterTuple.h
         Sources/Types/Deduction/Internal/CombineTuples.h
         Sources/Types/Deduction/Internal/MemberObjectPointerTraits.h
-        Sources/ECS/Containers/Group/Internal/GroupViewer.h
+        Sources/ECS/Containers/Group/Internal/PoolGroupViewer.h
         Sources/Types/Deduction/Internal/TypeIndexIn.h
         Sources/Events/ConnectionArgument.h
         Sources/Types/Deduction/Internal/InstantiateTuple.h
         Sources/Types/Capabilities/Internal/IsPredicateTrait.h
         Sources/Types/Capabilities/Internal/IsAllOf.h
         Sources/Types/Capabilities/Internal/IsNoneOf.h
+        Sources/ECS/Containers/Group/Group.h
+        Sources/Types/Deduction/Internal/CommonTypeOf.h
+        Sources/Types/Deduction/Internal/TupleSize.h
+        Sources/ECS/Containers/Group/Internal/PoolTraits.h
 )
 
 target_include_directories(VulkanEngine_lib PRIVATE Sources)

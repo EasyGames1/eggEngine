@@ -77,17 +77,17 @@ namespace egg::Hash
 
     template <std::unsigned_integral SizeType, Types::Byte ByteType>
     [[nodiscard]] constexpr SizeType FNV1a(const std::span<const ByteType> Data,
-                                           SizeType Hash = Internal::FNV1aTraits<SizeType>::Seed) noexcept
+                                           SizeType Seed = Internal::FNV1aTraits<SizeType>::Seed) noexcept
     {
         using TraitsType = Internal::FNV1aTraits<SizeType>;
 
         for (const auto Byte : Data)
         {
-            Hash ^= static_cast<SizeType>(Byte);
-            Hash *= TraitsType::Prime;
+            Seed ^= static_cast<SizeType>(Byte);
+            Seed *= TraitsType::Prime;
         }
 
-        return Hash;
+        return Seed;
     }
 
     template <std::unsigned_integral SizeType, Types::Byte ByteType>

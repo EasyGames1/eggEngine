@@ -3,19 +3,19 @@
 
 namespace egg::ECS
 {
-    template <typename... Type>
+    template <typename...>
     struct OwnType final
     {
     };
 
 
-    template <typename... Type>
+    template <typename...>
     struct ViewType final
     {
     };
 
 
-    template <typename... Type>
+    template <typename...>
     struct ExcludeType final
     {
     };

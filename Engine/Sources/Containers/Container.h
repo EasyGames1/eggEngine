@@ -1,6 +1,8 @@
 #ifndef ENGINE_SOURCES_CONTAINERS_FILE_CONTAINER_H
 #define ENGINE_SOURCES_CONTAINERS_FILE_CONTAINER_H
 
+#include <Types/Deduction/Deduction.h>
+
 #include <iterator>
 #include <memory>
 #include <type_traits>
@@ -99,8 +101,8 @@ namespace egg::Containers
     template <typename Type>
     using IteratorTraits = std::iterator_traits<Type>;
 
-    template <typename... Types>
-    using CommonTypeOf = std::common_type_t<Types...>;
+    template <typename... Ts>
+    using CommonTypeOf = Types::CommonTypeOf<Ts...>;
 }
 
 #endif // ENGINE_SOURCES_CONTAINERS_FILE_CONTAINER_H

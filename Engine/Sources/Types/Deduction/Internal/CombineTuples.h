@@ -13,13 +13,14 @@ namespace egg::Types::Internal
     {
     };
 
-    template <template<typename...> typename Tuple, typename... Types>
-    struct CombineTuples<Tuple, Tuple<Types...>> : std::type_identity<Tuple<Types...>>
+    template <template<typename...> typename Tuple, template<typename...> typename Other, typename... Types>
+    struct CombineTuples<Tuple, Other<Types...>> : std::type_identity<Tuple<Types...>>
     {
     };
 
-    template <template<typename...> typename Tuple, typename... LeftArgs, typename... RightArgs, typename... Other>
-    struct CombineTuples<Tuple, Tuple<LeftArgs...>, Tuple<RightArgs...>, Other...>
+    template <template<typename...> typename Tuple, template<typename...> typename LeftTuple, template<typename...> typename RightTuple,
+              typename... LeftArgs, typename... RightArgs, typename... Other>
+    struct CombineTuples<Tuple, LeftTuple<LeftArgs...>, RightTuple<RightArgs...>, Other...>
         : CombineTuples<Tuple, Tuple<LeftArgs..., RightArgs...>, Other...>
     {
     };
