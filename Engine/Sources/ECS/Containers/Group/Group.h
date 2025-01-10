@@ -2,12 +2,13 @@
 #define ENGINE_SOURCES_ECS_CONTAINERS_GROUP_FILE_GROUP_H
 
 #include "./Internal/GroupIterator.h"
+#include "./Internal/PoolTraits.h"
 
 #include <ECS/Entity.h>
 #include <ECS/Ownership.h>
 #include <ECS/Containers/Container.h>
 #include <ECS/Containers/Lifecycle.h>
-#include <ECS/Containers/Group/PoolGroup.h>
+#include <ECS/Containers/PoolGroup/PoolGroup.h>
 #include <Types/Capabilities/Capabilities.h>
 #include <Types/Deduction/Deduction.h>
 

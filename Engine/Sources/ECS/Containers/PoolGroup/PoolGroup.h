@@ -11,6 +11,7 @@
 #include <iterator>
 #include <ranges>
 #include <tuple>
+#include <type_traits>
 
 namespace egg::ECS::Containers
 {
@@ -42,13 +43,13 @@ namespace egg::ECS::Containers
             ExcludeType<ExcludeParameters...>
         >;
 
-        using CommonType = typename ViewerType::CommonType;
-
         using LeadingType = std::tuple_element_t<0u, std::tuple<OwnParameters...>>;
 
     public:
         using PoolsType = typename ViewerType::PoolsType;
         using FiltersType = typename ViewerType::FiltersType;
+
+        using CommonType = typename ViewerType::CommonType;
 
         using AllocatorType = typename CommonType::AllocatorType;
         using EntityType = typename CommonType::EntityType;
@@ -71,6 +72,16 @@ namespace egg::ECS::Containers
                 PushOnConstruct(Entity);
             }
         }
+
+        PoolGroup(const PoolGroup&) = delete;
+
+        constexpr PoolGroup(PoolGroup&&) noexcept = default;
+
+        constexpr ~PoolGroup() noexcept = default;
+
+        PoolGroup& operator=(const PoolGroup&) = delete;
+
+        constexpr PoolGroup& operator=(PoolGroup&&) noexcept = default;
 
         [[nodiscard]] constexpr Iterator Begin() const noexcept
         {
@@ -241,11 +252,11 @@ namespace egg::ECS::Containers
     {
         using ViewerType = Internal::PoolGroupViewer<OwnType<>, ViewType<ViewParameters...>, ExcludeType<ExcludeParameters...>>;
 
-        using CommonType = typename ViewerType::CommonType;
-
     public:
         using PoolsType = typename ViewerType::PoolsType;
         using FiltersType = typename ViewerType::FiltersType;
+
+        using CommonType = typename ViewerType::CommonType;
 
         using AllocatorType = typename CommonType::AllocatorType;
         using EntityType = typename CommonType::EntityType;
@@ -269,6 +280,16 @@ namespace egg::ECS::Containers
                 PushOnConstruct(Entity);
             }
         }
+
+        PoolGroup(const PoolGroup&) = delete;
+
+        constexpr PoolGroup(PoolGroup&&) noexcept(std::is_nothrow_move_constructible_v<CommonType>) = default;
+
+        constexpr ~PoolGroup() noexcept = default;
+
+        PoolGroup& operator=(const PoolGroup&) = delete;
+
+        constexpr PoolGroup& operator=(PoolGroup&&) noexcept(std::is_nothrow_move_assignable_v<CommonType>) = default;
 
         [[nodiscard]] constexpr Iterator Begin() const noexcept
         {

@@ -72,7 +72,7 @@ add_library(VulkanEngine_lib
         Sources/ECS/Containers/Lifecycle.h
         Sources/Types/Capabilities/Internal/IsInstanceOf.h
         Sources/Types/Capabilities/Internal/IsAnyOf.h
-        Sources/ECS/Containers/Group/PoolGroup.h
+        Sources/ECS/Containers/PoolGroup/PoolGroup.h
         Sources/ECS/Ownership.h
         Sources/Types/Capabilities/Internal/IsAllSame.h
         Sources/ECS/Containers/Group/Internal/GroupIterator.h
@@ -88,7 +88,7 @@ add_library(VulkanEngine_lib
         Sources/Types/Deduction/Internal/FilterTuple.h
         Sources/Types/Deduction/Internal/CombineTuples.h
         Sources/Types/Deduction/Internal/MemberObjectPointerTraits.h
-        Sources/ECS/Containers/Group/Internal/PoolGroupViewer.h
+        Sources/ECS/Containers/PoolGroup/Internal/PoolGroupViewer.h
         Sources/Types/Deduction/Internal/TypeIndexIn.h
         Sources/Events/ConnectionArgument.h
         Sources/Types/Deduction/Internal/InstantiateTuple.h

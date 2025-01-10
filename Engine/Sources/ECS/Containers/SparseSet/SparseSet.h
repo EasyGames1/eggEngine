@@ -50,7 +50,7 @@ namespace egg::ECS::Containers
 
         SparseSet(const SparseSet&) = delete;
 
-        constexpr SparseSet(SparseSet&& Other) noexcept(std::is_nothrow_move_constructible_v<SparseContainer>) = default;
+        constexpr SparseSet(SparseSet&&) noexcept(std::is_nothrow_move_constructible_v<SparseContainer>) = default;
 
         constexpr SparseSet(SparseSet&& Other, const AllocatorType& Allocator) : Sparse { std::move(Other.Sparse), Allocator },
                                                                                  Packed { std::move(Other.Packed), Allocator }
