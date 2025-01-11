@@ -1,12 +1,12 @@
 #ifndef ENGINE_SOURCES_ECS_CONTAINERS_GROUP_INTERNAL_FILE_GROUP_ITERATOR_H
 #define ENGINE_SOURCES_ECS_CONTAINERS_GROUP_INTERNAL_FILE_GROUP_ITERATOR_H
 
-#include "./PoolTraits.h"
 
 #include <Containers/PointerImitator.h>
 #include <ECS/Ownership.h>
-#include <ECS/Containers/Lifecycle.h>
+#include <ECS/Containers/Lifecycle/Lifecycle.h>
 #include <ECS/Containers/Storage/Storage.h>
+#include <ECS/Containers/Traits/PoolTraits.h>
 #include <Types/Capabilities/Capabilities.h>
 
 #include <cstddef>

@@ -3,7 +3,7 @@
 
 #include <ECS/Ownership.h>
 #include <ECS/Containers/Container.h>
-#include <ECS/Containers/Lifecycle.h>
+#include <ECS/Containers/Lifecycle/Lifecycle.h>
 #include <ECS/Containers/Storage/Storage.h>
 #include <Events/ConnectionArgument.h>
 #include <Types/Capabilities/Capabilities.h>

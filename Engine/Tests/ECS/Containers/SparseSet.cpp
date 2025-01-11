@@ -1,7 +1,7 @@
 #include "../../Single.h"
 
 #include <ECS/Containers/SparseSet/SparseSet.h>
-#include <Events/Delegate.h>
+#include <Events/Delegate/Delegate.h>
 #include <gtest/gtest.h>
 #include <Types/TypeInfo/TypeInfo.h>
 

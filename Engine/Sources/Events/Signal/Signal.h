@@ -1,9 +1,9 @@
 #ifndef ENGINE_SOURCES_EVENTS_FILE_SIGNAL_H
 #define ENGINE_SOURCES_EVENTS_FILE_SIGNAL_H
 
-#include <Events/Action.h>
 #include <Events/ConnectionArgument.h>
-#include <Events/Delegate.h>
+#include <Events/Delegate/Action.h>
+#include <Events/Delegate/Delegate.h>
 
 #include <memory>
 #include <vector>

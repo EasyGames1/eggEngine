@@ -17,15 +17,15 @@
 
 namespace egg::ECS::Containers
 {
-    template <ValidEntity Type, Types::ValidAllocator<Type> AllocatorParameter = std::allocator<Type>>
+    template <ValidEntity EntityParameter, Types::ValidAllocator<EntityParameter> AllocatorParameter = std::allocator<EntityParameter>>
     class SparseSet
     {
         using ContainerAllocatorTraits = AllocatorTraits<AllocatorParameter>;
 
-        using SparseContainer = PagedVector<Type, AllocatorParameter>;
-        using PackedContainer = std::vector<Type, AllocatorParameter>;
+        using SparseContainer = PagedVector<EntityParameter, AllocatorParameter>;
+        using PackedContainer = std::vector<EntityParameter, AllocatorParameter>;
 
-        using TraitsType = EntityTraits<Type>;
+        using TraitsType = EntityTraits<EntityParameter>;
 
         using Reference = typename PackedContainer::reference;
 

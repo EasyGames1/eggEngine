@@ -40,7 +40,7 @@ add_library(VulkanEngine_lib
         Sources/Containers/PointerImitator.h
         Sources/Types/TypeInfo/TypeInfo.h
         Sources/Hash/Hash.h
-        Sources/Events/Delegate.h
+        Sources/Events/Delegate/Delegate.h
         Sources/Events/Traits/FunctionPointerTraits.h
         Sources/Types/TypeInfo/Internal/FunctionNameUtils.h
         Sources/Types/TypeInfo/Internal/TypeNameUtils.h
@@ -52,14 +52,14 @@ add_library(VulkanEngine_lib
         Sources/ECS/Containers/SparseSet/Internal/SparseSetIterator.h
         Sources/ECS/Containers/Storage/Internal/StorageIterator.h
         Sources/Containers/PagedVector/Internal/PagedVectorIterator.h
-        Sources/Events/Signal.h
-        Sources/Events/Action.h
+        Sources/Events/Signal/Signal.h
+        Sources/Events/Delegate/Action.h
         Sources/Math/Traits/Capabilities.h
         Sources/Events/Traits/Internal/FunctionPointerTraits.h
         Sources/Events/Traits/FunctionTraits.h
-        Sources/Events/Sink.h
-        Sources/Events/EventLoop.h
-        Sources/Events/EventLoopInterface.h
+        Sources/Events/Signal/Sink.h
+        Sources/Events/EventLoop/EventLoop.h
+        Sources/Events/EventLoop/EventLoopInterface.h
         Sources/Events/Dispatcher.h
         Sources/Memory/Constants.h
         Sources/Memory/Deleter.h
@@ -69,7 +69,7 @@ add_library(VulkanEngine_lib
         Sources/Hash/Literals.h
         Sources/Types/Types.h
         Sources/ECS/Registry.h
-        Sources/ECS/Containers/Lifecycle.h
+        Sources/ECS/Containers/Lifecycle/Lifecycle.h
         Sources/Types/Capabilities/Internal/IsInstanceOf.h
         Sources/Types/Capabilities/Internal/IsAnyOf.h
         Sources/ECS/Containers/PoolGroup/PoolGroup.h
@@ -98,7 +98,8 @@ add_library(VulkanEngine_lib
         Sources/ECS/Containers/Group/Group.h
         Sources/Types/Deduction/Internal/CommonTypeOf.h
         Sources/Types/Deduction/Internal/TupleSize.h
-        Sources/ECS/Containers/Group/Internal/PoolTraits.h
+        Sources/ECS/Containers/Traits/PoolTraits.h
+        Sources/ECS/Containers/PoolGroup/PoolGroupInterface.h
 )
 
 target_include_directories(VulkanEngine_lib PRIVATE Sources)

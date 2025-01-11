@@ -8,9 +8,9 @@
 
 namespace egg::Hash::Literals
 {
-    [[nodiscard]] constexpr Types::HashType operator""_hs(const char* String, const std::size_t Size) noexcept
+    [[nodiscard]] constexpr Types::IDType operator""_hs(const char* String, const std::size_t Size) noexcept
     {
-        return Hash::Hash<Types::HashType>(std::span { String, Size });
+        return Hash::Hash<Types::IDType>(std::span { String, Size });
     }
 }
 

@@ -1,9 +1,9 @@
 #ifndef ENGINE_SOURCES_EVENTS_FILE_EVENT_LOOP_H
 #define ENGINE_SOURCES_EVENTS_FILE_EVENT_LOOP_H
 
-#include <Events/EventLoopInterface.h>
-#include <Events/Signal.h>
-#include <Events/Sink.h>
+#include <Events/EventLoop/EventLoopInterface.h>
+#include <Events/Signal/Signal.h>
+#include <Events/Signal/Sink.h>
 #include <Types/Capabilities/Capabilities.h>
 
 #include <concepts>

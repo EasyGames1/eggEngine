@@ -2,13 +2,13 @@
 #define ENGINE_SOURCES_ECS_CONTAINERS_GROUP_FILE_GROUP_H
 
 #include "./Internal/GroupIterator.h"
-#include "./Internal/PoolTraits.h"
 
 #include <ECS/Entity.h>
 #include <ECS/Ownership.h>
 #include <ECS/Containers/Container.h>
-#include <ECS/Containers/Lifecycle.h>
-#include <ECS/Containers/PoolGroup/PoolGroup.h>
+#include <ECS/Containers/Lifecycle/Lifecycle.h>
+#include "ECS/Containers/PoolGroup/PoolGroup.h"
+#include <ECS/Containers/Traits/PoolTraits.h>
 #include <Types/Capabilities/Capabilities.h>
 #include <Types/Deduction/Deduction.h>
 
@@ -32,7 +32,7 @@ namespace egg::ECS::Containers
     class Group<OwnType<OwnParameters...>, ViewType<ViewParameters...>, ExcludeType<ExcludeParameters...>,
                 EntityParameter, AllocatorParameter>
     {
-        using TraitsType = Internal::PoolTraits<EntityParameter, AllocatorParameter>;
+        using TraitsType = PoolTraits<EntityParameter, AllocatorParameter>;
 
         template <typename ElementType>
         using PoolFor = typename TraitsType::template LifecycleStorageFor<ElementType>;

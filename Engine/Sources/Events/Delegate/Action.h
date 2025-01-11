@@ -3,7 +3,7 @@
 
 #include <Config/Config.h>
 #include <Containers/CompressedPair/CompressedPair.h>
-#include <Events/Delegate.h>
+#include <Events/Delegate/Delegate.h>
 
 #include <tuple>
 

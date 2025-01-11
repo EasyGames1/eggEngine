@@ -3,8 +3,8 @@
 
 #include <ECS/Containers/SparseSet/SparseSet.h>
 #include <ECS/Containers/Storage/Storage.h>
-#include <Events/Signal.h>
-#include <Events/Sink.h>
+#include <Events/Signal/Signal.h>
+#include <Events/Signal/Sink.h>
 #include <Types/Capabilities/Capabilities.h>
 
 #include <iterator>

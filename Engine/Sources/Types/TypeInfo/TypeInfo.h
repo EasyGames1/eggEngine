@@ -35,7 +35,7 @@ namespace egg::Types
             }
         }
 
-        template <typename Group = void, std::unsigned_integral SizeType = TypeID>
+        template <typename Group = void, std::unsigned_integral SizeType = IDType>
         [[nodiscard]] static constexpr SizeType GetID() noexcept
         {
             if constexpr (constexpr std::string_view Name { GetName() }; Name.empty())

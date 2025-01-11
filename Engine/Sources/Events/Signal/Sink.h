@@ -1,7 +1,7 @@
 #ifndef ENGINE_SOURCES_EVENTS_FILE_SINK_H
 #define ENGINE_SOURCES_EVENTS_FILE_SINK_H
 
-#include <Events/Signal.h>
+#include <Events/Signal/Signal.h>
 
 namespace egg::Events
 {

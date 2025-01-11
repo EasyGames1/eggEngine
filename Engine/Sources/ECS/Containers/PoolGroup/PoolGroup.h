@@ -4,7 +4,8 @@
 #include "./Internal/PoolGroupViewer.h"
 
 #include <ECS/Ownership.h>
-#include <ECS/Containers/Lifecycle.h>
+#include <ECS/Containers/Lifecycle/Lifecycle.h>
+#include <ECS/Containers/PoolGroup/PoolGroupInterface.h>
 #include <Types/Capabilities/Capabilities.h>
 
 #include <algorithm>
@@ -35,7 +36,8 @@ namespace egg::ECS::Containers
                        typename ViewParameters::BaseType...,
                        typename ExcludeParameters::BaseType...> &&
         (sizeof...(OwnParameters) + sizeof...(ViewParameters) != 0u)
-    class PoolGroup<OwnType<OwnParameters...>, ViewType<ViewParameters...>, ExcludeType<ExcludeParameters...>>
+    class PoolGroup<OwnType<OwnParameters...>, ViewType<ViewParameters...>, ExcludeType<ExcludeParameters...>> final
+        : public PoolGroupInterface
     {
         using ViewerType = Internal::PoolGroupViewer<
             OwnType<OwnParameters...>,
@@ -77,7 +79,7 @@ namespace egg::ECS::Containers
 
         constexpr PoolGroup(PoolGroup&&) noexcept = default;
 
-        constexpr ~PoolGroup() noexcept = default;
+        constexpr ~PoolGroup() noexcept override = default;
 
         PoolGroup& operator=(const PoolGroup&) = delete;
 
@@ -130,12 +132,12 @@ namespace egg::ECS::Containers
             return GetLeading().Contains(Entity) && GetLeading().GetIndex(Entity) < Size;
         }
 
-        [[nodiscard]] constexpr std::size_t GetSize() const noexcept
+        [[nodiscard]] constexpr std::size_t GetSize() const noexcept override
         {
             return Size;
         }
 
-        [[nodiscard]] constexpr bool Empty() const noexcept
+        [[nodiscard]] constexpr bool Empty() const noexcept override
         {
             return !Size;
         }
@@ -248,7 +250,8 @@ namespace egg::ECS::Containers
         Types::AllUnique<typename ViewParameters::ElementType..., typename ExcludeParameters::ElementType...> &&
         Types::AllSame<typename ViewParameters::BaseType..., typename ExcludeParameters::BaseType...> &&
         (sizeof...(ViewParameters) != 0u)
-    class PoolGroup<OwnType<>, ViewType<ViewParameters...>, ExcludeType<ExcludeParameters...>>
+    class PoolGroup<OwnType<>, ViewType<ViewParameters...>, ExcludeType<ExcludeParameters...>> final
+        : public PoolGroupInterface
     {
         using ViewerType = Internal::PoolGroupViewer<OwnType<>, ViewType<ViewParameters...>, ExcludeType<ExcludeParameters...>>;
 
@@ -285,7 +288,7 @@ namespace egg::ECS::Containers
 
         constexpr PoolGroup(PoolGroup&&) noexcept(std::is_nothrow_move_constructible_v<CommonType>) = default;
 
-        constexpr ~PoolGroup() noexcept = default;
+        constexpr ~PoolGroup() noexcept override = default;
 
         PoolGroup& operator=(const PoolGroup&) = delete;
 
@@ -330,12 +333,12 @@ namespace egg::ECS::Containers
             return Container.Contains(Entity);
         }
 
-        [[nodiscard]] constexpr std::size_t GetSize() const noexcept
+        [[nodiscard]] constexpr std::size_t GetSize() const noexcept override
         {
             return Container.GetSize();
         }
 
-        [[nodiscard]] constexpr bool Empty() const noexcept
+        [[nodiscard]] constexpr bool Empty() const noexcept override
         {
             return Container.Empty();
         }

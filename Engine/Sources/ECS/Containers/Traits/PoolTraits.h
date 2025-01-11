@@ -2,7 +2,7 @@
 #define ENGINE_SOURCES_ECS_CONTAINERS_GROUP_INTERNAL_FILE_POOL_TRAITS_H
 
 #include <ECS/Entity.h>
-#include <ECS/Containers/Lifecycle.h>
+#include <ECS/Containers/Lifecycle/Lifecycle.h>
 #include <ECS/Containers/SparseSet/SparseSet.h>
 #include <ECS/Containers/Storage/Storage.h>
 #include <Types/Capabilities/Capabilities.h>
@@ -11,7 +11,7 @@
 #include <tuple>
 #include <type_traits>
 
-namespace egg::ECS::Containers::Internal
+namespace egg::ECS::Containers
 {
     template <ValidEntity EntityParameter, Types::ValidAllocator<EntityParameter> AllocatorParameter = std::allocator<EntityParameter>>
     class PoolTraits
@@ -22,7 +22,7 @@ namespace egg::ECS::Containers::Internal
         using EntityType = EntityParameter;
         using AllocatorType = AllocatorParameter;
 
-        using Sparse = SparseSet<EntityType, AllocatorType>;
+        using SparseSetType = SparseSet<EntityType, AllocatorType>;
 
         template <typename ElementType>
         using StorageFor = Storage<

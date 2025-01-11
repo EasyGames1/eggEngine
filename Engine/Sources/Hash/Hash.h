@@ -5,6 +5,7 @@
 #include <Hash/Traits/Murmur2Traits.h>
 #include <Memory/Constants.h>
 #include <Memory/Utils.h>
+#include <Types/Capabilities/Capabilities.h>
 
 #include <concepts>
 #include <cstdint>
