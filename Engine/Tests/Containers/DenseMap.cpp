@@ -34,13 +34,13 @@ TEST_F(DenseMapTest, Insert)
 {
     for (std::size_t i = 0u; i < IterationsCount; ++i)
     {
-        auto [It, IsInserted] { DenseMap.Insert({ i, GetEntityAt(i) }) };
+        auto [It, IsInserted] { DenseMap.Insert(std::pair { i, GetEntityAt(i) }) };
         EXPECT_FALSE(IsInserted);
     }
 
     for (std::size_t i = IterationsCount; i < IterationsCount * 2u; ++i)
     {
-        auto [It, IsInserted] { DenseMap.Insert({ i, GetEntityAt(i) }) };
+        auto [It, IsInserted] { DenseMap.Insert(std::pair { i, GetEntityAt(i) }) };
         ASSERT_TRUE(IsInserted);
         EXPECT_EQ(It, DenseMap.Find(i));
         EXPECT_EQ(It->first, i);

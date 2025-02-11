@@ -18,7 +18,7 @@ namespace egg::Events
     {
         using LoopAllocatorTraits = std::allocator_traits<AllocatorParameter>;
 
-        using CallbackSignature = void(Type&);
+        using CallbackSignature = void(const Type&);
         using SignalType = Signal<CallbackSignature, typename LoopAllocatorTraits::template rebind_alloc<Delegate<CallbackSignature>>>;
 
         using ContainerType = std::vector<Type, AllocatorParameter>;

@@ -88,7 +88,7 @@ namespace egg::ECS::Containers
         constexpr Storage(Storage&& Other, const AllocatorType& Allocator) : BaseType { std::move(Other), Allocator },
                                                                              Payload { std::move(Other.Payload), Allocator }
         {
-            EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || Payload.GetAllocator() == Other.Payload.GetAllocator(),
+            EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || GetElementAllocator() == Other.GetElementAllocator(),
                        "Cannot move storage because it has an incompatible allocator");
         }
 
@@ -102,7 +102,7 @@ namespace egg::ECS::Containers
         constexpr Storage& operator=(Storage&& Other)
             noexcept(std::is_nothrow_move_assignable_v<BaseType> && std::is_nothrow_move_assignable_v<ContainerType>)
         {
-            EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || Payload.GetAllocator() == Other.Payload.GetAllocator(),
+            EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || GetElementAllocator() == Other.GetElementAllocator(),
                        "Cannot move storage because it has an incompatible allocator");
             ShrinkToSize(0u);
             BaseType::operator=(std::move(Other));
@@ -144,9 +144,9 @@ namespace egg::ECS::Containers
             return ElementsBegin();
         }
 
-        template <typename EntityIteratorType, typename ContainerIteratorType>
-            requires (std::same_as<typename std::iterator_traits<ContainerIteratorType>::value_type, ElementType>)
-        constexpr Iterator Insert(EntityIteratorType First, EntityIteratorType Last, ContainerIteratorType From)
+        template <typename EntityIteratorType, std::sentinel_for<EntityIteratorType> SentinelType, typename ContainerIteratorType>
+            requires (std::same_as<std::iter_value_t<ContainerIteratorType>, ElementType>)
+        constexpr Iterator Insert(EntityIteratorType First, SentinelType Last, ContainerIteratorType From)
         {
             for (; First != Last; ++First, ++From)
             {
@@ -160,13 +160,13 @@ namespace egg::ECS::Containers
         constexpr ElementType& Patch(const EntityType Entity, CallableTypes&&... Callables)
         {
             auto& Element { Payload.GetReference(BaseType::GetIndex(Entity)) };
-            (std::forward<CallableTypes>(Callables)(Element), ...);
+            (std::invoke(std::forward<CallableTypes>(Callables), Element), ...);
             return Element;
         }
 
         constexpr void Clear() override
         {
-            AllocatorType Allocator { Payload.GetAllocator() };
+            AllocatorType Allocator { GetElementAllocator() };
 
             for (auto First = BaseType::Begin(), Last = BaseType::End(); First != Last; ++First)
             {
@@ -389,6 +389,11 @@ namespace egg::ECS::Containers
             return Payload.GetExtent();
         }
 
+        [[nodiscard]] constexpr AllocatorType GetElementAllocator() const noexcept
+        {
+            return Payload.GetAllocator();
+        }
+
     protected:
         constexpr typename BaseType::Iterator TryEmplace(const EntityType Entity) override
         {
@@ -404,7 +409,7 @@ namespace egg::ECS::Containers
 
         constexpr void Pop(typename BaseType::Iterator First, typename BaseType::Iterator Last) override
         {
-            for (AllocatorType Allocator { Payload.GetAllocator() }; First != Last; ++First)
+            for (AllocatorType Allocator { GetElementAllocator() }; First != Last; ++First)
             {
                 auto& Element { Payload.GetReference(BaseType::GetIndex(*First)) };
                 auto& Other { Payload.GetReference(BaseType::GetSize() - 1u) };
@@ -422,7 +427,7 @@ namespace egg::ECS::Containers
 
             try
             {
-                std::uninitialized_construct_using_allocator(std::addressof(Payload.Assure(It.GetIndex())), Payload.GetAllocator(),
+                std::uninitialized_construct_using_allocator(std::addressof(Payload.Assure(It.GetIndex())), GetElementAllocator(),
                                                              std::forward<Args>(Arguments)...);
             }
             catch (...)

@@ -55,7 +55,7 @@ namespace egg::ECS::Containers
         constexpr SparseSet(SparseSet&& Other, const AllocatorType& Allocator) : Sparse { std::move(Other.Sparse), Allocator },
                                                                                  Packed { std::move(Other.Packed), Allocator }
         {
-            EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || Packed.get_allocator() == Other.Packed.get_allocator(),
+            EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || GetAllocator() == Other.GetAllocator(),
                        "Cannot move sparse set because it has an incompatible allocator");
         }
 
@@ -65,7 +65,7 @@ namespace egg::ECS::Containers
 
         constexpr SparseSet& operator=(SparseSet&& Other) noexcept(std::is_nothrow_move_assignable_v<SparseContainer>)
         {
-            EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || Packed.get_allocator() == Other.Packed.get_allocator(),
+            EGG_ASSERT(ContainerAllocatorTraits::is_always_equal::value || GetAllocator() == Other.GetAllocator(),
                        "Cannot move sparse set because it has an incompatible allocator");
             Sparse = std::move(Other.Sparse);
             Packed = std::move(Other.Packed);
@@ -85,19 +85,6 @@ namespace egg::ECS::Containers
             return TryEmplace(Entity);
         }
 
-        template <typename IteratorType, std::sentinel_for<IteratorType> SentinelType>
-        constexpr Iterator Push(IteratorType First, SentinelType Last)
-        {
-            auto Current { End() };
-
-            for (; First != Last; ++First)
-            {
-                Current = TryEmplace(*First);
-            }
-
-            return Current;
-        }
-
         constexpr VersionType UpdateVersion(const EntityType Entity)
         {
             EGG_ASSERT(Entity != TraitsType::Tombstone, "Invalid entity");
@@ -114,10 +101,10 @@ namespace egg::ECS::Containers
             Pop(It, It + 1);
         }
 
-        template <typename It>
-        constexpr void Erase(It First, It Last)
+        template <typename IteratorType, std::sentinel_for<IteratorType> SentinelType>
+        constexpr void Erase(IteratorType First, SentinelType Last)
         {
-            if constexpr (std::same_as<It, Iterator>)
+            if constexpr (std::same_as<IteratorType, Iterator>)
             {
                 Pop(First, Last);
             }
@@ -146,12 +133,12 @@ namespace egg::ECS::Containers
             return Exists;
         }
 
-        template <typename It>
-        constexpr std::size_t Remove(It First, It Last)
+        template <typename IteratorType, std::sentinel_for<IteratorType> SentinelType>
+        constexpr std::size_t Remove(IteratorType First, SentinelType Last)
         {
             std::size_t Count {};
 
-            if constexpr (std::same_as<It, Iterator>)
+            if constexpr (std::same_as<IteratorType, Iterator>)
             {
                 while (First != Last)
                 {
@@ -397,6 +384,11 @@ namespace egg::ECS::Containers
             return ReverseEnd();
         }
 
+        [[nodiscard]] constexpr AllocatorType GetAllocator() const noexcept
+        {
+            return Packed.get_allocator();
+        }
+
     protected:
         constexpr virtual void UpdateToPacked(
             const std::size_t CurrentIndex,
@@ -430,7 +422,7 @@ namespace egg::ECS::Containers
 
         constexpr void Erase(Iterator It)
         {
-            EGG_ASSERT(Contains(*It), "Sparse does not contain entity to remove");
+            EGG_ASSERT(Contains(*It), "Sparse set does not contain entity to remove");
             auto& Index { GetReference(*It) };
             const auto EntityIndex { TraitsType::ToEntity(Index) };
 

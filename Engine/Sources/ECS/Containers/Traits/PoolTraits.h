@@ -24,6 +24,8 @@ namespace egg::ECS::Containers
 
         using SparseSetType = SparseSet<EntityType, AllocatorType>;
 
+        using LifecycleSparseSetType = Lifecycle<SparseSetType>;
+
         template <typename ElementType>
         using StorageFor = Storage<
             std::remove_const_t<ElementType>,

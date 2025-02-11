@@ -26,7 +26,7 @@ namespace egg::Events
         using ContainerType = Containers::DenseMap<KeyType, MappedType, std::identity, std::equal_to<>, ContainerAllocator>;
 
         template <Types::Decayed Type>
-        using EventLoopType = EventLoop<Type, typename DispatcherAllocatorTraits::template rebind_alloc<Type>>;
+        using EventLoopFor = EventLoop<Type, typename DispatcherAllocatorTraits::template rebind_alloc<Type>>;
 
         using EventLoopsType = Containers::CompressedPair<ContainerType, AllocatorParameter>;
 
@@ -34,7 +34,7 @@ namespace egg::Events
         using AllocatorType = AllocatorParameter;
 
         template <Types::Decayed EventType>
-        using SinkType = typename EventLoopType<EventType>::SinkType;
+        using SinkFor = typename EventLoopFor<EventType>::SinkType;
 
 
         constexpr Dispatcher() : Dispatcher { AllocatorType {} }
@@ -72,57 +72,66 @@ namespace egg::Events
             swap(Left.EventLoops, Right.EventLoops);
         }
 
-        template <typename Type>
-        [[nodiscard]] constexpr SinkType<std::decay_t<Type>> GetSink(
-            const Types::IDType Identifier = Types::TypeInfo<Type>::template GetID<Dispatcher>()
+        template <Types::Decayed EventType>
+        [[nodiscard]] constexpr SinkFor<EventType> GetSink(
+            const Types::IDType Identifier = Types::TypeInfo<EventType>::template GetID<Dispatcher>()
         )
         {
-            return Assure<std::decay_t<Type>>(Identifier).GetSink();
+            return Assure<EventType>(Identifier).GetSink();
         }
 
-        template <typename Type, typename... Args>
+        template <Types::Decayed EventType, typename... Args>
         constexpr void Enqueue(Args&&... Arguments)
         {
-            EnqueueWith<std::decay_t<Type>>(Types::TypeInfo<Type>::template GetID<Dispatcher>(), std::forward<Args>(Arguments)...);
+            EnqueueWith<EventType>(
+                Types::TypeInfo<EventType>::template GetID<Dispatcher>(),
+                std::forward<Args>(Arguments)...
+            );
         }
 
-        template <typename Type>
-        constexpr void Enqueue(Type&& Event)
+        template <typename EventType>
+        constexpr void Enqueue(EventType&& Event)
         {
-            EnqueueWith(Types::TypeInfo<std::decay_t<Type>>::template GetID<Dispatcher>(), std::forward<Type>(Event));
+            EnqueueWith(
+                Types::TypeInfo<std::decay_t<EventType>>::template GetID<Dispatcher>(),
+                std::forward<EventType>(Event)
+            );
         }
 
-        template <Types::Decayed Type, typename... Args>
+        template <Types::Decayed EventType, typename... Args>
         constexpr void EnqueueWith(const Types::IDType Identifier, Args&&... Arguments)
         {
-            Assure<Type>(Identifier).Enqueue(std::forward<Args>(Arguments)...);
+            Assure<EventType>(Identifier).Enqueue(std::forward<Args>(Arguments)...);
         }
 
-        template <typename Type>
-        constexpr void EnqueueWith(const Types::IDType Identifier, Type&& Event)
+        template <typename EventType>
+        constexpr void EnqueueWith(const Types::IDType Identifier, EventType&& Event)
         {
-            Assure<std::decay_t<Type>>(Identifier).Enqueue(std::forward<Type>(Event));
+            Assure<std::decay_t<EventType>>(Identifier).Enqueue(std::forward<EventType>(Event));
         }
 
-        template <typename Type>
-        constexpr void Trigger(Type&& Event = {}) const
+        template <typename EventType>
+        constexpr void Trigger(EventType&& Event = {}) const
         {
-            Trigger(Types::TypeInfo<std::decay_t<Type>>::template GetID<Dispatcher>(), std::forward<Type>(Event));
+            Trigger(
+                Types::TypeInfo<std::decay_t<EventType>>::template GetID<Dispatcher>(),
+                std::forward<EventType>(Event)
+            );
         }
 
-        template <typename Type>
-        constexpr void Trigger(const Types::IDType Identifier, Type&& Event = {}) const
+        template <typename EventType>
+        constexpr void Trigger(const Types::IDType Identifier, EventType&& Event = {}) const
         {
-            if (const auto* Loop { Find<std::decay_t<Type>>(Identifier) })
+            if (const auto* Loop { Find<std::decay_t<EventType>>(Identifier) })
             {
-                Loop->Trigger(std::forward<Type>(Event));
+                Loop->Trigger(std::forward<EventType>(Event));
             }
         }
 
-        template <typename Type>
-        constexpr void Update(const Types::IDType Identifier = Types::TypeInfo<Type>::template GetID<Dispatcher>())
+        template <Types::Decayed EventType>
+        constexpr void Update(const Types::IDType Identifier = Types::TypeInfo<EventType>::template GetID<Dispatcher>())
         {
-            if (const auto* Loop { Find<std::decay_t<Type>>(Identifier) })
+            if (const auto* Loop { Find<EventType>(Identifier) })
             {
                 Loop->Publish();
             }
@@ -136,10 +145,10 @@ namespace egg::Events
             }
         }
 
-        template <typename Type>
-        constexpr void Clear(const Types::IDType Identifier = Types::TypeInfo<Type>::template GetID<Dispatcher>())
+        template <Types::Decayed EventType>
+        constexpr void Clear(const Types::IDType Identifier = Types::TypeInfo<EventType>::template GetID<Dispatcher>())
         {
-            if (const auto* Loop { Find<std::decay_t<Type>>(Identifier) })
+            if (const auto* Loop { Find<EventType>(Identifier) })
             {
                 Loop->Clear();
             }
@@ -153,12 +162,12 @@ namespace egg::Events
             }
         }
 
-        template <typename Type>
+        template <Types::Decayed EventType>
         [[nodiscard]] constexpr std::size_t GetSize(
-            const Types::IDType Identifier = Types::TypeInfo<Type>::template GetID<Dispatcher>()
+            const Types::IDType Identifier = Types::TypeInfo<EventType>::template GetID<Dispatcher>()
         ) const noexcept
         {
-            if (const auto* Loop { Find<std::decay_t<Type>>(Identifier) })
+            if (const auto* Loop { Find<EventType>(Identifier) })
             {
                 return Loop->GetSize();
             }
@@ -183,27 +192,28 @@ namespace egg::Events
         }
 
     private:
-        template <Types::Decayed Type>
-        [[nodiscard]] constexpr EventLoopType<Type>& Assure(const Types::IDType Identifier)
+        template <Types::Decayed EventType>
+        [[nodiscard]] constexpr EventLoopFor<EventType>& Assure(const Types::IDType Identifier)
         {
             auto&& Pointer { EventLoops.GetFirst()[Identifier] };
 
             if (!Pointer)
             {
                 const auto& Allocator { GetAllocator() };
-                Pointer = std::allocate_shared<EventLoopType<Type>>(Allocator, Allocator);
+                Pointer = std::allocate_shared<EventLoopFor<EventType>>(Allocator, Allocator);
             }
 
-            return static_cast<EventLoopType<Type>&>(*Pointer);
+            return static_cast<EventLoopFor<EventType>&>(*Pointer);
         }
 
-        template <Types::Decayed Type>
-        [[nodiscard]] constexpr const EventLoopType<Type>* Find(const Types::IDType Identifier) const
+        template <Types::Decayed EventType>
+        [[nodiscard]] constexpr const EventLoopFor<EventType>* Find(const Types::IDType Identifier) const
         {
-            if (auto It { EventLoops.GetFirst().Find(Identifier) }; It != EventLoops.GetFirst().ConstEnd())
+            if (const auto It { EventLoops.GetFirst().Find(Identifier) }; It != EventLoops.GetFirst().End())
             {
-                return static_cast<const EventLoopType<Type>*>(It->second.get());
+                return static_cast<const EventLoopFor<EventType>*>(It->second.get());
             }
+
             return nullptr;
         }
 

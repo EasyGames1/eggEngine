@@ -8,7 +8,7 @@
 
 namespace egg::ECS
 {
-    template <typename Type>
+    template <ValidEntity Type>
     class EntityTraits : BasicEntityTraits<Type>
     {
         using BaseType = BasicEntityTraits<Type>;
@@ -81,15 +81,15 @@ namespace egg::ECS
             }
         }
 
-        [[nodiscard]] static constexpr ValueType Combine(const EntityType Left, const IntegralType Right) noexcept
+        [[nodiscard]] static constexpr ValueType Combine(const EntityType EntityPart, const IntegralType VersionPart) noexcept
         {
             if constexpr (!VersionMask)
             {
-                return ValueType { Left & EntityMask };
+                return ValueType { EntityPart & EntityMask };
             }
             else
             {
-                return ValueType { Left & EntityMask | Right & VersionMask << Length };
+                return ValueType { EntityPart & EntityMask | VersionPart & VersionMask << Length };
             }
         }
 

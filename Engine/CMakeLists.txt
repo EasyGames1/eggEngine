@@ -100,6 +100,7 @@ add_library(VulkanEngine_lib
         Sources/Types/Deduction/Internal/TupleSize.h
         Sources/ECS/Containers/Traits/PoolTraits.h
         Sources/ECS/Containers/PoolGroup/PoolGroupInterface.h
+        Sources/ECS/Recycler.h
 )
 
 target_include_directories(VulkanEngine_lib PRIVATE Sources)

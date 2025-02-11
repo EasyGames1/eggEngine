@@ -23,7 +23,7 @@ namespace egg::Events
         using Signature = typename DelegateType::Signature;
 
 
-        template <std::convertible_to<Args>...Other>
+        template <typename... Other> requires std::constructible_from<ArgumentsTuple, Other&&...>
         constexpr explicit Action(Other&&... Arguments) noexcept (std::is_nothrow_constructible_v<ArgumentsTuple, Other&&...>)
             : Callable {
                 std::piecewise_construct,
@@ -33,7 +33,7 @@ namespace egg::Events
         {
         }
 
-        template <std::convertible_to<Args>...Other>
+        template <typename... Other> requires std::constructible_from<ArgumentsTuple, Other&&...>
         constexpr explicit Action(DelegateType Callable, Other&&... Arguments)
             noexcept (std::is_nothrow_constructible_v<ArgumentsTuple, Other&&...>)
             : Callable {
@@ -64,7 +64,8 @@ namespace egg::Events
         Containers::CompressedPair<DelegateType, ArgumentsTuple> Callable;
     };
 
-    template <typename ReturnType, typename... Args, std::convertible_to<Args>...Other>
+    template <typename ReturnType, typename... Args, typename... Other>
+        requires (std::constructible_from<Args, Other&&> && ...)
     Action(Delegate<ReturnType(Args...)>, Other&&...) -> Action<ReturnType(Args...)>;
 }
 

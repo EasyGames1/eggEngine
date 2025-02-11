@@ -7,12 +7,13 @@
 #include <ECS/Ownership.h>
 #include <ECS/Containers/Container.h>
 #include <ECS/Containers/Lifecycle/Lifecycle.h>
-#include "ECS/Containers/PoolGroup/PoolGroup.h"
+#include <ECS/Containers/PoolGroup/PoolGroup.h>
 #include <ECS/Containers/Traits/PoolTraits.h>
 #include <Types/Capabilities/Capabilities.h>
 #include <Types/Deduction/Deduction.h>
 
 #include <concepts>
+#include <functional>
 
 namespace egg::ECS::Containers
 {
@@ -134,7 +135,7 @@ namespace egg::ECS::Containers
                 {
                     std::apply([&Callable]<typename... ElementTypes>(EntityType, ElementTypes&&... Elements) constexpr
                     {
-                        Callable(std::forward<ElementTypes>(Elements)...);
+                        std::invoke(Callable, std::forward<ElementTypes>(Elements)...);
                     }, Arguments);
                 }
             }
@@ -199,7 +200,7 @@ namespace egg::ECS::Containers
             return Iterator { Pools.SortAs(std::move(First), std::move(Last)), Pools.GetPools() };
         }
 
-        constexpr void ShrinkToFit() requires (sizeof...(OwnParameters) == 0u)
+        constexpr void ShrinkToFit() const requires (sizeof...(OwnParameters) == 0u)
         {
             Pools.ShrinkToFit();
         }
@@ -220,7 +221,7 @@ namespace egg::ECS::Containers
     class Group<OwnType<OwnParameters...>, ViewType<ViewParameters...>, ExcludeType<>,
                 EntityParameter, AllocatorParameter>
     {
-        using TraitsType = Internal::PoolTraits<EntityParameter, AllocatorParameter>;
+        using TraitsType = PoolTraits<EntityParameter, AllocatorParameter>;
         using CommonType = CommonTypeOf<OwnParameters..., ViewParameters...>;
 
         template <typename Const, typename NonConst>
@@ -374,7 +375,7 @@ namespace egg::ECS::Containers
             return ToIterator(Pool.SortAs(std::move(First), std::move(Last)));
         }
 
-        constexpr void ShrinkToFit() requires (sizeof...(OwnParameters) == 1u)
+        constexpr void ShrinkToFit() const requires (sizeof...(OwnParameters) == 1u)
         {
             GetPool().ShrinkToFit();
         }
@@ -422,7 +423,7 @@ namespace egg::ECS::Containers
     class Group<OwnType<OwnParameters...>, ViewType<ViewParameters...>, ExcludeType<>,
                 EntityParameter, AllocatorParameter>
     {
-        using TraitsType = Internal::PoolTraits<EntityParameter, AllocatorParameter>;
+        using TraitsType = PoolTraits<EntityParameter, AllocatorParameter>;
         using CommonType = CommonTypeOf<OwnParameters..., ViewParameters...>;
 
         template <typename Const, typename NonConst>
@@ -511,7 +512,7 @@ namespace egg::ECS::Containers
             return Pool.SortAs(std::move(First), std::move(Last));
         }
 
-        constexpr void ShrinkToFit() requires (sizeof...(OwnParameters) == 1u)
+        constexpr void ShrinkToFit() const requires (sizeof...(OwnParameters) == 1u)
         {
             GetPool().ShrinkToFit();
         }

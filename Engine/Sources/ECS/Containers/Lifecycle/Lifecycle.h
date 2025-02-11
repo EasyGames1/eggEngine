@@ -141,6 +141,7 @@ namespace egg::ECS::Containers
         SignalType Destruction;
     };
 
+
     template <Types::InstanceOf<Storage> ContainerParameter>
         requires (!OptimizableElement<typename ContainerParameter::ElementType, typename ContainerParameter::EntityType>)
     class Lifecycle<ContainerParameter> final

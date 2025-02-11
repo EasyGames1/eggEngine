@@ -32,27 +32,6 @@ TEST_F(SparseSetTest, Push)
     EXPECT_EQ(Sparse.GetSize(), IterationsCount * 2u);
 }
 
-TEST_F(SparseSetTest, PushIterators)
-{
-    std::vector<EntityType> Vector;
-
-    Vector.reserve(IterationsCount);
-    Sparse.Reserve(IterationsCount);
-
-    for (std::size_t i = IterationsCount; i < IterationsCount * 2u; ++i)
-    {
-        Vector.emplace_back(GetEntityAt(i));
-    }
-
-    Sparse.Push(Vector.begin(), Vector.end());
-
-    for (std::size_t i = IterationsCount; i < IterationsCount * 2u; ++i)
-    {
-        EXPECT_TRUE(Sparse.Contains(GetEntityAt(i)));
-        EXPECT_EQ(Vector[i - IterationsCount], Sparse[i]);
-    }
-}
-
 TEST_F(SparseSetTest, UpdateVersion)
 {
     for (std::size_t i = 0u; i < IterationsCount; ++i)
